@@ -1,0 +1,10 @@
+services:
+  dep_application:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dep_local
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
