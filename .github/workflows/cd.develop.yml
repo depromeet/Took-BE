@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'feat/2-infra-setup'
+      - 'develop'
 
 jobs:
   build:
