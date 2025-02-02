@@ -16,6 +16,6 @@ public enum CommonErrorCode implements ErrorCode {
 
     @Override
     public ErrorResponse getResponse() {
-        return new ErrorResponse(message);
+        return new ErrorResponse(name(), message);
     }
 }
