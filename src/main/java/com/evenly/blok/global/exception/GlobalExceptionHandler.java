@@ -17,9 +17,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handle(Exception ex) {
-        ErrorResponse response = new ErrorResponse("서버 관리자에게 문의하세요.");
+        ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
+        // TODO: 로그 추가
         return ResponseEntity
-                .internalServerError()
-                .body(response);
+                .status(errorCode.getStatus())
+                .body(errorCode.getResponse());
     }
 }
