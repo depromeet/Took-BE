@@ -36,6 +36,7 @@ public class WebSecurityConfig {
 
 		http.authorizeHttpRequests(authorize -> authorize
 			.requestMatchers("/public/**").permitAll()
+			.requestMatchers("/api/health").permitAll()
 			.anyRequest().authenticated());
 
 		return http.build();
