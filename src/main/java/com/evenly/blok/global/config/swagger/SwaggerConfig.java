@@ -39,23 +39,9 @@ public class SwaggerConfig {
 			.info(swaggerInfo());
 	}
 
-	@Bean
-	public ModelResolver modelResolver(ObjectMapper objectMapper) {
-		return new ModelResolver(objectMapper);
-	}
-
 	private List<Server> swaggerServers() {
 		Server server = new Server().url(getServerUrl()).description(API_DESCRIPTION);
 		return List.of(server);
-	}
-
-	private String getServerUrl() {
-		return switch (springEnvironmentUtil.getCurrentProfile()) {
-			// TODO: prod, dev 연결
-			// case "prod" -> UrlConstants.PROD_SERVER_URL.getValue();
-			// case "dev" -> UrlConstants.DEV_SERVER_URL.getValue();
-			default -> UrlConstants.LOCAL_SERVER_URL.getValue();
-		};
 	}
 
 	private Info swaggerInfo() {
@@ -68,5 +54,19 @@ public class SwaggerConfig {
 			.title(API_TITLE)
 			.description(API_DESCRIPTION)
 			.license(license);
+	}
+
+	@Bean
+	public ModelResolver modelResolver(ObjectMapper objectMapper) {
+		return new ModelResolver(objectMapper);
+	}
+
+	private String getServerUrl() {
+		return switch (springEnvironmentUtil.getCurrentProfile()) {
+			// TODO: prod, dev 연결
+			// case "prod" -> UrlConstants.PROD_SERVER_URL.getValue();
+			// case "dev" -> UrlConstants.DEV_SERVER_URL.getValue();
+			default -> UrlConstants.LOCAL_SERVER_URL.getValue();
+		};
 	}
 }
