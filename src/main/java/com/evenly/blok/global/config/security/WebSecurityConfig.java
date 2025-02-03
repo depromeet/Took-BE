@@ -41,6 +41,15 @@ public class WebSecurityConfig {
 		return http.build();
 	}
 
+	private void defaultFilterChain(HttpSecurity http) throws Exception {
+		http.httpBasic(AbstractHttpConfigurer::disable)
+			.formLogin(AbstractHttpConfigurer::disable)
+			.cors(withDefaults())
+			.csrf(AbstractHttpConfigurer::disable)
+			.sessionManagement(
+				session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+	}
+
 	// TODO: 임시 cors 설정
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
@@ -53,15 +62,6 @@ public class WebSecurityConfig {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
-	}
-
-	private void defaultFilterChain(HttpSecurity http) throws Exception {
-		http.httpBasic(AbstractHttpConfigurer::disable)
-			.formLogin(AbstractHttpConfigurer::disable)
-			.cors(withDefaults())
-			.csrf(AbstractHttpConfigurer::disable)
-			.sessionManagement(
-				session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 	}
 }
 
