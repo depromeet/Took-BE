@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 public enum EnvironmentConstants {
+
 	PROD(PROD_ENV),
 	DEV(DEV_ENV),
 	LOCAL(LOCAL_ENV);
@@ -20,6 +21,7 @@ public enum EnvironmentConstants {
 
 	@NoArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class Constants {
+
 		public static final String PROD_ENV = "prod";
 		public static final String DEV_ENV = "dev";
 		public static final String LOCAL_ENV = "local";

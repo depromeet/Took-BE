@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum UrlConstants {
+
 	LOCAL_SERVER_URL("http://localhost:8080"),
 	;
 
