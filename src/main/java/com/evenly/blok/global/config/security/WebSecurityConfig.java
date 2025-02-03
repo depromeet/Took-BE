@@ -23,7 +23,7 @@ public class WebSecurityConfig {
 	public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
 		defaultFilterChain(http);
 
-		http.securityMatcher("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**")
+		http.securityMatcher("/swagger-ui/**", "/v3/api-docs/**")
 			.httpBasic(withDefaults())
 			.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
 
