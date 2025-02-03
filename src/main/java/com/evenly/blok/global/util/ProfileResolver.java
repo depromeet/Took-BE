@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class SpringEnvironmentUtil {
+public class ProfileResolver {
 
 	private final Environment environment;
 

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.evenly.blok.global.common.constants.UrlConstants;
-import com.evenly.blok.global.util.SpringEnvironmentUtil;
+import com.evenly.blok.global.util.ProfileResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.core.jackson.ModelResolver;
@@ -27,7 +27,7 @@ public class SwaggerConfig {
 	private static final String API_DESCRIPTION = "16th 2ven 서버 API 문서입니다.";
 	private static final String GITHUB_URL = "https://github.com/depromeet/16th-team2-BE";
 
-	private final SpringEnvironmentUtil springEnvironmentUtil;
+	private final ProfileResolver profileResolver;
 
 	@Value("${swagger.version}")
 	private String version;
@@ -62,7 +62,7 @@ public class SwaggerConfig {
 	}
 
 	private String getServerUrl() {
-		return switch (springEnvironmentUtil.getCurrentProfile()) {
+		return switch (profileResolver.getCurrentProfile()) {
 			// TODO: prod, dev 연결
 			// case "prod" -> UrlConstants.PROD_SERVER_URL.getValue();
 			// case "dev" -> UrlConstants.DEV_SERVER_URL.getValue();
