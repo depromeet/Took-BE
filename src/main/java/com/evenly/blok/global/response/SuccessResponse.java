@@ -21,4 +21,8 @@ public class SuccessResponse {
     public static SuccessResponse of(Object data) {
         return new SuccessResponse(DEFAULT_HTTP_STATUS, DEFAULT_MESSAGE, LocalDateTime.now(), data);
     }
+
+    public static SuccessResponse of(HttpStatus status, Object data) {
+        return new SuccessResponse(status, DEFAULT_MESSAGE, LocalDateTime.now(), data);
+    }
 }

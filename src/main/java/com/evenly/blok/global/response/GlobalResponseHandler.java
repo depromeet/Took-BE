@@ -28,13 +28,10 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
 
         if (body instanceof ErrorResponse errorResponse) {
             response.setStatusCode(errorResponse.getStatus());
-            return errorResponse;
         }
-        if (body instanceof String) {
-            return body;
+        if (body instanceof SuccessResponse successResponse) {
+            response.setStatusCode(successResponse.getStatus());
         }
-        SuccessResponse successResponse = SuccessResponse.of(body);
-        response.setStatusCode(successResponse.getStatus());
-        return successResponse;
+        return body;
     }
 }
