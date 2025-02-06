@@ -1,6 +1,6 @@
 package com.evenly.blok.global.util;
 
-import static com.evenly.blok.global.common.constants.EnvironmentConstants.Constants.*;
+import static com.evenly.blok.global.common.constants.EnvironmentConstants.*;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
