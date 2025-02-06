@@ -24,11 +24,11 @@ public class ValidationErrorResponse extends ErrorResponse {
         return new ValidationErrorResponse(errorCode, fieldErrorDetails);
     }
 
-    public record FieldErrorDetail(String field,
-                                   String message,
-                                   Object value) {
+    private record FieldErrorDetail(String field,
+                                    String message,
+                                    Object value) {
 
-        public FieldErrorDetail(FieldError fieldError) {
+        private FieldErrorDetail(FieldError fieldError) {
             this(fieldError.getField(), fieldError.getDefaultMessage(), fieldError.getRejectedValue());
         }
     }

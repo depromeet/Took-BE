@@ -1,6 +1,7 @@
 package com.evenly.blok.global.exception;
 
 import com.evenly.blok.global.exception.dto.ErrorResponse;
+import com.evenly.blok.global.exception.dto.ServerErrorResponse;
 import com.evenly.blok.global.exception.dto.ValidationErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,6 @@ public class GlobalExceptionHandler {
         // TODO: 로그 추가
         ex.printStackTrace();
         ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
-        return ErrorResponse.of(errorCode);
+        return ServerErrorResponse.of(errorCode, ex);
     }
 }
