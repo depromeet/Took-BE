@@ -6,6 +6,7 @@ import com.evenly.blok.global.exception.dto.ValidationErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -17,8 +18,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
+    public ErrorResponse handle(NoResourceFoundException ex) {
+        ErrorCode errorCode = CommonErrorCode.INVALID_REQUEST_URL;
+        return ErrorResponse.of(errorCode);
+    }
+
+    @ExceptionHandler
     public ErrorResponse handle(MethodArgumentNotValidException ex) {
-        ErrorCode errorCode = CommonErrorCode.INVALID_REQUEST;
+        ErrorCode errorCode = CommonErrorCode.INVALID_REQUEST_VALUE;
         return ValidationErrorResponse.of(errorCode, ex);
     }
 
