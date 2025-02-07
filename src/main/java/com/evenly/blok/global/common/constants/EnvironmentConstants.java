@@ -11,5 +11,6 @@ public class EnvironmentConstants {
 	public static final String PROD_ENV = "prod";
 	public static final String DEV_ENV = "dev";
 	public static final String LOCAL_ENV = "local";
+	public static final String TEST_ENV = "test";
 	public static final List<String> PROD_AND_DEV_ENV = List.of(PROD_ENV, DEV_ENV);
 }
