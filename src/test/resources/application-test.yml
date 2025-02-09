@@ -11,11 +11,6 @@ spring:
         format_sql: true
         highlight_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
-  datasource:
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:mysql:8.0.26:///testdb
-    username: test
-    password: test
 
 logging:
   level:
