@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.evenly.blok.global.integration.IntegrationTest;
+import com.evenly.blok.global.controller.ControllerTest;
 
-class HealthControllerTest extends IntegrationTest {
+class HealthControllerTest extends ControllerTest {
 
 	@Test
-	void Health_Check_통합테스트_성공() throws Exception {
+	void Health_Check_Controller_테스트_성공() throws Exception {
 
 		// given, when
 		ResultActions resultActions = requestHealthCheck();
