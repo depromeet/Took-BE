@@ -31,7 +31,7 @@ public class SwaggerConfig {
 
 	private final ProfileResolver profileResolver;
 
-	@Value("${swagger.version}")
+	@Value("${swagger.version:0.0.1}")
 	private String version;
 
 	@Bean
