@@ -70,3 +70,5 @@ bin/
 ### Application Properties ###
 src/main/resources/application.yml
 
+# SSH Tunneling
+*.pem
