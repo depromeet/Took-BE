@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import com.evenly.blok.global.config.ssh.SshTunnelingInitializer;
@@ -24,7 +23,6 @@ public class SshDataSourceConfig {
 	private final DataSourceProperties properties;
 
 	@Bean
-	@Primary
 	public DataSource dataSource() {
 		Integer forwardedPort = initializer.buildSshConnection();
 		String url = properties.getUrl().replace("[forwardedPort]", forwardedPort.toString());

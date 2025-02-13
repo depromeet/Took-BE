@@ -11,21 +11,19 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
 import jakarta.annotation.PreDestroy;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Profile("local")
 @Component
 @Validated
-@Setter
 public class SshTunnelingInitializer {
 
 	@Value("${ssh.host}")
-	private String remoteJumpHost;
+	private String sshHost;
 
 	@Value("${ssh.user}")
-	private String user;
+	private String sshUser;
 
 	@Value("${ssh.port}")
 	private int sshPort;
@@ -42,7 +40,7 @@ public class SshTunnelingInitializer {
 	private Session session;
 
 	@PreDestroy
-	public void closeSSH() {
+	public void closeSsh() {
 		if (session.isConnected())
 			session.disconnect();
 	}
@@ -58,7 +56,7 @@ public class SshTunnelingInitializer {
 			log.info("creating ssh session");
 			jSch.addIdentity(privateKey);  // 개인키 설정
 
-			session = jSch.getSession(user, remoteJumpHost, sshPort);  // 터널링 세션 설정
+			session = jSch.getSession(sshUser, sshHost, sshPort);  // 터널링 세션 설정
 
 			Properties config = new Properties();
 			config.put("StrictHostKeyChecking", "no");
@@ -72,7 +70,7 @@ public class SshTunnelingInitializer {
 
 			log.info("success connecting ssh connection ");
 
-			// 로컬의 남는 포트 하나와 원격 접속한 인스턴스의 db포트 연결
+			// 로컬의 남는 포트 하나와 원격 접속한 인스턴스의 DB 포트 연결
 			log.info("start forwarding");
 			forwardedPort = session.setPortForwardingL(0, databaseHost, databasePort);
 
@@ -81,7 +79,7 @@ public class SshTunnelingInitializer {
 
 		} catch (Exception e) {
 			log.error("SSH tunneling failed with exception", e);
-			this.closeSSH();
+			this.closeSsh();
 			System.exit(1);
 		}
 
