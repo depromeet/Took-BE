@@ -37,7 +37,6 @@ springdoc:
     operations-sorter: alpha
     syntax-highlight:
       theme: none
-    urls-primary-name: 16th
 
 # SSH Tunnel Configuration
 ssh:
