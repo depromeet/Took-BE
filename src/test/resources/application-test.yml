@@ -1,6 +1,6 @@
 spring:
   application:
-    name: took
+    name: blok
   jpa:
     open-in-view: false
     hibernate:
