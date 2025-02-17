@@ -1,4 +1,4 @@
-package com.evenly.blok.global.config.datasource;
+package com.evenly.took.global.config.datasource;
 
 import javax.sql.DataSource;
 
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import com.evenly.blok.global.config.ssh.SshTunnelingInitializer;
+import com.evenly.took.global.config.ssh.SshTunnelingInitializer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

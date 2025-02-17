@@ -1,4 +1,4 @@
-package com.evenly.blok.global.config.ssh;
+package com.evenly.took.global.config.ssh;
 
 import java.util.Properties;
 
