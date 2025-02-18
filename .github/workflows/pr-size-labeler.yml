@@ -15,8 +15,12 @@ jobs:
         id: count
         run: |
           git fetch origin ${{ github.base_ref }}
-          CHANGED_LINES=$(git diff --stat origin/${{ github.base_ref }} | tail -n 1 | cut -d' ' -f4)
+          # Get the PR's head commit
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr-branch
+          # Calculate total changes in PR
+          CHANGED_LINES=$(git diff --stat origin/${{ github.base_ref }}..pr-branch | tail -n 1 | cut -d' ' -f4)
           echo "changed_lines=$CHANGED_LINES" >> $GITHUB_OUTPUT
+
 
       - name: Add size label
         uses: actions/github-script@v7
