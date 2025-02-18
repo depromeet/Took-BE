@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/oauth")
-public class OAuthController {
+public class OAuthController implements OAuthApi {
 
 	private final OAuthService oauthService;
 
