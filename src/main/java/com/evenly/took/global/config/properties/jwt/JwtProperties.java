@@ -1,4 +1,4 @@
-package com.evenly.took.global.config.jwt;
+package com.evenly.took.global.config.properties.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
