@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.evenly.took.global.common.constants.UrlConstants;
-import com.evenly.took.global.util.ProfileResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.core.jackson.ModelResolver;
@@ -28,10 +26,11 @@ public class SwaggerConfig {
 	private static final String API_DESCRIPTION = "took 서버 API 문서입니다.";
 	private static final String GITHUB_URL = "https://github.com/depromeet/Took-BE";
 
-	private final ProfileResolver profileResolver;
-
 	@Value("${swagger.version:0.0.1}")
 	private String version;
+
+	@Value("${swagger.server-url:http://localhost:8080}")
+	private String serverUrl;
 
 	@Bean
 	public OpenAPI openAPI() {
@@ -42,7 +41,7 @@ public class SwaggerConfig {
 	}
 
 	private List<Server> swaggerServers() {
-		Server server = new Server().url(getServerUrl()).description(API_DESCRIPTION);
+		Server server = new Server().url(serverUrl).description(API_DESCRIPTION);
 		return List.of(server);
 	}
 
@@ -71,14 +70,5 @@ public class SwaggerConfig {
 	@Bean
 	public ModelResolver modelResolver(ObjectMapper objectMapper) {
 		return new ModelResolver(objectMapper);
-	}
-
-	private String getServerUrl() {
-		return switch (profileResolver.getCurrentProfile()) {
-			// TODO: prod, dev 연결
-			// case "prod" -> UrlConstants.PROD_SERVER_URL.getValue();
-			// case "dev" -> UrlConstants.DEV_SERVER_URL.getValue();
-			default -> UrlConstants.LOCAL_SERVER_URL.getValue();
-		};
 	}
 }

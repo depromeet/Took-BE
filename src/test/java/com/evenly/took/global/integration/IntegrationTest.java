@@ -1,7 +1,5 @@
 package com.evenly.took.global.integration;
 
-import static com.evenly.took.global.common.constants.EnvironmentConstants.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +17,7 @@ import io.restassured.RestAssured;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
 @Transactional
-@ActiveProfiles(TEST_ENV)
+@ActiveProfiles("test")
 @Disabled
 public abstract class IntegrationTest {
 
