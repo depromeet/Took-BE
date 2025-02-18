@@ -1,7 +1,5 @@
 package com.evenly.took.global.controller;
 
-import static com.evenly.took.global.common.constants.EnvironmentConstants.*;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
 @Transactional
-@ActiveProfiles(TEST_ENV)
+@ActiveProfiles("test")
 @Disabled
 public abstract class ControllerTest {
 
