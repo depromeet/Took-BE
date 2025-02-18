@@ -9,7 +9,7 @@ import java.util.Date;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.domain.user.domain.User;
-import com.evenly.took.global.config.jwt.JwtProperties;
+import com.evenly.took.global.config.properties.jwt.JwtProperties;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
