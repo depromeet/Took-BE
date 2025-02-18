@@ -47,3 +47,7 @@ ssh:
   port: ${SSH_PORT}
   db-host: ${DB_HOST}
   db-port: ${DB_PORT}
+
+jwt:
+  access-token-secret: ${JWT_ACCESS_TOKEN_SECRET:secret}
+  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME:7200}

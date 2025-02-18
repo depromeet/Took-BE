@@ -37,3 +37,7 @@ springdoc:
     operations-sorter: alpha
     syntax-highlight:
       theme: none
+
+jwt:
+  access-token-secret: ${JWT_ACCESS_TOKEN_SECRET}
+  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME}
