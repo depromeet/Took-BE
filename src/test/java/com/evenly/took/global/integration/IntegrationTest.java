@@ -2,8 +2,8 @@ package com.evenly.took.global.integration;
 
 import static com.evenly.took.global.common.constants.EnvironmentConstants.*;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +20,7 @@ import io.restassured.RestAssured;
 @ExtendWith(SpringExtension.class)
 @Transactional
 @ActiveProfiles(TEST_ENV)
-@Ignore
+@Disabled
 public abstract class IntegrationTest {
 
 	@LocalServerPort
