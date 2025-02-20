@@ -15,20 +15,35 @@ jobs:
         id: count
         run: |
           git fetch origin ${{ github.base_ref }}
-          # Get the PR's head commit
           git fetch origin pull/${{ github.event.pull_request.number }}/head:pr-branch
-          # Calculate total changes in PR
-          CHANGED_LINES=$(git diff --stat origin/${{ github.base_ref }}..pr-branch | tail -n 1 | cut -d' ' -f4)
+          # Calculate total changes from base to latest PR head
+          CHANGED_LINES=$(git diff --numstat origin/${{ github.base_ref }}..pr-branch | awk '{sum += $1 + $2} END {print sum}')
           echo "changed_lines=$CHANGED_LINES" >> $GITHUB_OUTPUT
 
-
-      - name: Add size label
+      - name: Update size label
         uses: actions/github-script@v7
         with:
           script: |
             const changedLines = parseInt(process.env.CHANGED_LINES);
-            let sizeLabel = '';
             
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+
+            for (const label of currentLabels) {
+              if (label.name.startsWith('size/')) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  name: label.name
+                });
+              }
+            }
+            
+            let sizeLabel = '';
             if (changedLines >= 1000) {
               sizeLabel = 'size/XXL';
             } else if (changedLines >= 500) {
@@ -42,7 +57,7 @@ jobs:
             } else {
               sizeLabel = 'size/XS';
             }
-            
+
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
