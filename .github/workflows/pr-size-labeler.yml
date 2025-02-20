@@ -65,4 +65,4 @@ jobs:
               labels: [sizeLabel]
             });
         env:
-          CHANGED_LINES: ${{ steps.count.outputs.changed_lines }}ㄴ
+          CHANGED_LINES: ${{ steps.count.outputs.changed_lines }}
