@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: 'ko' # 한국어 리뷰
+early_access: false # 베타 기능 비활성화
+reviews:
+  poem: false # 유머/시적 리뷰 비활성화
+  suggested_reviewers: false # 리뷰어 추천 비활성화
+  suggested_labels: false # 라벨 추천 비활성화
+  collapse_walkthrough: true # 코드 개요는 기본적으로 접힘
+  auto_review:
+    enabled: true # 자동 리뷰 활성화
+    base_branches: # 아래 브랜치명에 대한 리뷰 활성화 (Default 브랜치: develop 은 항상 활성화)
+      - 'feat/.*'
+      - 'fix/.*'
+      - 'chore/.*'
+      - 'deploy/.*'
+      - 'refac/.*'
+      - 'test/.*'
+chat:
+  auto_reply: true # 질문에 자동 응답 활성화
