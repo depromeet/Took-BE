@@ -74,6 +74,7 @@ public class JwtTokenProvider {
 	}
 
 	private Key getSigningKey() {
-		return Keys.hmacShaKeyFor(jwtProperties.accessTokenSecret().getBytes(StandardCharsets.UTF_8));
+		String accessTokenSecret = jwtProperties.accessTokenSecret();
+		return Keys.hmacShaKeyFor(accessTokenSecret.getBytes(StandardCharsets.UTF_8));
 	}
 }
