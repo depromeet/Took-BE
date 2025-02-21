@@ -39,9 +39,6 @@ public class User extends BaseTimeEntity {
 	@NotNull
 	private String name;
 
-	@Column(name = "user_profile_image")
-	private String profileImage;
-
 	@Builder
 	public User(OAuthId oauthId, String name) {
 		this.oauthId = oauthId;

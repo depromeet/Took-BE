@@ -13,14 +13,13 @@ public class TestUserFactory {
 			.oauthId("google-oauth-id")
 			.oauthType(OAuthType.GOOGLE)
 			.build();
-		return createMockUser("testUser", oAuthId, "testProfile");
+		return createMockUser("testUser", oAuthId);
 	}
 
-	public static User createMockUser(String name, OAuthId oauthId, String profileImage) {
+	public static User createMockUser(String name, OAuthId oauthId) {
 		User mcokUser = User.builder()
 			.oauthId(oauthId)
 			.name(name)
-			.profileImage(profileImage)
 			.build();
 		ReflectionTestUtils.setField(mcokUser, "id", 1L);
 		return mcokUser;
