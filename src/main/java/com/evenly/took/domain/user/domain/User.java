@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,16 +35,16 @@ public class User extends BaseTimeEntity {
 	@Embedded
 	private OAuthId oauthId;
 
-	@Column(name = "user_name")
+	@Column(name = "name")
+	@NotNull
 	private String name;
 
 	@Column(name = "user_profile_image")
 	private String profileImage;
 
 	@Builder
-	public User(OAuthId oauthId, String name, String profileImage) {
+	public User(OAuthId oauthId, String name) {
 		this.oauthId = oauthId;
 		this.name = name;
-		this.profileImage = profileImage;
 	}
 }
