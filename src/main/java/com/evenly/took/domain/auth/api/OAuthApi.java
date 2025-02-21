@@ -38,7 +38,7 @@ public interface OAuthApi {
 	@ApiResponse(responseCode = "200", description = "로그인 성공",
 		content = @Content(schema = @Schema(implementation = SuccessResponse.class)))
 	@GetMapping("/login/{oauthType}")
-	SuccessResponse login(
+	void login(
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType,
 		@Parameter(description = "소셜 서버로부터 전달받은 인가 코드", required = true)

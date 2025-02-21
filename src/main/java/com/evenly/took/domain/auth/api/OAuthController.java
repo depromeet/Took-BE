@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.evenly.took.domain.auth.application.OAuthService;
 import com.evenly.took.domain.auth.domain.OAuthType;
-import com.evenly.took.domain.auth.dto.response.JwtResponse;
-import com.evenly.took.global.response.SuccessResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +29,7 @@ public class OAuthController implements OAuthApi {
 	}
 
 	@GetMapping("/login/{oauthType}")
-	public SuccessResponse login(@PathVariable OAuthType oauthType, @RequestParam String code) {
-		JwtResponse jwtResponse = oauthService.loginAndGenerateToken(oauthType, code);
-		return SuccessResponse.of(jwtResponse.accessToken());
+	public void login(@PathVariable OAuthType oauthType, @RequestParam String code) {
+		oauthService.loginAndGenerateToken(oauthType, code);
 	}
 }
