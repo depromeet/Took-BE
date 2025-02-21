@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.evenly.took.domain.user.domain.User;
 import com.evenly.took.global.config.properties.jwt.JwtProperties;
+import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.service.MockTest;
 
 class JwtTokenProviderTest extends MockTest {
@@ -45,7 +46,18 @@ class JwtTokenProviderTest extends MockTest {
 
 		// then
 		assertThat(token).isNotNull();
-		assertThat(jwtTokenProvider.validateToken(token)).isTrue();
+		assertThatNoException()
+			.isThrownBy(() -> jwtTokenProvider.validateToken(token));
 		assertThat(userId).isEqualTo("1");
+	}
+
+	@Test
+	void validateToken_유효하지_않은_토큰() {
+		// given
+		String invalidToken = "invalidToken";
+
+		// when & then (예외 발생 검증)
+		assertThatThrownBy(() -> jwtTokenProvider.validateToken(invalidToken))
+			.isInstanceOf(TookException.class);
 	}
 }
