@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.evenly.took.domain.auth.jwt.JwtTokenProvider;
+import com.evenly.took.global.exception.TookException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,23 +25,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-		FilterChain filterChain) throws ServletException, IOException {
-		String token = resolveToken(request);
-		if (token != null && jwtTokenProvider.validateToken(token)) {
-			// TODO: JWT 검증 성공 시 후속 처리를 진행 (현재는 헤더에 AUTHORIZATION 으로 넣음)
-			response.setHeader(AUTHORIZATION, jwtTokenProvider.getUserId(token));
-		} else {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, JWT_UNAUTHORIZED.getMessage());
+		FilterChain filterChain)
+		throws ServletException, IOException {
+
+		try {
+			String token = resolveToken(request);
+
+			jwtTokenProvider.validateToken(token);
+
+			String userId = jwtTokenProvider.getUserId(token);
+			response.setHeader(AUTHORIZATION, userId);
+
+		} catch (TookException e) {
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
 			return;
 		}
+
 		filterChain.doFilter(request, response);
 	}
 
 	private String resolveToken(HttpServletRequest request) {
 		String bearerToken = request.getHeader(AUTHORIZATION);
-		if (bearerToken != null && bearerToken.startsWith(BEARER)) {
-			return bearerToken.substring(7);
+		if (bearerToken == null || !bearerToken.startsWith(BEARER)) {
+			throw new TookException(JWT_UNAUTHORIZED);
 		}
-		return null;
+		return bearerToken.substring(BEARER.length());
 	}
 }

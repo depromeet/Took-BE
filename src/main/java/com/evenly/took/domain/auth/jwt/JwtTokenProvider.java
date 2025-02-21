@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.evenly.took.domain.user.domain.User;
 import com.evenly.took.global.config.properties.jwt.JwtProperties;
+import com.evenly.took.global.exception.TookException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -49,17 +50,12 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
-	public boolean validateToken(String token) {
-		Key key = getSigningKey();
+	public void validateToken(String token) {
 		try {
-			Jwts.parserBuilder()
-				.setSigningKey(key)
-				.build()
-				.parseClaimsJws(token);
-			return true;
+			parseClaims(token);
 		} catch (JwtException | IllegalArgumentException e) {
-			log.error(JWT_UNAUTHORIZED.getMessage());
-			return false;
+			log.error(JWT_UNAUTHORIZED.getMessage(), e);
+			throw new TookException(JWT_UNAUTHORIZED);
 		}
 	}
 
@@ -73,8 +69,16 @@ public class JwtTokenProvider {
 			.getSubject();
 	}
 
+	private void parseClaims(String token) {
+		Key key = getSigningKey();
+		Jwts.parserBuilder()
+			.setSigningKey(key)
+			.build()
+			.parseClaimsJws(token);
+	}
+
 	private Key getSigningKey() {
-		String accessTokenSecret = jwtProperties.accessTokenSecret();
-		return Keys.hmacShaKeyFor(accessTokenSecret.getBytes(StandardCharsets.UTF_8));
+		String secret = jwtProperties.accessTokenSecret();
+		return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 	}
 }
