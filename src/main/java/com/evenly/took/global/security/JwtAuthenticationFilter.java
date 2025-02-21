@@ -32,10 +32,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String token = resolveToken(request);
 
 			jwtTokenProvider.validateToken(token);
-
-			String userId = jwtTokenProvider.getUserId(token);
-			response.setHeader(AUTHORIZATION, userId);
-
 		} catch (TookException e) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
 			return;
