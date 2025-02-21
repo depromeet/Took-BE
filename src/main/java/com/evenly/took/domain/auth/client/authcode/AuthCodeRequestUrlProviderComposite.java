@@ -19,8 +19,8 @@ public class AuthCodeRequestUrlProviderComposite {
 	private final Map<OAuthType, AuthCodeRequestUrlProvider> mapping;
 
 	public AuthCodeRequestUrlProviderComposite(Set<AuthCodeRequestUrlProvider> providers) {
-		mapping = providers.stream()
-			.collect(Collectors.toMap(AuthCodeRequestUrlProvider::supportType, Function.identity()));
+		this.mapping = providers.stream()
+			.collect(Collectors.toUnmodifiableMap(AuthCodeRequestUrlProvider::supportType, Function.identity()));
 	}
 
 	public String provide(OAuthType oauthType) {
