@@ -1,6 +1,6 @@
 package com.evenly.took.domain.user.domain;
 
-import com.evenly.took.domain.auth.domain.OAuthId;
+import com.evenly.took.domain.auth.domain.OAuthIdentifier;
 import com.evenly.took.domain.common.model.BaseTimeEntity;
 
 import jakarta.persistence.Column;
@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "users", uniqueConstraints = {
 	@UniqueConstraint(
-		name = "oauth_id_unique",
+		name = "oauth_identifier_unique",
 		columnNames = {"oauth_id", "oauth_type"}
 	)
 })
@@ -33,15 +33,15 @@ public class User extends BaseTimeEntity {
 	private Long id;
 
 	@Embedded
-	private OAuthId oauthId;
+	private OAuthIdentifier oauthIdentifier;
 
 	@Column(name = "name")
 	@NotNull
 	private String name;
 
 	@Builder
-	public User(OAuthId oauthId, String name) {
-		this.oauthId = oauthId;
+	public User(OAuthIdentifier oauthIdentifier, String name) {
+		this.oauthIdentifier = oauthIdentifier;
 		this.name = name;
 	}
 }

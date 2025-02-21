@@ -27,7 +27,7 @@ public class OAuthService {
 
 	public JwtResponse loginAndGenerateToken(OAuthType oauthType, String authCode) {
 		User user = userClientComposite.fetch(oauthType, authCode);
-		User savedUser = userRepository.findByOauthId(user.getOauthId())
+		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
 			.orElseGet(() -> userRepository.save(user));
 
 		String accessToken = jwtTokenProvider.generateAccessToken(savedUser);

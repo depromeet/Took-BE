@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OAuthId {
+public class OAuthIdentifier {
 
 	@Column(name = "oauth_id")
 	@NotNull
@@ -25,7 +25,7 @@ public class OAuthId {
 	private OAuthType oauthType;
 
 	@Builder
-	public OAuthId(String oauthId, OAuthType oauthType) {
+	public OAuthIdentifier(String oauthId, OAuthType oauthType) {
 		this.oauthId = oauthId;
 		this.oauthType = oauthType;
 	}

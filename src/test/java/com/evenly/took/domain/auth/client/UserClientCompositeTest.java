@@ -1,4 +1,4 @@
-package com.evenly.took.domain.auth.client.user;
+package com.evenly.took.domain.auth.client;
 
 import static com.evenly.took.global.domain.TestUserFactory.*;
 import static org.assertj.core.api.Assertions.*;
@@ -9,9 +9,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.evenly.took.domain.auth.client.UserClient;
-import com.evenly.took.domain.auth.client.UserClientComposite;
-import com.evenly.took.domain.auth.domain.OAuthId;
+import com.evenly.took.domain.auth.domain.OAuthIdentifier;
 import com.evenly.took.domain.auth.domain.OAuthType;
 import com.evenly.took.domain.user.domain.User;
 import com.evenly.took.global.exception.auth.oauth.OAuthTypeNotFoundException;
@@ -63,10 +61,13 @@ class UserClientCompositeTest extends MockTest {
 
 		@Override
 		public User fetch(String authCode) {
+			OAuthIdentifier oauthIdentifier = OAuthIdentifier.builder()
+				.oauthId("test")
+				.oauthType(OAuthType.GOOGLE)
+				.build();
 			return User.builder()
-				.oauthId(new OAuthId("test", OAuthType.GOOGLE))
+				.oauthIdentifier(oauthIdentifier)
 				.name(testUser.getName())
-				.profileImage("test.png")
 				.build();
 		}
 	}
