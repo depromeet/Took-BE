@@ -6,9 +6,9 @@ import com.evenly.took.global.exception.TookException;
 import lombok.Getter;
 
 @Getter
-public class OAuthTypeNotFoundException extends TookException {
+public class InvalidJwtTokenException extends TookException {
 
-	public OAuthTypeNotFoundException(ErrorCode errorCode) {
+	public InvalidJwtTokenException(final ErrorCode errorCode) {
 		super(errorCode);
 	}
 }

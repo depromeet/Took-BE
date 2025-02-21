@@ -10,9 +10,10 @@ import org.springframework.stereotype.Component;
 
 import com.evenly.took.domain.user.domain.User;
 import com.evenly.took.global.config.properties.jwt.JwtProperties;
-import com.evenly.took.global.exception.TookException;
+import com.evenly.took.global.exception.auth.oauth.InvalidJwtTokenException;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -55,23 +56,19 @@ public class JwtTokenProvider {
 			parseClaims(token);
 		} catch (JwtException | IllegalArgumentException e) {
 			log.error(JWT_UNAUTHORIZED.getMessage(), e);
-			throw new TookException(JWT_UNAUTHORIZED);
+			throw new InvalidJwtTokenException(JWT_UNAUTHORIZED);
 		}
 	}
 
 	public String getUserId(String token) {
-		Key key = getSigningKey();
-		return Jwts.parserBuilder()
-			.setSigningKey(key)
-			.build()
-			.parseClaimsJws(token)
+		return parseClaims(token)
 			.getBody()
 			.getSubject();
 	}
 
-	private void parseClaims(String token) {
+	private Jws<Claims> parseClaims(String token) {
 		Key key = getSigningKey();
-		Jwts.parserBuilder()
+		return Jwts.parserBuilder()
 			.setSigningKey(key)
 			.build()
 			.parseClaimsJws(token);
