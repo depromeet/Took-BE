@@ -20,12 +20,12 @@ class UserClientCompositeTest extends MockTest {
 	private static User testUser;
 
 	private UserClientComposite composite;
-	private final UserClient mockGoogleUserClient = new MockGoogleUserClient();
+	private final UserClient stubGoogleUserClient = new StubGoogleUserClient();
 
 	@BeforeEach
 	void setUp() {
 		testUser = createMockGoogleUser();
-		composite = new UserClientComposite(Set.of(mockGoogleUserClient));
+		composite = new UserClientComposite(Set.of(stubGoogleUserClient));
 	}
 
 	@Test
@@ -52,7 +52,7 @@ class UserClientCompositeTest extends MockTest {
 		assertThat(exception.getErrorCode()).isNotNull();
 	}
 
-	static class MockGoogleUserClient implements UserClient {
+	static class StubGoogleUserClient implements UserClient {
 
 		@Override
 		public OAuthType supportType() {
