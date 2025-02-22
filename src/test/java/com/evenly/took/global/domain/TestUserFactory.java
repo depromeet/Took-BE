@@ -2,9 +2,9 @@ package com.evenly.took.global.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.evenly.took.domain.auth.domain.OAuthIdentifier;
-import com.evenly.took.domain.auth.domain.OAuthType;
-import com.evenly.took.domain.user.domain.User;
+import com.evenly.took.feature.auth.domain.OAuthIdentifier;
+import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.user.domain.User;
 
 public class TestUserFactory {
 
