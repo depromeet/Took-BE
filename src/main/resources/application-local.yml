@@ -26,9 +26,9 @@ spring:
 
   data:
     redis:
-      host: redis
-      port: 6379
-      password: redis_pw
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
 swagger:
   version: 0.0.1
