@@ -1,4 +1,4 @@
-package com.evenly.took.global.config.cache;
+package com.evenly.took.global.config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +41,10 @@ public class RedisConfig {
 		RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
 		redisConfig.setHostName(host);
 		redisConfig.setPort(port);
-		redisConfig.setPassword(password);
+		// 비밀번호가 빈 문자열이 아닐 때만 설정
+		if (password != null && !password.isEmpty()) {
+			redisConfig.setPassword(password);
+		}
 
 		return new LettuceConnectionFactory(redisConfig);
 	}

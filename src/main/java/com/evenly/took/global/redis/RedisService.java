@@ -1,4 +1,4 @@
-package com.evenly.took.global.cache;
+package com.evenly.took.global.redis;
 
 import java.time.Duration;
 
