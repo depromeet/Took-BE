@@ -28,7 +28,7 @@ public class SshTunnelingInitializer {
 	@Value("${ssh.port}")
 	private int sshPort;
 
-	@Value("${ssh.private-key-path}")
+	@Value("${ssh.private-key}")
 	private String privateKey;
 
 	@Value("${ssh.db-host}")
@@ -54,7 +54,7 @@ public class SshTunnelingInitializer {
 			JSch jSch = new JSch();
 
 			log.info("creating ssh session");
-			jSch.addIdentity(privateKey);  // 개인키 설정
+			jSch.addIdentity("ssh_key", privateKey.getBytes(), null, null); // 개인키 설정
 
 			session = jSch.getSession(sshUser, sshHost, sshPort);  // 터널링 세션 설정
 

@@ -24,6 +24,12 @@ spring:
 
     open-in-view: false
 
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: redis_pw
+
 swagger:
   version: 0.0.1
   server-url: ${SERVER_URL}
@@ -43,7 +49,7 @@ springdoc:
 ssh:
   host: ${SSH_HOST}
   user: ${SSH_USER}
-  private-key-path: ${SSH_PRIVATE_KEY_PATH}
+  private-key: ${SSH_PRIVATE_KEY}
   port: ${SSH_PORT}
   db-host: ${DB_HOST}
   db-port: ${DB_PORT}

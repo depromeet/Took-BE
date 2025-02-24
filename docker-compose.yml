@@ -1,10 +1,32 @@
 services:
-  dep_application:
+  redis:
+    image: redis:latest
+    container_name: redis_local
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis_pw
+    volumes:
+      - redis_volume:/data
+    networks:
+      - redis_nw
+
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dep_local
+    container_name: took_local
     env_file:
       - .env
     ports:
       - "8080:8080"
+    depends_on:
+      - redis
+    networks:
+      - redis_nw
+
+volumes:
+  redis_volume:  # 볼륨 정의
+
+networks:
+  redis_nw: # 네트워크 정의
+    driver: bridge
