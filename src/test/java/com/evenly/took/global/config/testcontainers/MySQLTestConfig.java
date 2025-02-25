@@ -1,4 +1,4 @@
-package com.evenly.took.global.config;
+package com.evenly.took.global.config.testcontainers;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -7,8 +7,8 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-public class TestcontainersConfig {
-
+public class MySQLTestConfig {
+	
 	@Bean
 	@ServiceConnection
 	MySQLContainer<?> mysqlContainer() {
@@ -17,5 +17,4 @@ public class TestcontainersConfig {
 			.withUsername("test")
 			.withPassword("test");
 	}
-
 }

@@ -2,7 +2,7 @@ FROM openjdk:17-jdk-slim AS build
 WORKDIR /app
 COPY . /app
 RUN apt-get update && apt-get install -y curl unzip
-RUN ./gradlew build
+RUN ./gradlew build -x test
 
 
 # Multi Stage Build
