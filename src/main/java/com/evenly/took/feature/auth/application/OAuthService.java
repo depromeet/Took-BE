@@ -6,9 +6,10 @@ import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.user.dao.UserRepository;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.security.auth.JwtTokenProvider;
+import com.evenly.took.global.security.auth.UuidTokenProvider;
 import com.evenly.took.global.security.client.AuthCodeRequestUrlProviderComposite;
 import com.evenly.took.global.security.client.UserClientComposite;
-import com.evenly.took.global.security.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 

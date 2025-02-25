@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.application;
+package com.evenly.took.global.security.auth;
 
 import java.time.Duration;
 import java.util.UUID;

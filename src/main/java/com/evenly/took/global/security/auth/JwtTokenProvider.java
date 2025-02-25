@@ -1,4 +1,4 @@
-package com.evenly.took.global.security.jwt;
+package com.evenly.took.global.security.auth;
 
 import static com.evenly.took.global.exception.auth.jwt.AuthErrorCode.*;
 

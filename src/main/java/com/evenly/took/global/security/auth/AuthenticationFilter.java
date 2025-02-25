@@ -1,4 +1,4 @@
-package com.evenly.took.global.security.jwt;
+package com.evenly.took.global.security.auth;
 
 import java.io.IOException;
 import java.util.List;
@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.evenly.took.feature.auth.api.HeaderHandler;
-import com.evenly.took.feature.auth.application.UuidTokenProvider;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
 import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.exception.auth.oauth.InvalidAccessTokenException;
