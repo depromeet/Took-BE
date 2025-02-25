@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.evenly.took.feature.auth.application.OAuthService;
 import com.evenly.took.feature.auth.domain.OAuthType;
-import com.evenly.took.feature.auth.dto.response.JwtResponse;
+import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.global.response.SuccessResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,17 +20,20 @@ import lombok.RequiredArgsConstructor;
 public class OAuthController implements OAuthApi {
 
 	private final OAuthService oauthService;
+	private final HeaderProvider headerProvider;
 
 	@GetMapping("/api/oauth/{oauthType}")
-	public void redirectAuthRequestUrl(@PathVariable OAuthType oauthType, HttpServletResponse response) throws
-		IOException {
+	public void redirectAuthRequestUrl(
+		@PathVariable OAuthType oauthType, HttpServletResponse response) throws IOException {
 		String url = oauthService.getAuthCodeRequestUrl(oauthType);
 		response.sendRedirect(url);
 	}
 
 	@GetMapping("/api/oauth/login/{oauthType}")
-	public SuccessResponse login(@PathVariable OAuthType oauthType, @RequestParam String code) {
-		JwtResponse jwtResponse = oauthService.loginAndGenerateToken(oauthType, code);
-		return SuccessResponse.of(jwtResponse.accessToken());
+	public SuccessResponse login(
+		@PathVariable OAuthType oauthType, @RequestParam String code, HttpServletResponse response) {
+		AuthResponse authResponse = oauthService.loginAndGenerateToken(oauthType, code);
+		headerProvider.setAuthHeader(response, authResponse);
+		return SuccessResponse.of(authResponse.user());
 	}
 }
