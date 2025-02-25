@@ -9,6 +9,7 @@ import java.util.Date;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.global.config.properties.jwt.AuthProperties;
+import com.evenly.took.global.exception.auth.jwt.AuthErrorCode;
 import com.evenly.took.global.exception.auth.oauth.InvalidAccessTokenException;
 
 import io.jsonwebtoken.Claims;
@@ -59,9 +60,13 @@ public class JwtTokenProvider {
 	}
 
 	public String getUserId(String token) {
-		return parseClaims(token)
-			.getBody()
-			.getSubject();
+		try {
+			return parseClaims(token)
+				.getBody()
+				.getSubject();
+		} catch (JwtException ex) {
+			throw new InvalidAccessTokenException(AuthErrorCode.INVALID_ACCESS_TOKEN);
+		}
 	}
 
 	private Jws<Claims> parseClaims(String token) {

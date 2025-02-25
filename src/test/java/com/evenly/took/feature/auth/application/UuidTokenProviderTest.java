@@ -2,6 +2,7 @@ package com.evenly.took.feature.auth.application;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,8 +25,13 @@ class UuidTokenProviderTest extends MockTest { // TODO Import 상위로 추출
 	@Autowired
 	RedisService redisService;
 
+	@BeforeEach
+	void setUp() {
+		redisService.deleteAllKeys();
+	}
+
 	@Test
-	void 갱신_토큰을_생성한다() {
+	void 리프레쉬_토큰을_생성한다() {
 		// given
 		String userId = "1";
 
@@ -34,41 +40,37 @@ class UuidTokenProviderTest extends MockTest { // TODO Import 상위로 추출
 
 		// then
 		assertThat(refreshToken).isNotNull();
-		assertThat(redisService.getValue(userId)).isEqualTo(refreshToken);
+		assertThat(redisService.getValue(refreshToken)).isEqualTo(userId);
 	}
 
 	@Test
-	void 갱신_토큰_생성_후_만료시간에_의한_만료_여부를_확인한다() throws InterruptedException {
+	void 리프레쉬_토큰_생성_후_만료시간에_의한_만료_여부를_확인한다() throws InterruptedException {
 		// given
 		String userId = "1";
 
 		// when
-		uuidTokenProvider.generateRefreshToken(userId);
+		String refreshToken = uuidTokenProvider.generateRefreshToken(userId);
 
 		// then
-		assertThat(redisService.getValue(userId)).isNotNull();
-		Thread.sleep(1500);
-		assertThat(redisService.getValue(userId)).isNull();
+		assertThat(redisService.getValue(refreshToken)).isNotNull();
+		Thread.sleep(6000);
+		assertThat(redisService.getValue(refreshToken)).isNull();
 	}
 
 	@Test
-	void 갱신_토큰이_존재하지_않는_경우_예외를_반환한다() {
-		// given
-		String userId = "invalid";
-
-		// when & then
-		assertThatThrownBy(() -> uuidTokenProvider.validateToken(userId, "dummy"))
+	void 리프레쉬_토큰이_존재하지_않는_경우_예외를_반환한다() {
+		assertThatThrownBy(() -> uuidTokenProvider.getUserId("dummy"))
 			.isInstanceOf(InvalidRefreshTokenException.class);
 	}
 
 	@Test
-	void 갱신_토큰이_유효하지_않은_경우_예외를_반환한다() {
+	void 리프레쉬_토큰이_유효하지_않은_경우_예외를_반환한다() {
 		// given
 		String userId = "1";
 		String refreshToken = uuidTokenProvider.generateRefreshToken(userId);
 
 		// when & then
-		assertThatThrownBy(() -> uuidTokenProvider.validateToken(userId, refreshToken + "invalid"))
+		assertThatThrownBy(() -> uuidTokenProvider.getUserId(refreshToken + "invalid"))
 			.isInstanceOf(InvalidRefreshTokenException.class);
 	}
 }

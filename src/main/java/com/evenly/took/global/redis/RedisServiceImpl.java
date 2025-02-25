@@ -46,6 +46,12 @@ public class RedisServiceImpl implements RedisService {
 		});
 	}
 
+	public void deleteAllKeys() {
+		executeOperation(() -> {
+			redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
+		});
+	}
+
 	private boolean executeOperation(Runnable operation) {
 		try {
 			operation.run();

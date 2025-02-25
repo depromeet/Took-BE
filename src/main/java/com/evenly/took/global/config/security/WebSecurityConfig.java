@@ -14,6 +14,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -34,11 +36,16 @@ public class WebSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		defaultFilterChain(http);
 
-		http.authorizeHttpRequests(authorize -> authorize
-			.requestMatchers("/public/**").permitAll()
-			.requestMatchers("/api/health").permitAll()
-			.requestMatchers("/api/oauth").permitAll()
-			.anyRequest().authenticated());
+		http.exceptionHandling(exception -> exception
+				.authenticationEntryPoint((request, response, authException) -> {
+					response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+				})
+			) // TODO 예외 응답 형식 통일
+			.authorizeHttpRequests(authorize -> authorize
+				.requestMatchers("/public/**").permitAll()
+				.requestMatchers("/api/health").permitAll()
+				.requestMatchers("/api/**").permitAll()
+				.anyRequest().authenticated());
 
 		return http.build();
 	}

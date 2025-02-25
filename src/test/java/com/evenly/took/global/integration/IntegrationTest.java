@@ -1,24 +1,20 @@
 package com.evenly.took.global.integration;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.evenly.took.global.config.testcontainers.RedisTestConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.restassured.RestAssured;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ExtendWith(SpringExtension.class)
-@Transactional
 @ActiveProfiles("test")
-@Disabled
+@Import(RedisTestConfig.class)
 public abstract class IntegrationTest {
 
 	@LocalServerPort

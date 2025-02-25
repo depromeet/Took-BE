@@ -26,5 +26,5 @@ logging:
 
 auth:
   access-token-secret: dummy_access_token_secret_dummy_access_token_secret
-  access-token-expiration-time: 1
-  refresh-token-expiration-time: 1
+  access-token-expiration-time: 3600
+  refresh-token-expiration-time: 5

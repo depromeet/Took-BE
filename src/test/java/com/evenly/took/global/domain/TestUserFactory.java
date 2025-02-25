@@ -24,4 +24,15 @@ public class TestUserFactory {
 		ReflectionTestUtils.setField(mcokUser, "id", 1L);
 		return mcokUser;
 	}
+
+	public static User createMockUser(String name) {
+		OAuthIdentifier oauthIdentifier = OAuthIdentifier.builder()
+			.oauthId("oauth-id")
+			.oauthType(OAuthType.KAKAO)
+			.build();
+		return User.builder()
+			.oauthIdentifier(oauthIdentifier)
+			.name(name)
+			.build();
+	}
 }
