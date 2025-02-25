@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class AuthenticationFilter extends OncePerRequestFilter {
 
 	private static final List<String> EXCLUDE_PATHS = List.of(
 		"/public",
