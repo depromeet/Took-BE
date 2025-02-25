@@ -3,6 +3,7 @@ package com.evenly.took.global.redis;
 import java.time.Duration;
 
 public interface RedisService {
+
 	/**
 	 * Redis에 key-value를 저장합니다.
 	 *

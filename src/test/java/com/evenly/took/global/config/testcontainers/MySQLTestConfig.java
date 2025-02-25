@@ -8,6 +8,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
 public class MySQLTestConfig {
+	
 	@Bean
 	@ServiceConnection
 	MySQLContainer<?> mysqlContainer() {

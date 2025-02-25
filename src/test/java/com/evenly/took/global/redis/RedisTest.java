@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.Duration;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,8 +21,7 @@ class RedisTest {
 	private RedisService redisService;
 
 	@Test
-	@DisplayName("Redis 값을 저장 및 조회")
-	void setValue_getValue() {
+	void Redis_값을_저장_및_조회() {
 		// given
 		String key = "test_key";
 		String value = "test_value";
@@ -37,8 +35,7 @@ class RedisTest {
 	}
 
 	@Test
-	@DisplayName("TTL 설정 후, 만료되는지 확인")
-	void setValueWithTTL() throws InterruptedException {
+	void TTL_설정_후_만료되는지_확인() throws InterruptedException {
 		// given
 		String key = "test_ttl_key";
 		String value = "test_ttl_value";
@@ -57,8 +54,7 @@ class RedisTest {
 	}
 
 	@Test
-	@DisplayName("저장된 키를 삭제")
-	void deleteKey() {
+	void 저장된_키를_삭제() {
 		// given
 		String key = "test_delete_key";
 		String value = "test_delete_value";

@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Configuration
 public class RedisConfig {
+
 	@Value("${spring.data.redis.host}")
 	private String host;
 
