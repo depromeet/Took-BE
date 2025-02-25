@@ -12,12 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.user.dao.UserRepository;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.config.testcontainers.RedisTestConfig;
+import com.evenly.took.global.domain.TestUserFactory;
 import com.evenly.took.global.security.client.AuthCodeRequestUrlProviderComposite;
 import com.evenly.took.global.security.client.UserClientComposite;
 import com.evenly.took.global.security.jwt.JwtTokenProvider;
@@ -55,16 +55,9 @@ class OAuthServiceTest { // TODO 상위 클래스 추출
 	}
 
 	@Test
-	void name() {
+	void 로그인시_토큰과_사용자_정보를_반환한다() {
 		// given
-		OAuthIdentifier oauthIdentifier = OAuthIdentifier.builder()
-			.oauthId("oauth-id")
-			.oauthType(OAuthType.KAKAO)
-			.build();
-		User user = User.builder()
-			.oauthIdentifier(oauthIdentifier)
-			.name("took")
-			.build();
+		User user = TestUserFactory.createMockUser("took");
 		given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 			.willReturn(user);
 
