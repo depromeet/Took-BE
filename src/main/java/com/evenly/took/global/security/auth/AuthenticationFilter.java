@@ -22,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 public class AuthenticationFilter extends OncePerRequestFilter {
 
 	private static final List<String> EXCLUDE_PATHS = List.of(
+		"/swagger-ui",
+		"/v3/api-docs",
 		"/public",
 		"/api/health",
 		"/api/oauth/login");
