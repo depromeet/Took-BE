@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.evenly.took.feature.user.domain.User;
-import com.evenly.took.global.config.properties.jwt.JwtProperties;
+import com.evenly.took.global.config.properties.jwt.AuthProperties;
 import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.security.jwt.JwtTokenProvider;
 import com.evenly.took.global.service.MockTest;
@@ -24,8 +24,8 @@ class JwtTokenProviderTest extends MockTest {
 
 		String accessTokenSecret = "secretKey123secretKey123secretKey123";
 
-		JwtProperties jwtProperties = new JwtProperties(accessTokenSecret, 3600L);
-		jwtTokenProvider = new JwtTokenProvider(jwtProperties);
+		AuthProperties authProperties = new AuthProperties(accessTokenSecret, 3600L, 1L);
+		jwtTokenProvider = new JwtTokenProvider(authProperties);
 	}
 
 	@Test

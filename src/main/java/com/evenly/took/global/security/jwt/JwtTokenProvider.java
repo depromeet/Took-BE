@@ -8,7 +8,7 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
-import com.evenly.took.global.config.properties.jwt.JwtProperties;
+import com.evenly.took.global.config.properties.jwt.AuthProperties;
 import com.evenly.took.global.exception.auth.oauth.InvalidAccessTokenException;
 
 import io.jsonwebtoken.Claims;
@@ -25,12 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-	private final JwtProperties jwtProperties;
+	private final AuthProperties authProperties;
 
 	public String generateAccessToken(String userId) {
 		Claims claims = generateClaims(userId);
 		Date now = new Date();
-		Date expiredAt = new Date(now.getTime() + jwtProperties.accessTokenExpirationMilliTime());
+		Date expiredAt = new Date(now.getTime() + authProperties.accessTokenExpirationMilliTime());
 		return buildAccessToken(claims, now, expiredAt);
 	}
 
@@ -73,7 +73,7 @@ public class JwtTokenProvider {
 	}
 
 	private Key getSigningKey() {
-		String secret = jwtProperties.accessTokenSecret();
+		String secret = authProperties.accessTokenSecret();
 		return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 	}
 }

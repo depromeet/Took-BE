@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import com.evenly.took.global.config.properties.jwt.AuthProperties;
 import com.evenly.took.global.exception.auth.jwt.AuthErrorCode;
 import com.evenly.took.global.exception.auth.oauth.InvalidRefreshTokenException;
 import com.evenly.took.global.redis.RedisService;
@@ -15,13 +16,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UuidTokenProvider {
 
-	private static final Duration EXPIRATION_OF_REFRESH_TOKEN = Duration.ofDays(7);
-
+	private final AuthProperties authProperties;
 	private final RedisService redisService;
 
 	public String generateRefreshToken(String userId) {
 		String refreshToken = UUID.randomUUID().toString();
-		redisService.setValueWithTTL(userId, refreshToken, EXPIRATION_OF_REFRESH_TOKEN);
+		Duration expiration = Duration.ofDays(authProperties.refreshTokenExpirationDay());
+		redisService.setValueWithTTL(userId, refreshToken, expiration);
 		return refreshToken;
 	}
 
