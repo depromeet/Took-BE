@@ -5,19 +5,12 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
-import com.evenly.took.global.config.testcontainers.RedisTestConfig;
 import com.evenly.took.global.exception.auth.oauth.InvalidRefreshTokenException;
 import com.evenly.took.global.redis.RedisService;
-import com.evenly.took.global.service.MockTest;
+import com.evenly.took.global.service.ServiceTest;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Import(RedisTestConfig.class)
-class UuidTokenProviderTest extends MockTest { // TODO Import 상위로 추출
+class UuidTokenProviderTest extends ServiceTest {
 
 	@Autowired
 	UuidTokenProvider uuidTokenProvider;
