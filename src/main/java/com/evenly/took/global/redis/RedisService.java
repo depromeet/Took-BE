@@ -38,4 +38,12 @@ public interface RedisService {
 	 * @return 삭제 성공 여부
 	 */
 	boolean deleteKey(String key);
+
+	/**
+	 * Redis에서 key 존재 여부를 검증합니다.
+	 *
+	 * @param key 검증할 키
+	 * @return 존재 여부
+	 */
+	boolean existsKey(String key);
 }

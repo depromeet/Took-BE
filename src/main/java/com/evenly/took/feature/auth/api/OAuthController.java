@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class OAuthController implements OAuthApi {
 
 	private final OAuthService oauthService;
-	private final HeaderProvider headerProvider;
+	private final HeaderHandler headerHandler;
 
 	@GetMapping("/api/oauth/{oauthType}")
 	public void redirectAuthRequestUrl(
@@ -33,7 +33,7 @@ public class OAuthController implements OAuthApi {
 	public SuccessResponse login(
 		@PathVariable OAuthType oauthType, @RequestParam String code, HttpServletResponse response) {
 		AuthResponse authResponse = oauthService.loginAndGenerateToken(oauthType, code);
-		headerProvider.setAuthHeader(response, authResponse);
+		headerHandler.setAuthHeader(response, authResponse.token());
 		return SuccessResponse.of(authResponse.user());
 	}
 }

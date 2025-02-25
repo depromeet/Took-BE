@@ -8,9 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.evenly.took.feature.auth.domain.OAuthIdentifier;
-import com.evenly.took.feature.auth.domain.OAuthType;
-import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.config.testcontainers.RedisTestConfig;
 import com.evenly.took.global.redis.RedisService;
 import com.evenly.took.global.service.MockTest;
@@ -29,17 +26,13 @@ class UuidTokenProviderTest extends MockTest { // TODO Import 상위로 추출
 	@Test
 	void refreshToken을_생성한다() {
 		// given
-		OAuthIdentifier oAuthIdentifier = OAuthIdentifier.builder()
-			.oauthId("oauth-id")
-			.oauthType(OAuthType.KAKAO)
-			.build();
-		User user = new User(1L, oAuthIdentifier, "took");
+		String userId = "1";
 
 		// when
-		String refreshToken = uuidTokenProvider.generateRefreshToken(user);
+		String refreshToken = uuidTokenProvider.generateRefreshToken(userId);
 
 		// then
 		assertThat(refreshToken).isNotNull();
-		assertThat(redisService.getValue(user.getId().toString())).isEqualTo(refreshToken);
+		assertThat(redisService.getValue(userId)).isEqualTo(refreshToken);
 	}
 }

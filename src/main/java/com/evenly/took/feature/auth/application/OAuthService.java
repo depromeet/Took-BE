@@ -31,8 +31,8 @@ public class OAuthService {
 		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
 			.orElseGet(() -> userRepository.save(user));
 
-		String accessToken = jwtTokenProvider.generateAccessToken(savedUser);
-		String refreshToken = uuidTokenProvider.generateRefreshToken(savedUser);
+		String accessToken = jwtTokenProvider.generateAccessToken(savedUser.getId().toString());
+		String refreshToken = uuidTokenProvider.generateRefreshToken(savedUser.getId().toString());
 
 		return new AuthResponse(accessToken, refreshToken, user);
 	}

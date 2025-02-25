@@ -31,7 +31,7 @@ class JwtTokenProviderTest extends MockTest {
 	@Test
 	void accessToken_생성_성공() {
 		// given, when
-		String token = jwtTokenProvider.generateAccessToken(testUser);
+		String token = jwtTokenProvider.generateAccessToken(testUser.getId().toString());
 
 		// then
 		assertThat(token).isNotNull();
@@ -40,7 +40,7 @@ class JwtTokenProviderTest extends MockTest {
 	@Test
 	void accessToken_validate_성공() {
 		// given
-		String token = jwtTokenProvider.generateAccessToken(testUser);
+		String token = jwtTokenProvider.generateAccessToken(testUser.getId().toString());
 
 		// when
 		String userId = jwtTokenProvider.getUserId(token);

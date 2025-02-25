@@ -1,6 +1,6 @@
 package com.evenly.took.global.security.jwt;
 
-import static com.evenly.took.global.exception.auth.jwt.JwtErrorCode.*;
+import static com.evenly.took.global.exception.auth.jwt.AuthErrorCode.*;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -8,9 +8,8 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
-import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.config.properties.jwt.JwtProperties;
-import com.evenly.took.global.exception.auth.oauth.InvalidJwtTokenException;
+import com.evenly.took.global.exception.auth.oauth.InvalidAccessTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -28,17 +27,16 @@ public class JwtTokenProvider {
 
 	private final JwtProperties jwtProperties;
 
-	public String generateAccessToken(User user) {
-		Claims claims = generateClaims(user);
+	public String generateAccessToken(String userId) {
+		Claims claims = generateClaims(userId);
 		Date now = new Date();
 		Date expiredAt = new Date(now.getTime() + jwtProperties.accessTokenExpirationMilliTime());
 		return buildAccessToken(claims, now, expiredAt);
 	}
 
-	private Claims generateClaims(final User user) {
-		Claims claims = Jwts.claims().setSubject(user.getId().toString());
-		claims.put("name", user.getName());
-		return claims;
+	private Claims generateClaims(String userId) {
+		return Jwts.claims()
+			.setSubject(userId);
 	}
 
 	private String buildAccessToken(Claims claims, Date now, Date expiredAt) {
@@ -56,7 +54,7 @@ public class JwtTokenProvider {
 			parseClaims(token);
 		} catch (JwtException | IllegalArgumentException e) {
 			log.error(JWT_UNAUTHORIZED.getMessage(), e);
-			throw new InvalidJwtTokenException(JWT_UNAUTHORIZED);
+			throw new InvalidAccessTokenException(JWT_UNAUTHORIZED);
 		}
 	}
 
