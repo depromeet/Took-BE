@@ -21,16 +21,17 @@ public class UuidTokenProvider {
 
 	public String generateRefreshToken(String userId) {
 		String refreshToken = UUID.randomUUID().toString();
-		Duration expiration = Duration.ofDays(authProperties.refreshTokenExpirationDay());
+		Duration expiration = Duration.ofSeconds(authProperties.refreshTokenExpirationTime());
 		redisService.setValueWithTTL(userId, refreshToken, expiration);
 		return refreshToken;
 	}
 
 	public void validateToken(String userId, String token) {
-		if (!redisService.existsKey(userId)) {
+		Object savedToken = redisService.getValue(userId);
+		if (savedToken == null) {
 			throw new InvalidRefreshTokenException(AuthErrorCode.EXPIRED_REFRESH_TOKEN);
 		}
-		if (!redisService.getValue(userId).toString().equals(token)) {
+		if (!savedToken.toString().equals(token)) {
 			throw new InvalidRefreshTokenException(AuthErrorCode.INVALID_REFRESH_TOKEN);
 		}
 	}

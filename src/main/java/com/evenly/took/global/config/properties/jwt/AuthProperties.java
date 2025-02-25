@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record AuthProperties(
 	String accessTokenSecret,
 	Long accessTokenExpirationTime,
-	Long refreshTokenExpirationDay
+	Long refreshTokenExpirationTime
 ) {
 
 	public Long accessTokenExpirationMilliTime() {

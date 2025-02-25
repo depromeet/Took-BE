@@ -46,12 +46,6 @@ public class RedisServiceImpl implements RedisService {
 		});
 	}
 
-	public boolean existsKey(String key) {
-		return executeOperation(() -> {
-			redisTemplate.hasKey(key);
-		});
-	}
-
 	private boolean executeOperation(Runnable operation) {
 		try {
 			operation.run();
