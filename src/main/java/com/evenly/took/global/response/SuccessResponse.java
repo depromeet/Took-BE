@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class SuccessResponse {
+public class SuccessResponse<T> {
 
 	private static final HttpStatus DEFAULT_HTTP_STATUS = HttpStatus.OK;
 	private static final String DEFAULT_MESSAGE = "요청이 성공적으로 처리되었습니다.";
@@ -18,13 +18,13 @@ public class SuccessResponse {
 	private final HttpStatus status;
 	private final String message;
 	private final LocalDateTime timestamp;
-	private final Object data;
+	private final T data;
 
-	public static SuccessResponse of(Object data) {
-		return new SuccessResponse(DEFAULT_HTTP_STATUS, DEFAULT_MESSAGE, LocalDateTime.now(), data);
+	public static <T> SuccessResponse<T> of(T data) {
+		return new SuccessResponse<>(DEFAULT_HTTP_STATUS, DEFAULT_MESSAGE, LocalDateTime.now(), data);
 	}
 
-	public static SuccessResponse of(HttpStatus status, Object data) {
-		return new SuccessResponse(status, DEFAULT_MESSAGE, LocalDateTime.now(), data);
+	public static <T> SuccessResponse<T> of(HttpStatus status, T data) {
+		return new SuccessResponse<>(status, DEFAULT_MESSAGE, LocalDateTime.now(), data);
 	}
 }

@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.auth.dto.response.AuthResponse;
+import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
 import com.evenly.took.global.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +27,7 @@ public interface OAuthApi {
 		description = "리다이렉트 성공",
 		content = @Content(schema = @Schema(implementation = SuccessResponse.class)))
 	@GetMapping("/{oauthType}")
-	SuccessResponse redirectAuthRequestUrl(
+	SuccessResponse<OAuthUrlResponse> redirectAuthRequestUrl(
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType);
 
@@ -37,7 +39,7 @@ public interface OAuthApi {
 		description = "로그인 성공",
 		content = @Content(schema = @Schema(implementation = SuccessResponse.class)))
 	@GetMapping("/login/{oauthType}")
-	SuccessResponse login(
+	SuccessResponse<AuthResponse> login( // TODO 에러 응답 추가
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType,
 		@Parameter(description = "소셜 서버로부터 전달받은 인가 코드", required = true)

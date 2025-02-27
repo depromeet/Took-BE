@@ -21,13 +21,13 @@ public class OAuthController implements OAuthApi {
 	private final OAuthService oauthService;
 
 	@GetMapping("/api/oauth/{oauthType}")
-	public SuccessResponse redirectAuthRequestUrl(@PathVariable OAuthType oauthType) {
+	public SuccessResponse<OAuthUrlResponse> redirectAuthRequestUrl(@PathVariable OAuthType oauthType) {
 		OAuthUrlResponse response = oauthService.getAuthCodeRequestUrl(oauthType);
 		return SuccessResponse.of(HttpStatus.FOUND, response);
 	}
 
 	@GetMapping("/api/oauth/login/{oauthType}")
-	public SuccessResponse login(@PathVariable OAuthType oauthType, @RequestParam String code) {
+	public SuccessResponse<AuthResponse> login(@PathVariable OAuthType oauthType, @RequestParam String code) {
 		AuthResponse authResponse = oauthService.loginAndGenerateToken(oauthType, code);
 		return SuccessResponse.of(authResponse);
 	}
