@@ -46,6 +46,5 @@ public interface OAuthApi {
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType,
 		@Parameter(description = "소셜 서버로부터 전달받은 인가 코드", required = true)
-		@RequestParam String code,
-		HttpServletResponse response);
+		@RequestParam String code);
 }
