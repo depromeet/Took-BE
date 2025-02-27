@@ -1,5 +1,6 @@
 package com.evenly.took.feature.auth.dto.response;
 
+import com.evenly.took.feature.auth.dto.TokenDto;
 import com.evenly.took.feature.user.domain.User;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,7 +11,8 @@ public record AuthResponse(
 	@Schema(description = "로그인 사용자 정보") UserResponse user
 ) {
 
-	public AuthResponse(String accessToken, String refreshToken, User user) {
-		this(new TokenResponse(accessToken, refreshToken), new UserResponse(user));
+	public AuthResponse(TokenDto tokens, User user) {
+		this(new TokenResponse(tokens.accessToken(), tokens.refreshToken()),
+			new UserResponse(user));
 	}
 }
