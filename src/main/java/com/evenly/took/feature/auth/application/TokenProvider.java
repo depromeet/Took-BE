@@ -16,6 +16,10 @@ public class TokenProvider {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UuidTokenProvider uuidTokenProvider;
 
+	public void validateAccessToken(String accessToken) {
+		jwtTokenProvider.validateToken(accessToken);
+	}
+
 	public TokenDto provideTokens(User user) {
 		String accessToken = jwtTokenProvider.generateAccessToken(user.getId().toString());
 		String refreshToken = uuidTokenProvider.generateRefreshToken(user.getId().toString());

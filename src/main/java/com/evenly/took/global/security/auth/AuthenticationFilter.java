@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.evenly.took.feature.auth.api.HeaderHandler;
+import com.evenly.took.feature.auth.application.TokenProvider;
 import com.evenly.took.global.exception.TookException;
 
 import jakarta.servlet.FilterChain;
@@ -26,7 +27,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		"/api/health",
 		"/api/oauth");
 
-	private final JwtTokenProvider jwtTokenProvider;
+	private final TokenProvider tokenProvider;
 	private final HeaderHandler headerHandler;
 
 	@Override
@@ -51,6 +52,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
 	private void checkTokens(HttpServletRequest request) {
 		String accessToken = headerHandler.resolveAccessToken(request);
-		jwtTokenProvider.validateToken(accessToken);
+		tokenProvider.validateAccessToken(accessToken);
 	}
 }
