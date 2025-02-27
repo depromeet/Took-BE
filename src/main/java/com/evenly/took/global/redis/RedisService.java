@@ -38,9 +38,4 @@ public interface RedisService {
 	 * @return 삭제 성공 여부
 	 */
 	boolean deleteKey(String key);
-
-	/**
-	 * Redis에서 모든 key-value를 삭제합니다.
-	 */
-	void deleteAllKeys();
 }

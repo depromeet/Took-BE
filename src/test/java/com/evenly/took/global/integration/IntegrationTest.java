@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.evenly.took.global.config.testcontainers.RedisTestConfig;
+import com.evenly.took.global.helper.RedisCleaner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.restassured.RestAssured;
@@ -23,9 +24,14 @@ public abstract class IntegrationTest {
 	@Autowired
 	protected ObjectMapper objectMapper;
 
+	@Autowired
+	protected RedisCleaner redisCleaner;
+
 	@BeforeEach
 	public void setUp() {
 		RestAssured.baseURI = "http://localhost";
 		RestAssured.port = port;
+
+		redisCleaner.deleteAllKeys();
 	}
 }

@@ -2,7 +2,6 @@ package com.evenly.took.feature.auth.application;
 
 import static org.assertj.core.api.Assertions.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,11 +17,6 @@ class UuidTokenProviderTest extends ServiceTest {
 
 	@Autowired
 	RedisService redisService;
-
-	@BeforeEach
-	void setUp() {
-		redisService.deleteAllKeys();
-	}
 
 	@Test
 	void 리프레쉬_토큰을_생성한다() {
