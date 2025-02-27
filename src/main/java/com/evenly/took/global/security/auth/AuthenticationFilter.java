@@ -7,9 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.evenly.took.feature.auth.api.HeaderHandler;
-import com.evenly.took.feature.auth.dto.response.TokenResponse;
 import com.evenly.took.global.exception.TookException;
-import com.evenly.took.global.exception.auth.oauth.InvalidAccessTokenException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,10 +24,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		"/v3/api-docs",
 		"/public",
 		"/api/health",
-		"/api/oauth/login");
+		"/api/oauth");
 
 	private final JwtTokenProvider jwtTokenProvider;
-	private final UuidTokenProvider uuidTokenProvider;
 	private final HeaderHandler headerHandler;
 
 	@Override
@@ -45,26 +42,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		FilterChain filterChain) throws ServletException, IOException {
 
 		try {
-			checkTokens(request, response);
+			checkTokens(request);
 			filterChain.doFilter(request, response);
 		} catch (TookException ex) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage()); // TODO 형식 통일
 		}
 	}
 
-	private void checkTokens(HttpServletRequest request, HttpServletResponse response) {
+	private void checkTokens(HttpServletRequest request) {
 		String accessToken = headerHandler.resolveAccessToken(request);
-		String refreshToken = headerHandler.resolveRefreshToken(request);
-		try {
-			jwtTokenProvider.validateToken(accessToken);
-		} catch (InvalidAccessTokenException ex) {
-			checkRefreshToken(refreshToken, response);
-		}
-	}
-
-	private void checkRefreshToken(String refreshToken, HttpServletResponse response) {
-		String userId = uuidTokenProvider.getUserId(refreshToken);
-		String accessToken = jwtTokenProvider.generateAccessToken(userId);
-		headerHandler.setAuthHeader(response, new TokenResponse(accessToken, refreshToken));
+		jwtTokenProvider.validateToken(accessToken);
 	}
 }

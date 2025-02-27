@@ -3,8 +3,10 @@ package com.evenly.took.feature.auth.application;
 import org.springframework.stereotype.Service;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
+import com.evenly.took.feature.auth.dto.response.TokenResponse;
 import com.evenly.took.feature.user.dao.UserRepository;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.security.auth.JwtTokenProvider;
@@ -34,9 +36,9 @@ public class OAuthService {
 		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
 			.orElseGet(() -> userRepository.save(user));
 
-		String accessToken = jwtTokenProvider.generateAccessToken(savedUser.getId().toString());
-		String refreshToken = uuidTokenProvider.generateRefreshToken(savedUser.getId().toString());
-
-		return new AuthResponse(accessToken, refreshToken, user);
+	public TokenResponse refreshToken(RefreshTokenRequest request) {
+		String refreshToken = request.refreshToken();
+		String accessToken = tokenProvider.provideAccessTokenByRefreshToken(refreshToken);
+		return new TokenResponse(accessToken, refreshToken);
 	}
 }
