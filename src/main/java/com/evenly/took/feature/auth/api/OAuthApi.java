@@ -1,7 +1,5 @@
 package com.evenly.took.feature.auth.api;
 
-import java.io.IOException;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 
 @Tag(name = "[1. OAuth]")
 public interface OAuthApi {
@@ -28,10 +25,9 @@ public interface OAuthApi {
 		responseCode = "302",
 		description = "리다이렉트 성공")
 	@GetMapping("/{oauthType}")
-	void redirectAuthRequestUrl(
+	SuccessResponse redirectAuthRequestUrl(
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
-		@PathVariable OAuthType oauthType,
-		HttpServletResponse response) throws IOException;
+		@PathVariable OAuthType oauthType);
 
 	@Operation(
 		summary = "소셜 로그인 및 토큰 발급",

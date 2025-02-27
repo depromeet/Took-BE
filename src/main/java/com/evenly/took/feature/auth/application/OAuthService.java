@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
+import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
 import com.evenly.took.feature.user.dao.UserRepository;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.security.auth.JwtTokenProvider;
@@ -23,8 +24,9 @@ public class OAuthService {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UuidTokenProvider uuidTokenProvider;
 
-	public String getAuthCodeRequestUrl(OAuthType oauthType) {
-		return authCodeComposite.provide(oauthType);
+	public OAuthUrlResponse getAuthCodeRequestUrl(OAuthType oauthType) {
+		String url = authCodeComposite.provide(oauthType);
+		return new OAuthUrlResponse(url);
 	}
 
 	public AuthResponse loginAndGenerateToken(OAuthType oauthType, String authCode) {
