@@ -1,7 +1,5 @@
 package com.evenly.took.global.security.client;
 
-import static com.evenly.took.global.exception.auth.oauth.OAuthErrorCode.*;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -11,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.global.exception.auth.jwt.AuthErrorCode;
 import com.evenly.took.global.exception.auth.oauth.OAuthTypeNotFoundException;
 
 @Component
@@ -25,7 +24,7 @@ public class AuthCodeRequestUrlProviderComposite {
 
 	public String provide(OAuthType oauthType) {
 		return Optional.ofNullable(mapping.get(oauthType))
-			.orElseThrow(() -> new OAuthTypeNotFoundException(OAUTH_TYPE_NOT_FOUND))
+			.orElseThrow(() -> new OAuthTypeNotFoundException(AuthErrorCode.OAUTH_TYPE_NOT_FOUND))
 			.provide();
 	}
 }

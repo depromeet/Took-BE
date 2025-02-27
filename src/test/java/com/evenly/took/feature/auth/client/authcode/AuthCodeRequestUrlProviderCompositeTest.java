@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
-import com.evenly.took.global.exception.auth.oauth.OAuthErrorCode;
+import com.evenly.took.global.exception.auth.jwt.AuthErrorCode;
 import com.evenly.took.global.exception.auth.oauth.OAuthTypeNotFoundException;
 import com.evenly.took.global.security.client.AuthCodeRequestUrlProvider;
 import com.evenly.took.global.security.client.AuthCodeRequestUrlProviderComposite;
@@ -48,11 +48,12 @@ class AuthCodeRequestUrlProviderCompositeTest extends MockTest {
 		});
 
 		// then
-		assertThat(exception.getErrorCode()).isEqualTo(OAuthErrorCode.OAUTH_TYPE_NOT_FOUND);
+		assertThat(exception.getErrorCode()).isEqualTo(AuthErrorCode.OAUTH_TYPE_NOT_FOUND);
 	}
 }
 
 class MockGoogleAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvider {
+
 	@Override
 	public OAuthType supportType() {
 		return OAuthType.GOOGLE;

@@ -1,7 +1,5 @@
 package com.evenly.took.global.security.auth;
 
-import static com.evenly.took.global.exception.auth.jwt.AuthErrorCode.*;
-
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
@@ -54,8 +52,8 @@ public class JwtTokenProvider {
 		try {
 			parseClaims(token);
 		} catch (JwtException | IllegalArgumentException e) {
-			log.error(JWT_UNAUTHORIZED.getMessage(), e);
-			throw new InvalidAccessTokenException(JWT_UNAUTHORIZED);
+			log.error(AuthErrorCode.JWT_UNAUTHORIZED.getMessage(), e);
+			throw new InvalidAccessTokenException(AuthErrorCode.JWT_UNAUTHORIZED);
 		}
 	}
 
