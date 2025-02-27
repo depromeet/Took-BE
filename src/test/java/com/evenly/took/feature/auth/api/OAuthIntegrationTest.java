@@ -8,6 +8,7 @@ import org.mockito.BDDMockito;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.domain.TestUserFactory;
 import com.evenly.took.global.integration.IntegrationTest;
@@ -49,15 +50,17 @@ public class OAuthIntegrationTest extends IntegrationTest {
 		BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 			.willReturn(user);
 
-		String tokenHeader = given().log().all()
+		AuthResponse response = given().log().all()
 			.when().get("/api/oauth/login/KAKAO?code=code")
 			.then().log().all()
 			.statusCode(200)
 			.extract()
-			.header("Authorization");
+			.body()
+			.jsonPath()
+			.getObject("data", AuthResponse.class);
 
 		given().log().all()
-			.header("Authorization", "Bearer %s %s".formatted("invalid", tokenHeader.split(" ")[2]))
+			.header("Authorization", "Bearer %s %s".formatted("invalid", response.token().refreshToken()))
 			.when().get("/api/test")
 			.then().log().all()
 			.statusCode(200);
@@ -69,15 +72,18 @@ public class OAuthIntegrationTest extends IntegrationTest {
 		BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 			.willReturn(user);
 
-		String tokenHeader = given().log().all()
+		AuthResponse response = given().log().all()
 			.when().get("/api/oauth/login/KAKAO?code=code")
 			.then().log().all()
 			.statusCode(200)
 			.extract()
-			.header("Authorization");
+			.body()
+			.jsonPath()
+			.getObject("data", AuthResponse.class);
 
 		given().log().all()
-			.header("Authorization", tokenHeader)
+			.header("Authorization",
+				"Bearer %s %s".formatted(response.token().accessToken(), response.token().refreshToken()))
 			.when().get("/api/test")
 			.then().log().all()
 			.statusCode(200);

@@ -9,7 +9,6 @@ import com.evenly.took.global.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,7 +22,8 @@ public interface OAuthApi {
 		description = "지정된 OAuthType에 따른 소셜 로그인 인가 코드 요청 URL로 클라이언트를 리다이렉트합니다.")
 	@ApiResponse(
 		responseCode = "302",
-		description = "리다이렉트 성공")
+		description = "리다이렉트 성공",
+		content = @Content(schema = @Schema(implementation = SuccessResponse.class)))
 	@GetMapping("/{oauthType}")
 	SuccessResponse redirectAuthRequestUrl(
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
@@ -35,7 +35,6 @@ public interface OAuthApi {
 	@ApiResponse(
 		responseCode = "200",
 		description = "로그인 성공",
-		headers = @Header(name = "Authorization", description = "Bearer [access token] [refresh token]", required = true),
 		content = @Content(schema = @Schema(implementation = SuccessResponse.class)))
 	@GetMapping("/login/{oauthType}")
 	SuccessResponse login(
