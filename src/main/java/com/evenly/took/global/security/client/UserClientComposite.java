@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.auth.exception.OAuthTypeNotFoundException;
+import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.feature.user.domain.User;
 
 @Component
@@ -25,7 +25,7 @@ public class UserClientComposite {
 
 	public User fetch(OAuthType oauthType, String authCode) {
 		return Optional.ofNullable(mapping.get(oauthType))
-			.orElseThrow(() -> new OAuthTypeNotFoundException(AuthErrorCode.OAUTH_TYPE_NOT_FOUND))
+			.orElseThrow(() -> new TookException(AuthErrorCode.OAUTH_TYPE_NOT_FOUND))
 			.fetch(authCode);
 	}
 }

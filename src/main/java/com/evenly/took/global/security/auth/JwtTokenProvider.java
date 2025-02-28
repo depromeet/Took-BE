@@ -7,7 +7,7 @@ import java.util.Date;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.auth.exception.InvalidAccessTokenException;
+import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.config.properties.jwt.AuthProperties;
 
 import io.jsonwebtoken.Claims;
@@ -53,7 +53,7 @@ public class JwtTokenProvider {
 			parseClaims(token);
 		} catch (JwtException | IllegalArgumentException e) {
 			log.error(AuthErrorCode.JWT_UNAUTHORIZED.getMessage(), e);
-			throw new InvalidAccessTokenException(AuthErrorCode.JWT_UNAUTHORIZED);
+			throw new TookException(AuthErrorCode.JWT_UNAUTHORIZED);
 		}
 	}
 
@@ -63,7 +63,7 @@ public class JwtTokenProvider {
 				.getBody()
 				.getSubject();
 		} catch (JwtException ex) {
-			throw new InvalidAccessTokenException(AuthErrorCode.INVALID_ACCESS_TOKEN);
+			throw new TookException(AuthErrorCode.INVALID_ACCESS_TOKEN);
 		}
 	}
 

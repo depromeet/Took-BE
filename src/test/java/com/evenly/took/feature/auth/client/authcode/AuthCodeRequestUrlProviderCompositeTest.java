@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.auth.exception.OAuthTypeNotFoundException;
+import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.security.client.AuthCodeRequestUrlProvider;
 import com.evenly.took.global.security.client.AuthCodeRequestUrlProviderComposite;
 import com.evenly.took.global.service.MockTest;
@@ -43,7 +43,7 @@ class AuthCodeRequestUrlProviderCompositeTest extends MockTest {
 		OAuthType invalidOAuthType = OAuthType.KAKAO;
 
 		// when
-		OAuthTypeNotFoundException exception = assertThrows(OAuthTypeNotFoundException.class, () -> {
+		TookException exception = assertThrows(TookException.class, () -> {
 			composite.provide(invalidOAuthType);
 		});
 

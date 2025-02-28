@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.auth.exception.InvalidRefreshTokenException;
+import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.config.properties.jwt.AuthProperties;
 import com.evenly.took.global.redis.RedisService;
 
@@ -29,7 +29,7 @@ public class UuidTokenProvider {
 	public String getUserId(String token) {
 		Object userId = redisService.getValue(token);
 		if (userId == null) {
-			throw new InvalidRefreshTokenException(AuthErrorCode.EXPIRED_REFRESH_TOKEN);
+			throw new TookException(AuthErrorCode.EXPIRED_REFRESH_TOKEN);
 		}
 		return userId.toString();
 	}

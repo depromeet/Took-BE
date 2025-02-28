@@ -3,7 +3,7 @@ package com.evenly.took.feature.auth.api;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.auth.exception.InvalidTokenException;
+import com.evenly.took.feature.common.exception.TookException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -21,7 +21,7 @@ public class HeaderHandler {
 
 	private void validateAuthHeader(String bearerToken) {
 		if (bearerToken == null || !bearerToken.startsWith(HEADER_VALUE_PREFIX_OF_AUTH)) {
-			throw new InvalidTokenException(AuthErrorCode.JWT_UNAUTHORIZED);
+			throw new TookException(AuthErrorCode.JWT_UNAUTHORIZED);
 		}
 	}
 }
