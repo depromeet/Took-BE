@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.evenly.took.global.exception.auth.oauth.InvalidRefreshTokenException;
+import com.evenly.took.feature.auth.exception.InvalidRefreshTokenException;
 import com.evenly.took.global.redis.RedisService;
 import com.evenly.took.global.security.auth.UuidTokenProvider;
 import com.evenly.took.global.service.ServiceTest;

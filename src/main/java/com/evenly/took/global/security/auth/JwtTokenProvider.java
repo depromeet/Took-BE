@@ -6,9 +6,9 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
+import com.evenly.took.feature.auth.exception.AuthErrorCode;
+import com.evenly.took.feature.auth.exception.InvalidAccessTokenException;
 import com.evenly.took.global.config.properties.jwt.AuthProperties;
-import com.evenly.took.global.exception.auth.jwt.AuthErrorCode;
-import com.evenly.took.global.exception.auth.oauth.InvalidAccessTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

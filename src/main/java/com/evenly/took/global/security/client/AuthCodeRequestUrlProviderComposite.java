@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
-import com.evenly.took.global.exception.auth.jwt.AuthErrorCode;
-import com.evenly.took.global.exception.auth.oauth.OAuthTypeNotFoundException;
+import com.evenly.took.feature.auth.exception.AuthErrorCode;
+import com.evenly.took.feature.auth.exception.OAuthTypeNotFoundException;
 
 @Component
 public class AuthCodeRequestUrlProviderComposite {

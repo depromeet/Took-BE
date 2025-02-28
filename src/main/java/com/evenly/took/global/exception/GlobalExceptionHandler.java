@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.evenly.took.feature.common.exception.CommonErrorCode;
+import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.exception.dto.ErrorResponse;
 import com.evenly.took.global.exception.dto.ServerErrorResponse;
 import com.evenly.took.global.exception.dto.ValidationErrorResponse;

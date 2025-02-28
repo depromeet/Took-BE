@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import com.evenly.took.feature.auth.exception.AuthErrorCode;
+import com.evenly.took.feature.auth.exception.InvalidRefreshTokenException;
 import com.evenly.took.global.config.properties.jwt.AuthProperties;
-import com.evenly.took.global.exception.auth.jwt.AuthErrorCode;
-import com.evenly.took.global.exception.auth.oauth.InvalidRefreshTokenException;
 import com.evenly.took.global.redis.RedisService;
 
 import lombok.RequiredArgsConstructor;

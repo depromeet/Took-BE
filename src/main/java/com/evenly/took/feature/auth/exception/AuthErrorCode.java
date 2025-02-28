@@ -1,4 +1,4 @@
-package com.evenly.took.global.exception.auth.jwt;
+package com.evenly.took.feature.auth.exception;
 
 import org.springframework.http.HttpStatus;
 

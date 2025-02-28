@@ -2,8 +2,8 @@ package com.evenly.took.feature.auth.api;
 
 import org.springframework.stereotype.Component;
 
-import com.evenly.took.global.exception.auth.jwt.AuthErrorCode;
-import com.evenly.took.global.exception.auth.oauth.InvalidTokenException;
+import com.evenly.took.feature.auth.exception.AuthErrorCode;
+import com.evenly.took.feature.auth.exception.InvalidTokenException;
 
 import jakarta.servlet.http.HttpServletRequest;
 

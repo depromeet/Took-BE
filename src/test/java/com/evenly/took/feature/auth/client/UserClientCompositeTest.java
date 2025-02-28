@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.auth.exception.OAuthTypeNotFoundException;
 import com.evenly.took.feature.user.domain.User;
-import com.evenly.took.global.exception.auth.oauth.OAuthTypeNotFoundException;
 import com.evenly.took.global.security.client.UserClient;
 import com.evenly.took.global.security.client.UserClientComposite;
 import com.evenly.took.global.service.MockTest;

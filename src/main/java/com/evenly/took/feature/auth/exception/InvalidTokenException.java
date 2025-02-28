@@ -1,7 +1,7 @@
-package com.evenly.took.global.exception.auth.oauth;
+package com.evenly.took.feature.auth.exception;
 
+import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.exception.ErrorCode;
-import com.evenly.took.global.exception.TookException;
 
 import lombok.Getter;
 

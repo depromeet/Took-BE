@@ -1,6 +1,8 @@
-package com.evenly.took.global.exception;
+package com.evenly.took.feature.common.exception;
 
 import org.springframework.http.HttpStatus;
+
+import com.evenly.took.global.exception.ErrorCode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
