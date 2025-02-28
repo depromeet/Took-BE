@@ -10,7 +10,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.evenly.took.feature.auth.api.HeaderHandler;
 import com.evenly.took.feature.auth.application.TokenProvider;
-import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.exception.ErrorCode;
 import com.evenly.took.global.exception.dto.ErrorResponse;
@@ -58,8 +57,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 			checkTokens(request);
 			filterChain.doFilter(request, response);
 		} catch (TookException ex) {
-			AuthErrorCode errorCode = AuthErrorCode.EXPIRED_ACCESS_TOKEN;
-			sendError(response, errorCode);
+			sendError(response, ex.getErrorCode());
 		}
 	}
 

@@ -52,8 +52,8 @@ public class JwtTokenProvider {
 		try {
 			parseClaims(token);
 		} catch (JwtException | IllegalArgumentException e) {
-			log.error(AuthErrorCode.JWT_UNAUTHORIZED.getMessage(), e);
-			throw new TookException(AuthErrorCode.JWT_UNAUTHORIZED);
+			log.error(AuthErrorCode.INVALID_ACCESS_TOKEN.getMessage(), e);
+			throw new TookException(AuthErrorCode.INVALID_ACCESS_TOKEN);
 		}
 	}
 
