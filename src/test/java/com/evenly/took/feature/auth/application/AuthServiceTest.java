@@ -15,13 +15,13 @@ import com.evenly.took.global.domain.TestUserFactory;
 import com.evenly.took.global.security.client.UserClientComposite;
 import com.evenly.took.global.service.ServiceTest;
 
-class OAuthServiceTest extends ServiceTest {
+class AuthServiceTest extends ServiceTest {
 
 	@MockitoBean
 	UserClientComposite userClientComposite;
 
 	@Autowired
-	OAuthService oauthService;
+	AuthService authService;
 
 	@Test
 	void 로그인시_토큰과_사용자_정보를_반환한다() {
@@ -31,7 +31,7 @@ class OAuthServiceTest extends ServiceTest {
 			.willReturn(user);
 
 		// when
-		AuthResponse response = oauthService.loginAndGenerateToken(OAuthType.KAKAO, "code");
+		AuthResponse response = authService.loginAndGenerateToken(OAuthType.KAKAO, "code");
 
 		// then
 		assertThat(response.token().accessToken()).containsAnyOf(".");

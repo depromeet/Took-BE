@@ -16,8 +16,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "[1. OAuth]")
-public interface OAuthApi {
+@Tag(name = "[1. Auth]")
+public interface AuthApi {
 
 	@Operation(
 		summary = "소셜 로그인 인가 URL 리다이렉트",
@@ -26,7 +26,7 @@ public interface OAuthApi {
 		responseCode = "302",
 		description = "리다이렉트 성공",
 		content = @Content(schema = @Schema(implementation = SuccessResponse.class)))
-	@GetMapping("/{oauthType}")
+	@GetMapping("/api/auth/{oauthType}")
 	SuccessResponse<OAuthUrlResponse> redirectAuthRequestUrl(
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType);
@@ -38,10 +38,12 @@ public interface OAuthApi {
 		responseCode = "200",
 		description = "로그인 성공",
 		content = @Content(schema = @Schema(implementation = SuccessResponse.class)))
-	@GetMapping("/login/{oauthType}")
+	@GetMapping("/api/auth/login/{oauthType}")
 	SuccessResponse<AuthResponse> login( // TODO 에러 응답 추가
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType,
 		@Parameter(description = "소셜 서버로부터 전달받은 인가 코드", required = true)
 		@RequestParam String code);
+
+	// TODO refresh API 추가
 }

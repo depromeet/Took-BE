@@ -17,7 +17,7 @@ import com.evenly.took.global.security.client.UserClientComposite;
 
 import io.restassured.http.ContentType;
 
-public class OAuthIntegrationTest extends IntegrationTest {
+public class AuthIntegrationTest extends IntegrationTest {
 
 	@MockitoBean
 	UserClientComposite userClientComposite;
@@ -29,7 +29,7 @@ public class OAuthIntegrationTest extends IntegrationTest {
 			.willReturn(user);
 
 		given().log().all()
-			.when().get("/api/oauth/login/KAKAO?code=code")
+			.when().get("/api/auth/login/KAKAO?code=code")
 			.then().log().all()
 			.statusCode(200);
 	}
@@ -54,7 +54,7 @@ public class OAuthIntegrationTest extends IntegrationTest {
 			.willReturn(user);
 
 		TokenResponse tokens = given().log().all()
-			.when().get("/api/oauth/login/KAKAO?code=code")
+			.when().get("/api/auth/login/KAKAO?code=code")
 			.then().log().all()
 			.statusCode(200)
 			.extract()
@@ -66,7 +66,7 @@ public class OAuthIntegrationTest extends IntegrationTest {
 		given().log().all()
 			.contentType(ContentType.JSON)
 			.body(request)
-			.when().get("/api/oauth/refresh")
+			.when().get("/api/auth/refresh")
 			.then().log().all()
 			.statusCode(200);
 	}
@@ -81,7 +81,7 @@ public class OAuthIntegrationTest extends IntegrationTest {
 		given().log().all()
 			.contentType(ContentType.JSON)
 			.body(request)
-			.when().get("/api/oauth/refresh")
+			.when().get("/api/auth/refresh")
 			.then().log().all()
 			.statusCode(401);
 	}
@@ -93,7 +93,7 @@ public class OAuthIntegrationTest extends IntegrationTest {
 			.willReturn(user);
 
 		TokenResponse tokens = given().log().all()
-			.when().get("/api/oauth/login/KAKAO?code=code")
+			.when().get("/api/auth/login/KAKAO?code=code")
 			.then().log().all()
 			.statusCode(200)
 			.extract()

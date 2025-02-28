@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class OAuthService {
+public class AuthService {
 
 	private final AuthCodeRequestUrlProviderComposite authCodeComposite;
 	private final UserClientComposite userClientComposite;

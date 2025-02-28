@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @ActiveProfiles("test")
 @RestController
-public class TestAuthController {
+public class TestController {
 
 	@GetMapping("/api/test")
 	public void test() {

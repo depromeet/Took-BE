@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.evenly.took.feature.auth.application.OAuthService;
+import com.evenly.took.feature.auth.application.AuthService;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
@@ -19,25 +19,25 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class OAuthController implements OAuthApi {
+public class AuthController implements AuthApi {
 
-	private final OAuthService oauthService;
+	private final AuthService authService;
 
-	@GetMapping("/api/oauth/{oauthType}")
+	@GetMapping("/api/auth/{oauthType}")
 	public SuccessResponse<OAuthUrlResponse> redirectAuthRequestUrl(@PathVariable OAuthType oauthType) {
-		OAuthUrlResponse response = oauthService.getAuthCodeRequestUrl(oauthType);
+		OAuthUrlResponse response = authService.getAuthCodeRequestUrl(oauthType);
 		return SuccessResponse.of(HttpStatus.FOUND, response);
 	}
 
-	@GetMapping("/api/oauth/login/{oauthType}")
+	@GetMapping("/api/auth/login/{oauthType}")
 	public SuccessResponse<AuthResponse> login(@PathVariable OAuthType oauthType, @RequestParam String code) {
-		AuthResponse response = oauthService.loginAndGenerateToken(oauthType, code);
+		AuthResponse response = authService.loginAndGenerateToken(oauthType, code);
 		return SuccessResponse.of(response);
 	}
 
-	@GetMapping("/api/oauth/refresh")
+	@GetMapping("/api/auth/refresh")
 	public SuccessResponse<TokenResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
-		TokenResponse response = oauthService.refreshToken(request);
+		TokenResponse response = authService.refreshToken(request);
 		return SuccessResponse.of(response);
 	}
 }
