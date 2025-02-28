@@ -1,6 +1,5 @@
-package com.evenly.took.feature.auth.client.authcode;
+package com.evenly.took.feature.auth.client;
 
-import static com.evenly.took.feature.auth.client.authcode.AuthCodeRequestUrlProviderCompositeTest.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,8 +11,6 @@ import org.junit.jupiter.api.Test;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
-import com.evenly.took.global.security.client.AuthCodeRequestUrlProvider;
-import com.evenly.took.global.security.client.AuthCodeRequestUrlProviderComposite;
 import com.evenly.took.global.service.MockTest;
 
 class AuthCodeRequestUrlProviderCompositeTest extends MockTest {
@@ -50,17 +47,17 @@ class AuthCodeRequestUrlProviderCompositeTest extends MockTest {
 		// then
 		assertThat(exception.getErrorCode()).isEqualTo(AuthErrorCode.OAUTH_TYPE_NOT_FOUND);
 	}
-}
 
-class MockGoogleAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvider {
+	static class MockGoogleAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvider {
 
-	@Override
-	public OAuthType supportType() {
-		return OAuthType.GOOGLE;
-	}
+		@Override
+		public OAuthType supportType() {
+			return OAuthType.GOOGLE;
+		}
 
-	@Override
-	public String provide() {
-		return TEST_URL;
+		@Override
+		public String provide() {
+			return TEST_URL;
+		}
 	}
 }

@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.domain.TestUserFactory;
-import com.evenly.took.global.security.client.UserClientComposite;
 import com.evenly.took.global.service.ServiceTest;
 
 class AuthServiceTest extends ServiceTest {

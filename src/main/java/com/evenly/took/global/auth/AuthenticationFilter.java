@@ -1,4 +1,4 @@
-package com.evenly.took.global.security.auth;
+package com.evenly.took.global.auth;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

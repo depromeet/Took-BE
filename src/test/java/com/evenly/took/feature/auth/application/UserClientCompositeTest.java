@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client;
+package com.evenly.took.feature.auth.application;
 
 import static com.evenly.took.global.domain.TestUserFactory.*;
 import static org.assertj.core.api.Assertions.*;
@@ -9,12 +9,12 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.evenly.took.feature.auth.client.UserClient;
+import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.feature.user.domain.User;
-import com.evenly.took.global.security.client.UserClient;
-import com.evenly.took.global.security.client.UserClientComposite;
 import com.evenly.took.global.service.MockTest;
 
 class UserClientCompositeTest extends MockTest {

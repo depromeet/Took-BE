@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.domain.TestUserFactory;
 import com.evenly.took.global.integration.IntegrationTest;
-import com.evenly.took.global.security.client.UserClientComposite;
 
 import io.restassured.http.ContentType;
 

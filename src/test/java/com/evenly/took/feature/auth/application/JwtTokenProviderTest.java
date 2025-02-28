@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.jwt;
+package com.evenly.took.feature.auth.application;
 
 import static com.evenly.took.global.domain.TestUserFactory.*;
 import static org.assertj.core.api.Assertions.*;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.config.properties.jwt.AuthProperties;
-import com.evenly.took.global.security.auth.JwtTokenProvider;
 import com.evenly.took.global.service.MockTest;
 
 class JwtTokenProviderTest extends MockTest {

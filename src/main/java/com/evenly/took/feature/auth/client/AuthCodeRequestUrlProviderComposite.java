@@ -1,4 +1,4 @@
-package com.evenly.took.global.security.client;
+package com.evenly.took.feature.auth.client;
 
 import java.util.Map;
 import java.util.Optional;

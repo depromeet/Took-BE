@@ -1,4 +1,4 @@
-package com.evenly.took.global.security.auth;
+package com.evenly.took.feature.auth.application;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;

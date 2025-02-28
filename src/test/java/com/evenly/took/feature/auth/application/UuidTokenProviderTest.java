@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.redis.RedisService;
-import com.evenly.took.global.security.auth.UuidTokenProvider;
 import com.evenly.took.global.service.ServiceTest;
 
 class UuidTokenProviderTest extends ServiceTest {

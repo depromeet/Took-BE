@@ -4,8 +4,6 @@ import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.dto.TokenDto;
 import com.evenly.took.feature.user.domain.User;
-import com.evenly.took.global.security.auth.JwtTokenProvider;
-import com.evenly.took.global.security.auth.UuidTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
