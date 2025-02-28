@@ -42,7 +42,7 @@ public interface AuthApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "로그인 성공")
 	})
-	@GetMapping("/api/auth/login/{oauthType}")
+	@PostMapping("/api/auth/login/{oauthType}")
 	SuccessResponse<AuthResponse> login( // TODO 에러 응답 추가
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType,

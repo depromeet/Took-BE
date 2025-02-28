@@ -29,7 +29,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 			.willReturn(user);
 
 		given().log().all()
-			.when().get("/api/auth/login/KAKAO?code=code")
+			.when().post("/api/auth/login/KAKAO?code=code")
 			.then().log().all()
 			.statusCode(200);
 	}
@@ -54,7 +54,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 			.willReturn(user);
 
 		TokenResponse tokens = given().log().all()
-			.when().get("/api/auth/login/KAKAO?code=code")
+			.when().post("/api/auth/login/KAKAO?code=code")
 			.then().log().all()
 			.statusCode(200)
 			.extract()
@@ -93,7 +93,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 			.willReturn(user);
 
 		TokenResponse tokens = given().log().all()
-			.when().get("/api/auth/login/KAKAO?code=code")
+			.when().post("/api/auth/login/KAKAO?code=code")
 			.then().log().all()
 			.statusCode(200)
 			.extract()

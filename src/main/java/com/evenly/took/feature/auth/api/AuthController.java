@@ -30,7 +30,7 @@ public class AuthController implements AuthApi {
 		return SuccessResponse.of(HttpStatus.FOUND, response);
 	}
 
-	@GetMapping("/api/auth/login/{oauthType}")
+	@PostMapping("/api/auth/login/{oauthType}")
 	public SuccessResponse<AuthResponse> login(@PathVariable OAuthType oauthType, @RequestParam String code) {
 		AuthResponse response = authService.loginAndGenerateToken(oauthType, code);
 		return SuccessResponse.of(response);
