@@ -66,7 +66,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 		given().log().all()
 			.contentType(ContentType.JSON)
 			.body(request)
-			.when().get("/api/auth/refresh")
+			.when().post("/api/auth/refresh")
 			.then().log().all()
 			.statusCode(200);
 	}
@@ -81,7 +81,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 		given().log().all()
 			.contentType(ContentType.JSON)
 			.body(request)
-			.when().get("/api/auth/refresh")
+			.when().post("/api/auth/refresh")
 			.then().log().all()
 			.statusCode(401);
 	}
