@@ -44,6 +44,7 @@ springdoc:
     syntax-highlight:
       theme: none
 
-jwt:
-  access-token-secret: ${JWT_ACCESS_TOKEN_SECRET}
-  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME}
+auth:
+  access-token-secret: ${JWT_ACCESS_TOKEN_SECRET:secret}
+  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME:7200}
+  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
