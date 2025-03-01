@@ -12,5 +12,4 @@ public record GoogleProperties(
 	String clientSecret,
 	String scope
 ) {
-
 }
