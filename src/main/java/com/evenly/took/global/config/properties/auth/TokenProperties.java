@@ -1,9 +1,9 @@
-package com.evenly.took.global.config.properties.jwt;
+package com.evenly.took.global.config.properties.auth;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "auth")
-public record AuthProperties(
+public record TokenProperties(
 	String accessTokenSecret,
 	Long accessTokenExpirationTime,
 	Long refreshTokenExpirationTime
