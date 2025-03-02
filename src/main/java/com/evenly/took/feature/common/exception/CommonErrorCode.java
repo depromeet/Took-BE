@@ -15,6 +15,7 @@ public enum CommonErrorCode implements ErrorCode {
 	INVALID_REQUEST_VALUE(HttpStatus.BAD_REQUEST, "유효하지 않은 요청값입니다."),
 	INVALID_REQUEST_URL(HttpStatus.BAD_REQUEST, "유효하지 않은 경로입니다."),
 	INVALID_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, "유효하지 않은 쿼리 파라미터입니다."),
+	INVALID_HTTP_METHOD(HttpStatus.BAD_REQUEST, "지원하지 않는 HTTP 메서드입니다."),
 	;
 
 	private final HttpStatus status;

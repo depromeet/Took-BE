@@ -1,5 +1,6 @@
 package com.evenly.took.global.exception;
 
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,6 +26,12 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler
 	public ErrorResponse handle(NoResourceFoundException ex) {
 		ErrorCode errorCode = CommonErrorCode.INVALID_REQUEST_URL;
+		return ErrorResponse.of(errorCode);
+	}
+
+	@ExceptionHandler
+	public ErrorResponse handle(HttpRequestMethodNotSupportedException ex) {
+		ErrorCode errorCode = CommonErrorCode.INVALID_HTTP_METHOD;
 		return ErrorResponse.of(errorCode);
 	}
 
