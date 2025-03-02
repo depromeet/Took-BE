@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.evenly.took.feature.auth.client.kakao.dto.KakaoUserResponse;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
@@ -30,7 +29,6 @@ class KakaoUserInfoProviderTest extends BaseRestClientTest {
 
 	@BeforeEach
 	void setUp() {
-		mockServer = MockRestServiceServer.bindTo(restClientBuilder).build();
 		kakaoUserInfoProvider = new KakaoUserInfoProvider(restClientBuilder, errorHandler, kakaoProperties);
 	}
 

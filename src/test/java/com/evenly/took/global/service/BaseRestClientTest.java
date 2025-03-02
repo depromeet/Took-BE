@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -27,6 +28,11 @@ public abstract class BaseRestClientTest {
 	protected RestClient.Builder restClientBuilder;
 
 	protected MockRestServiceServer mockServer;
+
+	@BeforeEach
+	void setUp() {
+		mockServer = MockRestServiceServer.bindTo(restClientBuilder).build();
+	}
 
 	protected void configure200MockServer(String requestUri, String responseBody) {
 		mockServer.expect(requestTo(requestUri))
