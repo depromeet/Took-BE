@@ -31,6 +31,9 @@ auth:
 
 oauth: # TODO application.yml로 공통 필드 추출
   kakao:
-    auth-code-url: https://kauth.kakao.com/oauth/authorize
     client-id: clientId
     redirect-uri: redirectUri
+    url:
+      auth-code-url: https://kauth.kakao.com/oauth/authorize
+      token-url: https://kauth.kakao.com/oauth/token
+      user-info-url: https://kapi.kakao.com/v2/user/me

@@ -61,6 +61,9 @@ auth:
 
 oauth:
   kakao:
-    auth-code-url: https://kauth.kakao.com/oauth/authorize
     client-id: ${KAKAO_CLIENT_ID}
     redirect-uri: ${KAKAO_REDIRECT_URI}
+    url:
+      auth-code-url: https://kauth.kakao.com/oauth/authorize
+      token-url: https://kauth.kakao.com/oauth/token
+      user-info-url: https://kapi.kakao.com/v2/user/me
