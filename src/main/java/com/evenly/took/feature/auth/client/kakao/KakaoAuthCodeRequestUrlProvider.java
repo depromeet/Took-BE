@@ -1,6 +1,5 @@
 package com.evenly.took.feature.auth.client.kakao;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-@EnableConfigurationProperties(KakaoProperties.class)
 public class KakaoAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvider {
 
 	private final KakaoProperties kakaoProperties;

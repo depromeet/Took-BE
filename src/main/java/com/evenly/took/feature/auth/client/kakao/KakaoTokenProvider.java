@@ -2,7 +2,6 @@ package com.evenly.took.feature.auth.client.kakao;
 
 import java.nio.charset.StandardCharsets;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,6 @@ import com.evenly.took.feature.auth.client.kakao.dto.KakaoTokenResponse;
 import com.evenly.took.global.config.properties.auth.KakaoProperties;
 
 @Component
-@EnableConfigurationProperties(KakaoProperties.class)
 public class KakaoTokenProvider {
 
 	private final RestClient restClient;

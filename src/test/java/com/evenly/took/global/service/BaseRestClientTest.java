@@ -16,10 +16,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
+import com.evenly.took.feature.auth.config.AuthConfig;
 import com.evenly.took.global.config.client.ClientConfig;
 
 @ActiveProfiles("test")
-@Import({ClientConfig.class})
+@Import({ClientConfig.class, AuthConfig.class})
 public abstract class BaseRestClientTest {
 
 	@Autowired
