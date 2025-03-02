@@ -1,6 +1,7 @@
 package com.evenly.took.feature.auth.client.kakao;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 
@@ -10,18 +11,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.test.web.client.MockRestServiceServer;
 
+import com.evenly.took.feature.auth.client.kakao.dto.KakaoTokenResponse;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.config.properties.auth.KakaoProperties;
 import com.evenly.took.global.service.BaseRestClientTest;
 
-@RestClientTest({KakaoUserClient.class, KakaoResponseErrorHandler.class})
-class KakaoUserClientTest extends BaseRestClientTest {
+@RestClientTest({KakaoTokenProvider.class, KakaoTokenProviderErrorHandler.class})
+class KakaoTokenProviderTest extends BaseRestClientTest {
 
-	KakaoUserClient kakaoUserClient;
+	KakaoTokenProvider kakaoTokenProvider;
 
 	@Autowired
-	KakaoResponseErrorHandler errorHandler;
+	KakaoTokenProviderErrorHandler errorHandler;
 
 	@Autowired
 	KakaoProperties kakaoProperties;
@@ -29,7 +31,23 @@ class KakaoUserClientTest extends BaseRestClientTest {
 	@BeforeEach
 	void setUp() {
 		mockServer = MockRestServiceServer.bindTo(restClientBuilder).build();
-		kakaoUserClient = new KakaoUserClient(restClientBuilder, errorHandler, kakaoProperties);
+		kakaoTokenProvider = new KakaoTokenProvider(restClientBuilder, errorHandler, kakaoProperties);
+	}
+
+	@Test
+	void 성공적으로_응답을_받은_경우_토큰_정보를_조회할_수_있다() throws IOException {
+		// given
+		String responseBody = readResourceFile("auth/kakao/success-token-response.json");
+		configure200MockServer(kakaoProperties.url().tokenUrl(), responseBody);
+
+		// when
+		KakaoTokenResponse response = kakaoTokenProvider.fetchAccessToken("code");
+
+		// then
+		assertAll(
+			() -> mockServer.verify(),
+			() -> assertThat(response.accessToken()).isEqualTo("took-access-token")
+		);
 	}
 
 	@Test
@@ -38,7 +56,7 @@ class KakaoUserClientTest extends BaseRestClientTest {
 		configure401MockServer(kakaoProperties.url().tokenUrl());
 
 		// when, then
-		assertThatThrownBy(() -> kakaoUserClient.fetch("valid-code"))
+		assertThatThrownBy(() -> kakaoTokenProvider.fetchAccessToken("code"))
 			.isInstanceOf(TookException.class)
 			.hasMessage(AuthErrorCode.KAKAO_INVALID_APP_INFO.getMessage());
 	}
@@ -50,7 +68,7 @@ class KakaoUserClientTest extends BaseRestClientTest {
 		configure400MockServer(kakaoProperties.url().tokenUrl(), errorResponseBody);
 
 		// when, then
-		assertThatThrownBy(() -> kakaoUserClient.fetch("invalid-code"))
+		assertThatThrownBy(() -> kakaoTokenProvider.fetchAccessToken("invalid-code"))
 			.isInstanceOf(TookException.class)
 			.hasMessage(AuthErrorCode.KAKAO_INVALID_AUTH_CODE.getMessage());
 	}

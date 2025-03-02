@@ -30,7 +30,7 @@ public abstract class BaseRestClientTest {
 	protected void configure200MockServer(String requestUri, String responseBody) {
 		mockServer.expect(requestTo(requestUri))
 			.andExpect(content().contentType(MediaType.APPLICATION_FORM_URLENCODED))
-			.andExpect(method(HttpMethod.GET))
+			.andExpect(method(HttpMethod.POST))
 			.andRespond(withSuccess(responseBody, MediaType.APPLICATION_JSON));
 	}
 
@@ -46,6 +46,13 @@ public abstract class BaseRestClientTest {
 			.andExpect(content().contentType(MediaType.APPLICATION_FORM_URLENCODED))
 			.andExpect(method(HttpMethod.POST))
 			.andRespond(withUnauthorizedRequest());
+	}
+
+	protected void configure401MockServer(String requestUri, String responseBody) {
+		mockServer.expect(requestTo(requestUri))
+			.andExpect(content().contentType(MediaType.APPLICATION_FORM_URLENCODED))
+			.andExpect(method(HttpMethod.POST))
+			.andRespond(withUnauthorizedRequest().body(responseBody).contentType(MediaType.APPLICATION_JSON));
 	}
 
 	protected String readResourceFile(String fileName) throws IOException {
