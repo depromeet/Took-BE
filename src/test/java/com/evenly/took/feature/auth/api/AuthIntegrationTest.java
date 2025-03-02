@@ -33,6 +33,14 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.then().log().all()
 				.statusCode(302);
 		}
+
+		@Test
+		void 제공하지_않는_플랫폼_소셜로그인을_요청한_경우_400_예외를_반환한다() {
+			given().log().all()
+				.when().get("/api/auth/INVALID")
+				.then().log().all()
+				.statusCode(400);
+		}
 	}
 
 	@Nested
