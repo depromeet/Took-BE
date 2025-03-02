@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client;
+package com.evenly.took.feature.auth.client.kakao;
 
 import static org.assertj.core.api.Assertions.*;
 

@@ -1,9 +1,10 @@
-package com.evenly.took.feature.auth.client;
+package com.evenly.took.feature.auth.client.kakao;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.evenly.took.feature.auth.client.AuthCodeRequestUrlProvider;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.global.config.properties.auth.KakaoProperties;
 

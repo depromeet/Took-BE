@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client;
+package com.evenly.took.feature.auth.client.kakao;
 
 import java.nio.charset.StandardCharsets;
 
@@ -8,9 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import com.evenly.took.feature.auth.client.dto.KakaoTokenRequest;
-import com.evenly.took.feature.auth.client.dto.KakaoTokenResponse;
-import com.evenly.took.feature.auth.client.dto.KakaoUserResponse;
+import com.evenly.took.feature.auth.client.UserClient;
+import com.evenly.took.feature.auth.client.kakao.dto.KakaoTokenRequest;
+import com.evenly.took.feature.auth.client.kakao.dto.KakaoTokenResponse;
+import com.evenly.took.feature.auth.client.kakao.dto.KakaoUserResponse;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.user.domain.User;

@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client;
+package com.evenly.took.feature.auth.client.kakao;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +10,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 
-import com.evenly.took.feature.auth.client.dto.KakaoErrorResponse;
+import com.evenly.took.feature.auth.client.kakao.dto.KakaoErrorResponse;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 import com.fasterxml.jackson.databind.ObjectMapper;
