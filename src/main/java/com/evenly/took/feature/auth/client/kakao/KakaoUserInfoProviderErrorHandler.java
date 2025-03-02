@@ -27,6 +27,7 @@ public class KakaoUserInfoProviderErrorHandler implements ResponseErrorHandler {
 	public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
 		if (response.getStatusCode().is4xxClientError()) {
 			handle4xxError(response);
+			return;
 		}
 		log.error("카카오 소셜 로그인 과정에서 에러 발생: {}", new String(response.getBody().readAllBytes()));
 		throw new TookException(AuthErrorCode.KAKAO_SERVER_ERROR);
