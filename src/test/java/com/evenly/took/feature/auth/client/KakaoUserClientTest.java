@@ -39,7 +39,8 @@ class KakaoUserClientTest extends BaseRestClientTest {
 
 		// when, then
 		assertThatThrownBy(() -> kakaoUserClient.fetch("valid-code"))
-			.isInstanceOf(TookException.class); // TODO exception message 추가
+			.isInstanceOf(TookException.class)
+			.hasMessage(AuthErrorCode.KAKAO_INVALID_APP_INFO.getMessage());
 	}
 
 	@Test
@@ -50,6 +51,7 @@ class KakaoUserClientTest extends BaseRestClientTest {
 
 		// when, then
 		assertThatThrownBy(() -> kakaoUserClient.fetch("invalid-code"))
-			.isInstanceOf(TookException.class);
+			.isInstanceOf(TookException.class)
+			.hasMessage(AuthErrorCode.KAKAO_INVALID_AUTH_CODE.getMessage());
 	}
 }
