@@ -28,3 +28,9 @@ auth:
   access-token-secret: dummy_access_token_secret_dummy_access_token_secret
   access-token-expiration-time: 3600
   refresh-token-expiration-time: 5
+
+oauth: # TODO application.yml로 공통 필드 추출
+  kakao:
+    auth-code-url: https://kauth.kakao.com/oauth/authorize
+    client-id: clientId
+    redirect-uri: redirectUri
