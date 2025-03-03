@@ -23,9 +23,14 @@ public class UserClientComposite {
 			.collect(Collectors.toMap(UserClient::supportType, Function.identity()));
 	}
 
-	public User fetch(OAuthType oauthType, String authCode) {
+	public User fetch(OAuthType oauthType, AuthContext context) {
 		return Optional.ofNullable(mapping.get(oauthType))
 			.orElseThrow(() -> new TookException(AuthErrorCode.OAUTH_TYPE_NOT_FOUND))
-			.fetch(authCode);
+			.fetch(context);
+	}
+
+	public User fetch(OAuthType oauthType, String authCode) {
+		AuthContext context = new AuthContext(authCode);
+		return fetch(oauthType, context);
 	}
 }

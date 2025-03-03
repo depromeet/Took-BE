@@ -28,3 +28,11 @@ auth:
   access-token-secret: dummy_access_token_secret_dummy_access_token_secret
   access-token-expiration-time: 3600
   refresh-token-expiration-time: 5
+
+oauth:
+  apple:
+    client-id: dummy_client_id
+    redirect-uri: dummy_redirect_uri
+    team-id: dummy_team_id
+    key-id: dummy_key_id
+    private-key: dummy_private_key

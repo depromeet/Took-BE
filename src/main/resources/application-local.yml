@@ -58,3 +58,14 @@ auth:
   access-token-secret: ${JWT_ACCESS_TOKEN_SECRET:secret}
   access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME:7200}
   refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
+
+oauth:
+  apple:
+    client-id: ${APPLE_OAUTH_CLIENT_ID}
+    redirect-uri: ${APPLE_OAUTH_REDIRECT_URI}
+    team-id: ${APPLE_OAUTH_TEAM_ID}
+    key-id: ${APPLE_OAUTH_KEY_ID}
+    private-key: ${APPLE_OAUTH_PRIVATE_KEY}
+    url:
+      token-url: ${APPLE_OAUTH_TOKEN_URL}
+      auth-url: ${APPLE_OAUTH_AUTH_URL}

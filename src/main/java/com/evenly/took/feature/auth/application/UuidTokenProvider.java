@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
-import com.evenly.took.global.config.properties.jwt.AuthProperties;
+import com.evenly.took.global.config.properties.auth.TokenProperties;
 import com.evenly.took.global.redis.RedisService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,12 +16,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UuidTokenProvider {
 
-	private final AuthProperties authProperties;
+	private final TokenProperties tokenProperties;
 	private final RedisService redisService;
 
 	public String generateRefreshToken(String userId) {
 		String refreshToken = UUID.randomUUID().toString();
-		Duration expiration = Duration.ofSeconds(authProperties.refreshTokenExpirationTime());
+		Duration expiration = Duration.ofSeconds(tokenProperties.refreshTokenExpirationTime());
 		redisService.setValueWithTTL(refreshToken, userId, expiration);
 		return refreshToken;
 	}

@@ -3,6 +3,7 @@ package com.evenly.took.feature.auth.application;
 import org.springframework.stereotype.Service;
 
 import com.evenly.took.feature.auth.client.AuthCodeRequestUrlProviderComposite;
+import com.evenly.took.feature.auth.client.AuthContext;
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.TokenDto;
@@ -34,7 +35,15 @@ public class AuthService {
 		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
 			.orElseGet(() -> userRepository.save(user));
 		TokenDto tokens = tokenProvider.provideTokens(savedUser);
-		return new AuthResponse(tokens, user);
+		return new AuthResponse(tokens, savedUser);
+	}
+
+	public AuthResponse loginAndGenerateToken(OAuthType oauthType, AuthContext context) {
+		User user = userClientComposite.fetch(oauthType, context);
+		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
+			.orElseGet(() -> userRepository.save(user));
+		TokenDto tokens = tokenProvider.provideTokens(savedUser);
+		return new AuthResponse(tokens, savedUser);
 	}
 
 	public TokenResponse refreshToken(RefreshTokenRequest request) {
