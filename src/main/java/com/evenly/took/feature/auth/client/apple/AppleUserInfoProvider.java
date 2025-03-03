@@ -65,7 +65,6 @@ public class AppleUserInfoProvider {
 				log.error("ID 토큰에 sub 클레임이 없음");
 				throw new TookException(AuthErrorCode.APPLE_INVALID_ID_TOKEN);
 			}
-			log.info(sub);
 
 			// 5. 선택적 정보 (email) 추출
 			String email = payloadJson.has("email") ? payloadJson.get("email").asText() : null;

@@ -9,6 +9,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.evenly.took.feature.auth.client.AuthContext;
 import com.evenly.took.feature.auth.client.UserClient;
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
@@ -62,7 +63,7 @@ class UserClientCompositeTest extends MockTest {
 		}
 
 		@Override
-		public User fetch(String authCode) {
+		public User fetch(AuthContext authContext) {
 			OAuthIdentifier oauthIdentifier = OAuthIdentifier.builder()
 				.oauthId("test")
 				.oauthType(OAuthType.GOOGLE)
