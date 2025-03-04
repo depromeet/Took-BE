@@ -6,9 +6,10 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.feature.user.domain.User;
-import com.evenly.took.global.config.properties.jwt.AuthProperties;
+import com.evenly.took.global.config.properties.auth.TokenProperties;
 import com.evenly.took.global.service.MockTest;
 
 class JwtTokenProviderTest extends MockTest {
@@ -23,8 +24,8 @@ class JwtTokenProviderTest extends MockTest {
 
 		String accessTokenSecret = "secretKey123secretKey123secretKey123";
 
-		AuthProperties authProperties = new AuthProperties(accessTokenSecret, 3600L, 1L);
-		jwtTokenProvider = new JwtTokenProvider(authProperties);
+		TokenProperties tokenProperties = new TokenProperties(accessTokenSecret, 3600L, 1L);
+		jwtTokenProvider = new JwtTokenProvider(tokenProperties);
 	}
 
 	@Test
@@ -58,6 +59,7 @@ class JwtTokenProviderTest extends MockTest {
 
 		// when & then (예외 발생 검증)
 		assertThatThrownBy(() -> jwtTokenProvider.validateToken(invalidToken))
-			.isInstanceOf(TookException.class);
+			.isInstanceOf(TookException.class)
+			.hasMessage(AuthErrorCode.INVALID_ACCESS_TOKEN.getMessage());
 	}
 }

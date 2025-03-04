@@ -15,6 +15,10 @@ public enum AuthErrorCode implements ErrorCode {
 	JWT_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "JWT를 찾을 수 없습니다."),
 	EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "refresh token이 만료되었습니다."),
 	INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "access token이 유효하지 않습니다."),
+	KAKAO_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 로그인 서버와의 연결 과정에서 문제가 발생하였습니다."),
+	KAKAO_INVALID_APP_INFO(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 애플리케이션 정보가 유효하지 않습니다."),
+	KAKAO_INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "카카오 인증 코드가 유효하지 않습니다."),
+	KAKAO_INVALID_ACCESS_TOKEN(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 access token이 유효하지 않습니다."),
 	;
 
 	private final HttpStatus status;

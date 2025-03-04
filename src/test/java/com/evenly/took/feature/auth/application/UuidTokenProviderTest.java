@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.redis.RedisService;
 import com.evenly.took.global.service.ServiceTest;
@@ -47,7 +48,8 @@ class UuidTokenProviderTest extends ServiceTest {
 	@Test
 	void 리프레쉬_토큰이_존재하지_않는_경우_예외를_반환한다() {
 		assertThatThrownBy(() -> uuidTokenProvider.getUserId("dummy"))
-			.isInstanceOf(TookException.class);
+			.isInstanceOf(TookException.class)
+			.hasMessage(AuthErrorCode.EXPIRED_REFRESH_TOKEN.getMessage());
 	}
 
 	@Test
@@ -58,6 +60,7 @@ class UuidTokenProviderTest extends ServiceTest {
 
 		// when & then
 		assertThatThrownBy(() -> uuidTokenProvider.getUserId(refreshToken + "invalid"))
-			.isInstanceOf(TookException.class);
+			.isInstanceOf(TookException.class)
+			.hasMessage(AuthErrorCode.EXPIRED_REFRESH_TOKEN.getMessage());
 	}
 }

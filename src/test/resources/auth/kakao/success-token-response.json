@@ -1,0 +1,7 @@
+{
+  "access_token": "took-access-token",
+  "token_type": "bearer",
+  "refresh_token": "took-refresh-token",
+  "expires_in": 21599,
+  "refresh_token_expires_in": 5183999
+}
