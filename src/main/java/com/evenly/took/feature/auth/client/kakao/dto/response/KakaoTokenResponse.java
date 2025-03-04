@@ -14,6 +14,6 @@ public record KakaoTokenResponse(
 	String refreshToken,
 
 	@JsonProperty("refresh_token_expires_in")
-	String refreshTokenExpiresIn
+	Integer refreshTokenExpiresIn
 ) {
 }
