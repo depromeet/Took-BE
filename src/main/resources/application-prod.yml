@@ -50,6 +50,15 @@ auth:
   refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
 
 oauth:
+  google:
+    redirect-uri: ${GOOGLE_OAUTH_REDIRECT_URI}
+    client-id: ${GOOGLE_OAUTH_CLIENT_ID}
+    client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET}
+    scope: ${GOOGLE_OAUTH_SCOPE}
+    url:
+      authorization-uri: ${GOOGLE_AUTHORIZATION_URL}
+      token-uri: ${GOOGLE_OAUTH_TOKEN_URI}
+      user-info-url: ${GOOGLE_OAUTH_USER_INFO_URL}
   kakao:
     client-id: ${KAKAO_CLIENT_ID}
     redirect-uri: ${KAKAO_REDIRECT_URI}
