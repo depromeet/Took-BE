@@ -15,11 +15,13 @@ public enum AuthErrorCode implements ErrorCode {
 	JWT_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "JWT를 찾을 수 없습니다."),
 	EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "refresh token이 만료되었습니다."),
 	INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "access token이 유효하지 않습니다."),
-	INVALID_GOOGLE_TOKEN(HttpStatus.UNAUTHORIZED, "Google OAuth 토큰 발급 실패: 유효한 토큰 응답을 받지 못했습니다."),
-	INVALID_GOOGLE_USER_NOT_FOUND(HttpStatus.UNAUTHORIZED,
-		"Google OAuth 사용자 정보 조회 실패: 응답 상태가 비정상적이거나 사용자 정보를 확인할 수 없습니다."),
-	INVALID_GOOGLE_CONNECTION(HttpStatus.BAD_GATEWAY,
-		"Google OAuth 통신 오류: 사용자 정보를 가져오는 중 HTTP 클라이언트 에러가 발생했습니다."),
+	INVALID_GOOGLE_TOKEN_REQUEST(HttpStatus.BAD_REQUEST, "Google 승인코드 요청 중 잘못된 요청으로 오류가 발생했습니다."),
+	INVALID_GOOGLE_USER_REQUEST(HttpStatus.BAD_REQUEST,
+		"Google OAuth V2 정보 요청 중 잘못된 요청으로 오류가 발생했습니다."),
+	INVALID_GOOGLE_USER_EXPIRED_REQUEST(HttpStatus.INTERNAL_SERVER_ERROR,
+		"Google OAuth V2 정보 요청 중 만료된 토큰 또는 승인코드로 오류가 발생했습니다."),
+	INVALID_GOOGLE_CONNECTION(HttpStatus.INTERNAL_SERVER_ERROR,
+		"Google OAuth 통신 오류: 구글 로그인 서버와의 연결 과정 중 문제가 발생했습니다."),
 	;
 
 	private final HttpStatus status;
