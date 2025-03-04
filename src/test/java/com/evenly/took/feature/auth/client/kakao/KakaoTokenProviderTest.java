@@ -70,4 +70,16 @@ class KakaoTokenProviderTest extends BaseRestClientTest {
 			.isInstanceOf(TookException.class)
 			.hasMessage(AuthErrorCode.KAKAO_INVALID_AUTH_CODE.getMessage());
 	}
+
+	@Test
+	void 처리하지_않은_에러가_발생할_경우_500_에러를_반환한다() throws IOException {
+		// given
+		String errorResponseBody = readResourceFile("auth/kakao/error-unhandled.json");
+		configure400MockServer(kakaoProperties.url().tokenUrl(), errorResponseBody);
+
+		// when, then
+		assertThatThrownBy(() -> kakaoTokenProvider.fetchAccessToken("code"))
+			.isInstanceOf(TookException.class)
+			.hasMessage(AuthErrorCode.KAKAO_SERVER_ERROR.getMessage());
+	}
 }

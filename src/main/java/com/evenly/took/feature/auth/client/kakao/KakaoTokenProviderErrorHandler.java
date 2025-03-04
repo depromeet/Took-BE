@@ -1,7 +1,6 @@
 package com.evenly.took.feature.auth.client.kakao;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 import org.springframework.http.HttpMethod;
@@ -32,24 +31,24 @@ public class KakaoTokenProviderErrorHandler implements ResponseErrorHandler {
 
 	@Override
 	public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
+		byte[] responseBody = response.getBody().readAllBytes();
 		if (response.getStatusCode().is4xxClientError()) {
-			handle4xxError(response);
-			return;
+			handle4xxError(response, new String(responseBody));
 		}
-		log.error("카카오 소셜 로그인 과정에서 에러 발생: {}", new String(response.getBody().readAllBytes()));
+		log.error("카카오 소셜 로그인 과정에서 에러 발생: {}", new String(responseBody));
 		throw new TookException(AuthErrorCode.KAKAO_SERVER_ERROR);
 	}
 
-	private void handle4xxError(ClientHttpResponse response) throws IOException {
+	private void handle4xxError(ClientHttpResponse response, String responseBody) throws IOException {
 		if (response.getStatusCode().isSameCodeAs(HttpStatus.UNAUTHORIZED)) {
 			throw new TookException(AuthErrorCode.KAKAO_INVALID_APP_INFO);
 		}
-		if (hasErrorCodeOf(response.getBody(), ERROR_CODE_WHEN_INVALID_CODE)) {
+		if (hasErrorCodeOf(responseBody, ERROR_CODE_WHEN_INVALID_CODE)) {
 			throw new TookException(AuthErrorCode.KAKAO_INVALID_AUTH_CODE);
 		}
 	}
 
-	private boolean hasErrorCodeOf(InputStream responseBody, String errorCode) throws IOException {
+	private boolean hasErrorCodeOf(String responseBody, String errorCode) throws IOException {
 		KakaoErrorResponse response = OBJECT_MAPPER.readValue(responseBody, KakaoErrorResponse.class);
 		return response.errorCode().equals(errorCode);
 	}

@@ -59,4 +59,16 @@ class KakaoUserInfoProviderTest extends BaseRestClientTest {
 			.isInstanceOf(TookException.class)
 			.hasMessage(AuthErrorCode.KAKAO_INVALID_ACCESS_TOKEN.getMessage());
 	}
+
+	@Test
+	void 처리하지_않은_에러가_발생할_경우_500_에러를_반환한다() throws IOException {
+		// given
+		String errorResponseBody = readResourceFile("auth/kakao/error-unhandled.json");
+		configure400MockServer(kakaoProperties.url().userInfoUrl(), errorResponseBody);
+
+		// when, then
+		assertThatThrownBy(() -> kakaoUserInfoProvider.fetchUserInfo("access-token"))
+			.isInstanceOf(TookException.class)
+			.hasMessage(AuthErrorCode.KAKAO_SERVER_ERROR.getMessage());
+	}
 }
