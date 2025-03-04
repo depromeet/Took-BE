@@ -5,11 +5,11 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
-import com.evenly.took.feature.auth.client.google.dto.GoogleTokenResponse;
+import com.evenly.took.feature.auth.client.google.dto.request.GoogleTokenRequest;
+import com.evenly.took.feature.auth.client.google.dto.response.GoogleTokenResponse;
+import com.evenly.took.feature.auth.client.google.error.GoogleTokenProviderErrorHandler;
 import com.evenly.took.global.config.properties.auth.GoogleProperties;
 import com.evenly.took.global.config.properties.auth.GoogleUrlProperties;
 
@@ -35,21 +35,12 @@ public class GoogleTokenProvider {
 	}
 
 	public GoogleTokenResponse fetchAccessToken(String authCode) {
+		GoogleTokenRequest request = GoogleTokenRequest.of(googleProperties, authCode);
 		return restClient.post()
 			.uri(googleUrlProperties.tokenUri())
 			.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-			.body(getTokenRequestParams(authCode))
+			.body(request.toMultiValueMap())
 			.retrieve()
 			.body(GoogleTokenResponse.class);
-	}
-
-	private MultiValueMap<String, String> getTokenRequestParams(String authCode) {
-		MultiValueMap<String, String> tokenRequestParams = new LinkedMultiValueMap<>();
-		tokenRequestParams.add("code", authCode);
-		tokenRequestParams.add("client_id", googleProperties.clientId());
-		tokenRequestParams.add("client_secret", googleProperties.clientSecret());
-		tokenRequestParams.add("redirect_uri", googleProperties.redirectUri());
-		tokenRequestParams.add("grant_type", "authorization_code");
-		return tokenRequestParams;
 	}
 }
