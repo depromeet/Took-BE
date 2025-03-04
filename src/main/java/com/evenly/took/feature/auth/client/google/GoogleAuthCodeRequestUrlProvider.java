@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.evenly.took.feature.auth.client.AuthCodeRequestUrlProvider;
-import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.config.properties.GoogleProperties;
 import com.evenly.took.feature.auth.config.properties.GoogleUrlProperties;
+import com.evenly.took.feature.auth.domain.OAuthType;
 
 import lombok.RequiredArgsConstructor;
 
