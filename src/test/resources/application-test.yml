@@ -29,7 +29,7 @@ auth:
   access-token-expiration-time: 3600
   refresh-token-expiration-time: 5
 
-oauth: # TODO application.yml로 공통 필드 추출
+oauth:
   kakao:
     client-id: clientId
     redirect-uri: redirectUri
