@@ -1,49 +1,34 @@
 package com.evenly.took.feature.auth.client.google;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
 import org.mockito.Mock;
 import org.springframework.web.client.RestClient;
 
 import com.evenly.took.feature.auth.client.google.dto.GoogleUserInfoResponse;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
-import com.evenly.took.global.config.properties.auth.GoogleProperties;
-import com.evenly.took.global.service.MockTest;
 
-public class GoogleUserInfoProviderTest extends MockTest {
-
-	@Mock
-	private GoogleProperties googleProperties;
-
-	@Mock
-	private RestClient.Builder restClientBuilder;
+public class GoogleUserInfoProviderTest extends MockGoogleProviderTest {
 
 	@Mock
 	private GoogleUserInfoProviderErrorHandler errorHandler;
 
-	@Mock(answer = Answers.RETURNS_DEEP_STUBS)
-	private RestClient restClient;
-
 	private GoogleUserInfoProvider googleUserInfoProvider;
 
 	@BeforeEach
-	void setUp() {
-		when(restClientBuilder.defaultStatusHandler(errorHandler)).thenReturn(restClientBuilder);
-		when(restClientBuilder.defaultHeader("Content-Type", "application/x-www-form-urlencoded", "UTF-8"))
-			.thenReturn(restClientBuilder);
-		when(restClientBuilder.build()).thenReturn(restClient);
-
+	void setUpUserInfoProvider() {
 		googleUserInfoProvider = new GoogleUserInfoProvider(googleProperties, restClientBuilder, errorHandler);
 	}
 
 	@Nested
 	class 성공_케이스 {
+
 		@Test
 		void 유효한_액세스토큰_주어졌을때_사용자정보_반환() {
 			// given
@@ -70,6 +55,7 @@ public class GoogleUserInfoProviderTest extends MockTest {
 
 	@Nested
 	class 실패_케이스 {
+
 		@Test
 		void 사용자정보_조회시_예외발생() {
 			// given
@@ -81,7 +67,7 @@ public class GoogleUserInfoProviderTest extends MockTest {
 			when(requestSpec.header("Authorization", "Bearer " + accessToken)).thenReturn(requestSpec);
 			RestClient.ResponseSpec responseSpec = requestSpec.retrieve();
 			when(responseSpec.body(eq(GoogleUserInfoResponse.class)))
-				.thenThrow(new TookException(AuthErrorCode.INVALID_GOOGLE_USER_REQUEST));
+				.thenThrow(new TookException(AuthErrorCode.INVALID_GOOGLE_SERVER_ERROR));
 
 			// when, then
 			assertThatThrownBy(() -> googleUserInfoProvider.fetchUserInfo(accessToken))
