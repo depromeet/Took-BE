@@ -1,7 +1,6 @@
 package com.evenly.took.feature.auth.client.apple.error;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 import org.springframework.http.HttpMethod;
@@ -28,30 +27,34 @@ public abstract class AppleErrorHandler implements ResponseErrorHandler {
 
 	@Override
 	public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
+		// 응답 본문을 한 번만 읽어 저장
+		byte[] responseBody = response.getBody().readAllBytes();
+		String responseBodyStr = new String(responseBody);
+
 		if (response.getStatusCode().is4xxClientError()) {
 			try {
-				handle4xxError(response);
+				// 저장된 응답 본문을 전달
+				handle4xxError(response, responseBodyStr);
 			} catch (TookException e) {
 				throw e;
 			}
 			// 나머지 4xx 상태는 여기서 공통 예외 처리
-			log.error("처리되지 않은 Apple 4xx 에러 발생: {}", new String(response.getBody().readAllBytes()));
+			log.error("처리되지 않은 Apple 4xx 에러 발생: {}", responseBodyStr);
 			throw new TookException(AuthErrorCode.APPLE_SERVER_ERROR);
 		}
-		log.error("애플 소셜 로그인 과정에서 에러 발생: {}", new String(response.getBody().readAllBytes()));
+		log.error("애플 소셜 로그인 과정에서 에러 발생: {}", responseBodyStr);
 		throw new TookException(AuthErrorCode.APPLE_SERVER_ERROR);
 	}
 
 	/**
 	 * 4xx 에러를 처리하는 추상 메서드
-	 * 각 하위 클래스에서 구체적인 에러 처리 로직 구현
 	 */
-	protected abstract void handle4xxError(ClientHttpResponse response) throws IOException;
+	protected abstract void handle4xxError(ClientHttpResponse response, String responseBody) throws IOException;
 
 	/**
 	 * 에러 응답을 AppleErrorResponse 객체로 파싱
 	 */
-	protected AppleErrorResponse parseErrorResponse(InputStream responseBody) throws IOException {
+	protected AppleErrorResponse parseErrorResponse(String responseBody) throws IOException {
 		try {
 			return OBJECT_MAPPER.readValue(responseBody, AppleErrorResponse.class);
 		} catch (Exception e) {

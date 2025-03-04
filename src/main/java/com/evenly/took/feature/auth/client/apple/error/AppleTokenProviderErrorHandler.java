@@ -22,12 +22,12 @@ public class AppleTokenProviderErrorHandler extends AppleErrorHandler {
 	private static final String ERROR_INVALID_CLIENT = "invalid_client";
 
 	@Override
-	protected void handle4xxError(ClientHttpResponse response) throws IOException {
+	protected void handle4xxError(ClientHttpResponse response, String responseBody) throws IOException {
 		if (isUnauthorized(response)) {
 			throw new TookException(AuthErrorCode.APPLE_INVALID_APP_INFO);
 		}
 
-		AppleErrorResponse errorResponse = parseErrorResponse(response.getBody());
+		AppleErrorResponse errorResponse = parseErrorResponse(responseBody);
 
 		if (hasErrorCode(errorResponse, ERROR_INVALID_GRANT)) {
 			throw new TookException(AuthErrorCode.APPLE_INVALID_AUTH_CODE);
