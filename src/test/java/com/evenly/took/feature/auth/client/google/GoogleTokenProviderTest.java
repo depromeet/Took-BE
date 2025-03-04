@@ -11,7 +11,8 @@ import org.mockito.Mock;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
-import com.evenly.took.feature.auth.client.google.dto.GoogleTokenResponse;
+import com.evenly.took.feature.auth.client.google.dto.response.GoogleTokenResponse;
+import com.evenly.took.feature.auth.client.google.error.GoogleTokenProviderErrorHandler;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 

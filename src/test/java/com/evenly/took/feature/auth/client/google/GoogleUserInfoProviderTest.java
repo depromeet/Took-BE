@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.web.client.RestClient;
 
-import com.evenly.took.feature.auth.client.google.dto.GoogleUserInfoResponse;
+import com.evenly.took.feature.auth.client.google.dto.response.GoogleUserInfoResponse;
+import com.evenly.took.feature.auth.client.google.error.GoogleUserInfoProviderErrorHandler;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 

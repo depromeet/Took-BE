@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client.google;
+package com.evenly.took.feature.auth.client.google.error;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class GoogleTokenProviderErrorHandler implements ResponseErrorHandler {
+public class GoogleUserInfoProviderErrorHandler implements ResponseErrorHandler {
 
 	@Override
 	public boolean hasError(ClientHttpResponse response) throws IOException {
@@ -29,10 +29,14 @@ public class GoogleTokenProviderErrorHandler implements ResponseErrorHandler {
 		String responseBody = StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8);
 
 		if (response.getStatusCode().is4xxClientError()) {
-			throw new TookException(AuthErrorCode.INVALID_GOOGLE_TOKEN_REQUEST);
+			throw new TookException(AuthErrorCode.INVALID_GOOGLE_USER_REQUEST);
 		}
 
-		log.error("Google 승인토큰 오류: {}", responseBody);
+		if (response.getStatusCode().is5xxServerError()) {
+			throw new TookException(AuthErrorCode.INVALID_GOOGLE_SERVER_ERROR);
+		}
+
+		log.error("Google 사용자정보 알 수 없는 오류: {}", responseBody);
 		throw new TookException(AuthErrorCode.INVALID_GOOGLE_CONNECTION);
 	}
 }

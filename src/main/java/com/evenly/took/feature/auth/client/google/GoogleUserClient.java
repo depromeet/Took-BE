@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.evenly.took.feature.auth.client.UserClient;
-import com.evenly.took.feature.auth.client.google.dto.GoogleTokenResponse;
-import com.evenly.took.feature.auth.client.google.dto.GoogleUserInfoResponse;
+import com.evenly.took.feature.auth.client.google.dto.response.GoogleTokenResponse;
+import com.evenly.took.feature.auth.client.google.dto.response.GoogleUserInfoResponse;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;

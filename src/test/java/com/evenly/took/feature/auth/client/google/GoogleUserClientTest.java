@@ -10,8 +10,8 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.evenly.took.feature.auth.client.google.dto.GoogleTokenResponse;
-import com.evenly.took.feature.auth.client.google.dto.GoogleUserInfoResponse;
+import com.evenly.took.feature.auth.client.google.dto.response.GoogleTokenResponse;
+import com.evenly.took.feature.auth.client.google.dto.response.GoogleUserInfoResponse;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;

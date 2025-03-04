@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client.google.dto;
+package com.evenly.took.feature.auth.client.google.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
