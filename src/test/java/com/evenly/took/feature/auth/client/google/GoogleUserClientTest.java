@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.evenly.took.feature.auth.client.AuthContext;
 import com.evenly.took.feature.auth.client.google.dto.response.GoogleTokenResponse;
 import com.evenly.took.feature.auth.client.google.dto.response.GoogleUserInfoResponse;
 import com.evenly.took.feature.auth.domain.OAuthType;
@@ -43,7 +44,7 @@ public class GoogleUserClientTest extends MockTest {
 			when(googleUserInfoProvider.fetchUserInfo(tokenResponse.accessToken())).thenReturn(userInfoResponse);
 
 			// when
-			User user = googleUserClient.fetch(authCode);
+			User user = googleUserClient.fetch(new AuthContext(authCode));
 
 			// then
 			assertThat(user).isNotNull();
@@ -63,7 +64,7 @@ public class GoogleUserClientTest extends MockTest {
 				.thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
 			// when, then
-			assertThatThrownBy(() -> googleUserClient.fetch(authCode))
+			assertThatThrownBy(() -> googleUserClient.fetch(new AuthContext(authCode)))
 				.isInstanceOf(TookException.class)
 				.hasFieldOrPropertyWithValue("errorCode", AuthErrorCode.INVALID_GOOGLE_CONNECTION);
 		}
