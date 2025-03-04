@@ -65,9 +65,10 @@ public class GoogleUserInfoProviderTest extends MockGoogleProviderTest {
 
 			RestClient.RequestHeadersSpec requestSpec = restClient.get().uri(userInfoUrl);
 			when(requestSpec.header("Authorization", "Bearer " + accessToken)).thenReturn(requestSpec);
+
 			RestClient.ResponseSpec responseSpec = requestSpec.retrieve();
-			when(responseSpec.body(eq(GoogleUserInfoResponse.class)))
-				.thenThrow(new TookException(AuthErrorCode.INVALID_GOOGLE_SERVER_ERROR));
+			when(responseSpec.body(any(Class.class)))
+				.thenThrow(new TookException(AuthErrorCode.INVALID_GOOGLE_USER_REQUEST));
 
 			// when, then
 			assertThatThrownBy(() -> googleUserInfoProvider.fetchUserInfo(accessToken))

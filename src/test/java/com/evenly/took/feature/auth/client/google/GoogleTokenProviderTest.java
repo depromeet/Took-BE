@@ -44,6 +44,7 @@ public class GoogleTokenProviderTest extends MockGoogleProviderTest {
 			RestClient.RequestBodySpec requestBodySpec = restClient.post().uri(tokenUri);
 			when(requestBodySpec.header(anyString(), (String[])any())).thenReturn(requestBodySpec);
 			lenient().when(requestBodySpec.body(any(MultiValueMap.class))).thenReturn(requestBodySpec);
+
 			RestClient.ResponseSpec responseSpec = requestBodySpec.retrieve();
 			when(responseSpec.body(eq(GoogleTokenResponse.class))).thenReturn(expectedResponse);
 
@@ -69,8 +70,8 @@ public class GoogleTokenProviderTest extends MockGoogleProviderTest {
 			RestClient.RequestBodySpec requestBodySpec = restClient.post().uri(tokenUri);
 			when(requestBodySpec.header(anyString(), (String[])any())).thenReturn(requestBodySpec);
 			lenient().when(requestBodySpec.body(any(MultiValueMap.class))).thenReturn(requestBodySpec);
-			RestClient.ResponseSpec responseSpec = requestBodySpec.retrieve();
-			when(responseSpec.body(eq(GoogleTokenResponse.class)))
+
+			when(requestBodySpec.retrieve())
 				.thenThrow(new TookException(AuthErrorCode.INVALID_GOOGLE_TOKEN_REQUEST));
 
 			// when, then
