@@ -33,7 +33,7 @@ public class GoogleUserInfoProviderErrorHandler implements ResponseErrorHandler 
 		}
 
 		if (response.getStatusCode().is5xxServerError()) {
-			throw new TookException(AuthErrorCode.INVALID_GOOGLE_USER_EXPIRED_REQUEST);
+			throw new TookException(AuthErrorCode.INVALID_GOOGLE_SERVER_ERROR);
 		}
 
 		log.error("Google 사용자정보 알 수 없는 오류: {}", responseBody);

@@ -18,7 +18,7 @@ public enum AuthErrorCode implements ErrorCode {
 	INVALID_GOOGLE_TOKEN_REQUEST(HttpStatus.BAD_REQUEST, "Google 승인코드 요청 중 잘못된 요청으로 오류가 발생했습니다."),
 	INVALID_GOOGLE_USER_REQUEST(HttpStatus.BAD_REQUEST,
 		"Google OAuth V2 정보 요청 중 잘못된 요청으로 오류가 발생했습니다."),
-	INVALID_GOOGLE_USER_EXPIRED_REQUEST(HttpStatus.INTERNAL_SERVER_ERROR,
+	INVALID_GOOGLE_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,
 		"Google OAuth V2 정보 요청 중 만료된 토큰 또는 승인코드로 오류가 발생했습니다."),
 	INVALID_GOOGLE_CONNECTION(HttpStatus.INTERNAL_SERVER_ERROR,
 		"Google OAuth 통신 오류: 구글 로그인 서버와의 연결 과정 중 문제가 발생했습니다."),
