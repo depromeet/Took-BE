@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client.apple.dto.error;
+package com.evenly.took.feature.auth.client.apple.error;
 
 import java.io.IOException;
 

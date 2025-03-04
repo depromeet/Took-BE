@@ -14,7 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
-import com.evenly.took.feature.auth.client.apple.dto.error.AppleTokenProviderErrorHandler;
+import com.evenly.took.feature.auth.client.apple.error.AppleTokenProviderErrorHandler;
 import com.evenly.took.global.config.properties.auth.AppleProperties;
 import com.evenly.took.global.config.properties.auth.AppleUrlProperties;
 import com.evenly.took.global.service.MockTest;

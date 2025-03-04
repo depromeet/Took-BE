@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class AuthContext {
+
 	private final String authCode;
 	private final String name;
 

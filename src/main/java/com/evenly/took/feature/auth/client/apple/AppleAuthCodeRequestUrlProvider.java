@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class AppleAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvider {
+
 	private final AppleProperties appleProperties;
 	private final AppleUrlProperties appleUrlProperties;
 
@@ -26,5 +27,5 @@ public class AppleAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvid
 		AppleAuthRequest request = AppleAuthRequest.of(appleProperties);
 		return appleUrlProperties.authUrl() + "?" + request.toQueryString();
 	}
-	
+
 }

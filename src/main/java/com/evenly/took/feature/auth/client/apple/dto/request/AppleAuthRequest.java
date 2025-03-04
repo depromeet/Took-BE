@@ -25,17 +25,6 @@ public record AppleAuthRequest(
 		);
 	}
 
-	public static AppleAuthRequest of(AppleProperties appleProperties, String state) {
-		return new AppleAuthRequest(
-			"code",
-			appleProperties.clientId(),
-			appleProperties.redirectUri(),
-			state,
-			"name email",
-			"form_post"
-		);
-	}
-
 	public String toQueryString() {
 		return Stream.of(
 				paramIfNotNull("response_type", responseType),
