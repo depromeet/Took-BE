@@ -28,3 +28,12 @@ auth:
   access-token-secret: dummy_access_token_secret_dummy_access_token_secret
   access-token-expiration-time: 3600
   refresh-token-expiration-time: 5
+
+oauth:
+  kakao:
+    client-id: clientId
+    redirect-uri: redirectUri
+    url:
+      auth-code-url: https://kauth.kakao.com/oauth/authorize
+      token-url: https://kauth.kakao.com/oauth/token
+      user-info-url: https://kapi.kakao.com/v2/user/me

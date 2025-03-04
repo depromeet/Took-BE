@@ -22,6 +22,10 @@ public enum AuthErrorCode implements ErrorCode {
 		"Google OAuth V2 정보 요청 중 만료된 토큰 또는 승인코드로 오류가 발생했습니다."),
 	INVALID_GOOGLE_CONNECTION(HttpStatus.INTERNAL_SERVER_ERROR,
 		"Google OAuth 통신 오류: 구글 로그인 서버와의 연결 과정 중 문제가 발생했습니다."),
+	KAKAO_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 로그인 서버와의 연결 과정에서 문제가 발생하였습니다."),
+	KAKAO_INVALID_APP_INFO(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 애플리케이션 정보가 유효하지 않습니다."),
+	KAKAO_INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "카카오 인증 코드가 유효하지 않습니다."),
+	KAKAO_INVALID_ACCESS_TOKEN(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 access token이 유효하지 않습니다."),
 	;
 
 	private final HttpStatus status;
