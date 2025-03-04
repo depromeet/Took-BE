@@ -60,6 +60,16 @@ auth:
   refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
 
 oauth:
+  apple:
+    client-id: ${APPLE_OAUTH_CLIENT_ID}
+    redirect-uri: ${APPLE_OAUTH_REDIRECT_URI}
+    team-id: ${APPLE_OAUTH_TEAM_ID}
+    key-id: ${APPLE_OAUTH_KEY_ID}
+    private-key: ${APPLE_OAUTH_PRIVATE_KEY}
+    url:
+      token-url: ${APPLE_OAUTH_TOKEN_URL}
+      auth-url: ${APPLE_OAUTH_AUTH_URL}
+
   google:
     redirect-uri: ${GOOGLE_OAUTH_REDIRECT_URI}
     client-id: ${GOOGLE_OAUTH_CLIENT_ID}
@@ -69,6 +79,7 @@ oauth:
       authorization-uri: ${GOOGLE_AUTHORIZATION_URL}
       token-uri: ${GOOGLE_OAUTH_TOKEN_URI}
       user-info-url: ${GOOGLE_OAUTH_USER_INFO_URL}
+
   kakao:
     client-id: ${KAKAO_CLIENT_ID}
     redirect-uri: ${KAKAO_REDIRECT_URI}
@@ -76,3 +87,4 @@ oauth:
       auth-code-url: https://kauth.kakao.com/oauth/authorize
       token-url: https://kauth.kakao.com/oauth/token
       user-info-url: https://kapi.kakao.com/v2/user/me
+

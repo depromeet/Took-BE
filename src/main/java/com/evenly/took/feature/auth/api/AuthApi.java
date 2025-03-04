@@ -47,7 +47,10 @@ public interface AuthApi {
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType,
 		@Parameter(description = "소셜 서버로부터 전달받은 인가 코드", required = true)
-		@RequestParam String code);
+		@RequestParam String code,
+		@Parameter(description = "애플 최초 가입 시, 서버로부터 전달받는 사용자 이름", required = false)
+		@RequestParam String name
+	);
 
 	@Operation(
 		summary = "토큰 재발급",

@@ -2,6 +2,7 @@ package com.evenly.took.feature.auth.client.kakao;
 
 import org.springframework.stereotype.Component;
 
+import com.evenly.took.feature.auth.client.AuthContext;
 import com.evenly.took.feature.auth.client.UserClient;
 import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoTokenResponse;
 import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoUserResponse;
@@ -24,8 +25,8 @@ public class KakaoUserClient implements UserClient {
 	}
 
 	@Override
-	public User fetch(String authCode) {
-		KakaoTokenResponse tokenResponse = kakaoTokenProvider.fetchAccessToken(authCode);
+	public User fetch(AuthContext authContext) {
+		KakaoTokenResponse tokenResponse = kakaoTokenProvider.fetchAccessToken(authContext.getAuthCode());
 		KakaoUserResponse userResponse = kakaoUserInfoProvider.fetchUserInfo(tokenResponse.accessToken());
 		return buildUser(userResponse);
 	}

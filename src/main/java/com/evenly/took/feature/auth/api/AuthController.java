@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.evenly.took.feature.auth.application.AuthService;
+import com.evenly.took.feature.auth.client.AuthContext;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
@@ -17,7 +18,9 @@ import com.evenly.took.feature.auth.dto.response.TokenResponse;
 import com.evenly.took.global.response.SuccessResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class AuthController implements AuthApi {
@@ -31,9 +34,21 @@ public class AuthController implements AuthApi {
 	}
 
 	@PostMapping("/api/auth/login/{oauthType}")
-	public SuccessResponse<AuthResponse> login(@PathVariable OAuthType oauthType, @RequestParam String code) {
-		AuthResponse response = authService.loginAndGenerateToken(oauthType, code);
-		return SuccessResponse.of(response);
+	public SuccessResponse<AuthResponse> login(
+		@PathVariable OAuthType oauthType,
+		@RequestParam String code,
+		@RequestParam(required = false) String name) {
+
+		if (oauthType == OAuthType.APPLE && name != null) {
+			// 애플 로그인에서 사용자 정보가 있는 경우
+			AuthContext context = new AuthContext(code, name);
+			AuthResponse response = authService.loginAndGenerateToken(oauthType, context);
+			return SuccessResponse.of(response);
+		} else {
+			// 기존 로직 그대로 사용
+			AuthResponse response = authService.loginAndGenerateToken(oauthType, code);
+			return SuccessResponse.of(response);
+		}
 	}
 
 	@PostMapping("/api/auth/refresh")
@@ -41,4 +56,5 @@ public class AuthController implements AuthApi {
 		TokenResponse response = authService.refreshToken(request);
 		return SuccessResponse.of(response);
 	}
+
 }

@@ -7,5 +7,5 @@ public interface UserClient {
 
 	OAuthType supportType();
 
-	User fetch(String authCode);
+	User fetch(AuthContext context);
 }
