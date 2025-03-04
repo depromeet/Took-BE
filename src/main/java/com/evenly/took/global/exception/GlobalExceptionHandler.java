@@ -1,13 +1,16 @@
 package com.evenly.took.global.exception;
 
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.evenly.took.feature.common.exception.CommonErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.exception.dto.ErrorResponse;
+import com.evenly.took.global.exception.dto.RequestParameterErrorResponse;
 import com.evenly.took.global.exception.dto.ServerErrorResponse;
 import com.evenly.took.global.exception.dto.ValidationErrorResponse;
 
@@ -24,6 +27,18 @@ public class GlobalExceptionHandler {
 	public ErrorResponse handle(NoResourceFoundException ex) {
 		ErrorCode errorCode = CommonErrorCode.INVALID_REQUEST_URL;
 		return ErrorResponse.of(errorCode);
+	}
+
+	@ExceptionHandler
+	public ErrorResponse handle(HttpRequestMethodNotSupportedException ex) {
+		ErrorCode errorCode = CommonErrorCode.INVALID_HTTP_METHOD;
+		return ErrorResponse.of(errorCode);
+	}
+
+	@ExceptionHandler
+	public ErrorResponse handle(MethodArgumentTypeMismatchException ex) {
+		ErrorCode errorCode = CommonErrorCode.INVALID_REQUEST_PARAMETER;
+		return RequestParameterErrorResponse.of(errorCode, ex);
 	}
 
 	@ExceptionHandler
