@@ -11,18 +11,22 @@ import org.springframework.web.client.RestClient;
 
 import com.evenly.took.feature.auth.client.google.dto.GoogleTokenResponse;
 import com.evenly.took.global.config.properties.auth.GoogleProperties;
+import com.evenly.took.global.config.properties.auth.GoogleUrlProperties;
 
 @Component
 public class GoogleTokenProvider {
 
 	private final RestClient restClient;
 	private final GoogleProperties googleProperties;
+	private final GoogleUrlProperties googleUrlProperties;
 
 	public GoogleTokenProvider(GoogleProperties googleProperties,
+		GoogleUrlProperties googleUrlProperties,
 		RestClient.Builder restClientBuilder,
 		GoogleTokenProviderErrorHandler errorHandler) {
 
 		this.googleProperties = googleProperties;
+		this.googleUrlProperties = googleUrlProperties;
 		this.restClient = restClientBuilder
 			.defaultStatusHandler(errorHandler)
 			.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE,
@@ -32,7 +36,7 @@ public class GoogleTokenProvider {
 
 	public GoogleTokenResponse fetchAccessToken(String authCode) {
 		return restClient.post()
-			.uri(googleProperties.tokenUri())
+			.uri(googleUrlProperties.tokenUri())
 			.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 			.body(getTokenRequestParams(authCode))
 			.retrieve()

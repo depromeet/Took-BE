@@ -24,7 +24,8 @@ public class GoogleTokenProviderTest extends MockGoogleProviderTest {
 
 	@BeforeEach
 	void setUpTokenProvider() {
-		googleTokenProvider = new GoogleTokenProvider(googleProperties, restClientBuilder, errorHandler);
+		googleTokenProvider =
+			new GoogleTokenProvider(googleProperties, googleUrlProperties, restClientBuilder, errorHandler);
 	}
 
 	@Nested
@@ -35,7 +36,7 @@ public class GoogleTokenProviderTest extends MockGoogleProviderTest {
 			// given
 			String authCode = "validAuthCode";
 			String tokenUri = "http://dummy-token-uri";
-			when(googleProperties.tokenUri()).thenReturn(tokenUri);
+			when(googleUrlProperties.tokenUri()).thenReturn(tokenUri);
 
 			GoogleTokenResponse expectedResponse = new GoogleTokenResponse(
 				"dummyAccessToken", 3600, "scope", "Bearer", "dummyIdToken"
@@ -65,7 +66,7 @@ public class GoogleTokenProviderTest extends MockGoogleProviderTest {
 			// given
 			String authCode = "invalidAuthCode";
 			String tokenUri = "http://dummy-token-uri";
-			when(googleProperties.tokenUri()).thenReturn(tokenUri);
+			when(googleUrlProperties.tokenUri()).thenReturn(tokenUri);
 
 			RestClient.RequestBodySpec requestBodySpec = restClient.post().uri(tokenUri);
 			when(requestBodySpec.header(anyString(), (String[])any())).thenReturn(requestBodySpec);

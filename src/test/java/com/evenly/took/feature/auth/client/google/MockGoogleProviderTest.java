@@ -9,12 +9,16 @@ import org.mockito.Mock;
 import org.springframework.web.client.RestClient;
 
 import com.evenly.took.global.config.properties.auth.GoogleProperties;
+import com.evenly.took.global.config.properties.auth.GoogleUrlProperties;
 import com.evenly.took.global.service.MockTest;
 
 public abstract class MockGoogleProviderTest extends MockTest {
 
 	@Mock
 	protected GoogleProperties googleProperties;
+
+	@Mock
+	protected GoogleUrlProperties googleUrlProperties;
 
 	@Mock
 	protected RestClient.Builder restClientBuilder;

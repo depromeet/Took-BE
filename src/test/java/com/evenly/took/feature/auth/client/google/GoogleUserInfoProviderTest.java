@@ -23,7 +23,7 @@ public class GoogleUserInfoProviderTest extends MockGoogleProviderTest {
 
 	@BeforeEach
 	void setUpUserInfoProvider() {
-		googleUserInfoProvider = new GoogleUserInfoProvider(googleProperties, restClientBuilder, errorHandler);
+		googleUserInfoProvider = new GoogleUserInfoProvider(googleUrlProperties, restClientBuilder, errorHandler);
 	}
 
 	@Nested
@@ -34,7 +34,7 @@ public class GoogleUserInfoProviderTest extends MockGoogleProviderTest {
 			// given
 			String accessToken = "validAccessToken";
 			String userInfoUrl = "http://dummy-userinfo-url";
-			when(googleProperties.userInfoUrl()).thenReturn(userInfoUrl);
+			when(googleUrlProperties.userInfoUrl()).thenReturn(userInfoUrl);
 
 			GoogleUserInfoResponse expectedResponse = new GoogleUserInfoResponse("dummySub", "홍길동");
 
@@ -61,7 +61,7 @@ public class GoogleUserInfoProviderTest extends MockGoogleProviderTest {
 			// given
 			String accessToken = "invalidAccessToken";
 			String userInfoUrl = "http://dummy-userinfo-url";
-			when(googleProperties.userInfoUrl()).thenReturn(userInfoUrl);
+			when(googleUrlProperties.userInfoUrl()).thenReturn(userInfoUrl);
 
 			RestClient.RequestHeadersSpec requestSpec = restClient.get().uri(userInfoUrl);
 			when(requestSpec.header("Authorization", "Bearer " + accessToken)).thenReturn(requestSpec);

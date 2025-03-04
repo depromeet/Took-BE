@@ -6,6 +6,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.evenly.took.feature.auth.client.AuthCodeRequestUrlProvider;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.global.config.properties.auth.GoogleProperties;
+import com.evenly.took.global.config.properties.auth.GoogleUrlProperties;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class GoogleAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvider {
 
 	private final GoogleProperties googleProperties;
+	private final GoogleUrlProperties googleUrlProperties;
 
 	@Override
 	public OAuthType supportType() {
@@ -22,7 +24,7 @@ public class GoogleAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvi
 
 	@Override
 	public String provide() {
-		return UriComponentsBuilder.fromUriString(googleProperties.authorizationUri())
+		return UriComponentsBuilder.fromUriString(googleUrlProperties.authorizationUri())
 			.queryParam("client_id", googleProperties.clientId())
 			.queryParam("redirect_uri", googleProperties.redirectUri())
 			.queryParam("response_type", "code")

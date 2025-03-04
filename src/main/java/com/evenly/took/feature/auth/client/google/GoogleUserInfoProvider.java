@@ -8,19 +8,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import com.evenly.took.feature.auth.client.google.dto.GoogleUserInfoResponse;
-import com.evenly.took.global.config.properties.auth.GoogleProperties;
+import com.evenly.took.global.config.properties.auth.GoogleUrlProperties;
 
 @Component
 public class GoogleUserInfoProvider {
 
 	private final RestClient restClient;
-	private final GoogleProperties googleProperties;
+	private final GoogleUrlProperties googleUrlProperties;
 
-	public GoogleUserInfoProvider(GoogleProperties googleProperties,
+	public GoogleUserInfoProvider(GoogleUrlProperties googleUrlProperties,
 		RestClient.Builder restClientBuilder,
 		GoogleUserInfoProviderErrorHandler errorHandler) {
 
-		this.googleProperties = googleProperties;
+		this.googleUrlProperties = googleUrlProperties;
 		this.restClient = restClientBuilder
 			.defaultStatusHandler(errorHandler)
 			.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE,
@@ -30,7 +30,7 @@ public class GoogleUserInfoProvider {
 
 	public GoogleUserInfoResponse fetchUserInfo(String accessToken) {
 		return restClient.get()
-			.uri(googleProperties.userInfoUrl())
+			.uri(googleUrlProperties.userInfoUrl())
 			.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
 			.retrieve()
 			.body(GoogleUserInfoResponse.class);
