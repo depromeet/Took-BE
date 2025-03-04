@@ -3,7 +3,7 @@ package com.evenly.took.feature.auth.client.google.dto.request;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.evenly.took.global.config.properties.auth.GoogleProperties;
+import com.evenly.took.feature.auth.config.properties.GoogleProperties;
 
 public record GoogleTokenRequest(
 	String grantType,

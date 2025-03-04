@@ -5,7 +5,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.evenly.took.feature.auth.client.AuthCodeRequestUrlProvider;
 import com.evenly.took.feature.auth.domain.OAuthType;
-import com.evenly.took.global.config.properties.auth.KakaoProperties;
+import com.evenly.took.feature.auth.config.properties.KakaoProperties;
 
 import lombok.RequiredArgsConstructor;
 

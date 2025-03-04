@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
-import com.evenly.took.global.config.properties.auth.TokenProperties;
+import com.evenly.took.feature.auth.config.properties.TokenProperties;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

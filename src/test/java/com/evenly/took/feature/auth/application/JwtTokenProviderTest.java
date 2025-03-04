@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.feature.user.domain.User;
-import com.evenly.took.global.config.properties.auth.TokenProperties;
+import com.evenly.took.feature.auth.config.properties.TokenProperties;
 import com.evenly.took.global.service.MockTest;
 
 class JwtTokenProviderTest extends MockTest {

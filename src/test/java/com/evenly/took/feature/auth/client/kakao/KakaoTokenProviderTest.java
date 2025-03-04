@@ -14,7 +14,7 @@ import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoTokenResponse
 import com.evenly.took.feature.auth.client.kakao.error.KakaoTokenProviderErrorHandler;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
-import com.evenly.took.global.config.properties.auth.KakaoProperties;
+import com.evenly.took.feature.auth.config.properties.KakaoProperties;
 import com.evenly.took.global.service.BaseRestClientTest;
 
 @RestClientTest({KakaoTokenProvider.class, KakaoTokenProviderErrorHandler.class})

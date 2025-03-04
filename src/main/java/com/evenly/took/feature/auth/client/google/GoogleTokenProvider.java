@@ -10,8 +10,8 @@ import org.springframework.web.client.RestClient;
 import com.evenly.took.feature.auth.client.google.dto.request.GoogleTokenRequest;
 import com.evenly.took.feature.auth.client.google.dto.response.GoogleTokenResponse;
 import com.evenly.took.feature.auth.client.google.error.GoogleTokenProviderErrorHandler;
-import com.evenly.took.global.config.properties.auth.GoogleProperties;
-import com.evenly.took.global.config.properties.auth.GoogleUrlProperties;
+import com.evenly.took.feature.auth.config.properties.GoogleProperties;
+import com.evenly.took.feature.auth.config.properties.GoogleUrlProperties;
 
 @Component
 public class GoogleTokenProvider {

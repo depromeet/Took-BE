@@ -15,8 +15,8 @@ import org.springframework.web.client.RestClient;
 import com.evenly.took.feature.auth.client.apple.dto.request.AppleTokenRequest;
 import com.evenly.took.feature.auth.client.apple.dto.response.AppleTokenResponse;
 import com.evenly.took.feature.auth.client.apple.error.AppleTokenProviderErrorHandler;
-import com.evenly.took.global.config.properties.auth.AppleProperties;
-import com.evenly.took.global.config.properties.auth.AppleUrlProperties;
+import com.evenly.took.feature.auth.config.properties.AppleProperties;
+import com.evenly.took.feature.auth.config.properties.AppleUrlProperties;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

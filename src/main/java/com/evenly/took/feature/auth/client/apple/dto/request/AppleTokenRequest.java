@@ -3,7 +3,7 @@ package com.evenly.took.feature.auth.client.apple.dto.request;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.evenly.took.global.config.properties.auth.AppleProperties;
+import com.evenly.took.feature.auth.config.properties.AppleProperties;
 
 public record AppleTokenRequest(
 	String grantType,

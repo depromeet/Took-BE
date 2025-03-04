@@ -5,8 +5,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.evenly.took.feature.auth.client.AuthCodeRequestUrlProvider;
 import com.evenly.took.feature.auth.domain.OAuthType;
-import com.evenly.took.global.config.properties.auth.GoogleProperties;
-import com.evenly.took.global.config.properties.auth.GoogleUrlProperties;
+import com.evenly.took.feature.auth.config.properties.GoogleProperties;
+import com.evenly.took.feature.auth.config.properties.GoogleUrlProperties;
 
 import lombok.RequiredArgsConstructor;
 
