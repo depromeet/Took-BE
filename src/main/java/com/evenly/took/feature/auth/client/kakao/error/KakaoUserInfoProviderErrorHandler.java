@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client.kakao;
+package com.evenly.took.feature.auth.client.kakao.error;
 
 import java.io.IOException;
 import java.net.URI;

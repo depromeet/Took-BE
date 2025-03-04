@@ -7,8 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import com.evenly.took.feature.auth.client.kakao.dto.KakaoTokenRequest;
-import com.evenly.took.feature.auth.client.kakao.dto.KakaoTokenResponse;
+import com.evenly.took.feature.auth.client.kakao.dto.request.KakaoTokenRequest;
+import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoTokenResponse;
+import com.evenly.took.feature.auth.client.kakao.error.KakaoTokenProviderErrorHandler;
 import com.evenly.took.global.config.properties.auth.KakaoProperties;
 
 @Component

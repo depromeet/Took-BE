@@ -3,8 +3,8 @@ package com.evenly.took.feature.auth.client.kakao;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.client.UserClient;
-import com.evenly.took.feature.auth.client.kakao.dto.KakaoTokenResponse;
-import com.evenly.took.feature.auth.client.kakao.dto.KakaoUserResponse;
+import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoTokenResponse;
+import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoUserResponse;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.user.domain.User;

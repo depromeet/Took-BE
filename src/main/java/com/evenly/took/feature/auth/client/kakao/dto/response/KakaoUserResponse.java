@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client.kakao.dto;
+package com.evenly.took.feature.auth.client.kakao.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

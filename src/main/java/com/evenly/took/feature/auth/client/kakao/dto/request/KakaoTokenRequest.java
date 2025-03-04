@@ -1,4 +1,4 @@
-package com.evenly.took.feature.auth.client.kakao.dto;
+package com.evenly.took.feature.auth.client.kakao.dto.request;
 
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;

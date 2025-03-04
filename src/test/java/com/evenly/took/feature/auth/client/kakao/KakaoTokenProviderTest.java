@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 
-import com.evenly.took.feature.auth.client.kakao.dto.KakaoTokenResponse;
+import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoTokenResponse;
+import com.evenly.took.feature.auth.client.kakao.error.KakaoTokenProviderErrorHandler;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.config.properties.auth.KakaoProperties;
