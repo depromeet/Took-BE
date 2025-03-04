@@ -43,13 +43,20 @@ public class KakaoTokenProviderErrorHandler implements ResponseErrorHandler {
 		if (response.getStatusCode().isSameCodeAs(HttpStatus.UNAUTHORIZED)) {
 			throw new TookException(AuthErrorCode.KAKAO_INVALID_APP_INFO);
 		}
+		if (responseBody == null || responseBody.isBlank()) {
+			throw new TookException(AuthErrorCode.KAKAO_SERVER_ERROR);
+		}
 		if (hasErrorCodeOf(responseBody, ERROR_CODE_WHEN_INVALID_CODE)) {
 			throw new TookException(AuthErrorCode.KAKAO_INVALID_AUTH_CODE);
 		}
 	}
 
-	private boolean hasErrorCodeOf(String responseBody, String errorCode) throws IOException {
-		KakaoErrorResponse response = OBJECT_MAPPER.readValue(responseBody, KakaoErrorResponse.class);
-		return response.errorCode().equals(errorCode);
+	private boolean hasErrorCodeOf(String responseBody, String errorCode) {
+		try {
+			KakaoErrorResponse response = OBJECT_MAPPER.readValue(responseBody, KakaoErrorResponse.class);
+			return response.errorCode().equals(errorCode);
+		} catch (Exception ex) {
+			throw new TookException(AuthErrorCode.KAKAO_SERVER_ERROR);
+		}
 	}
 }
