@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 
 import com.evenly.took.feature.auth.client.google.dto.response.GoogleUserInfoResponse;
 import com.evenly.took.feature.auth.client.google.error.GoogleUserInfoProviderErrorHandler;
-import com.evenly.took.global.config.properties.auth.GoogleUrlProperties;
+import com.evenly.took.feature.auth.config.properties.GoogleUrlProperties;
 
 @Component
 public class GoogleUserInfoProvider {

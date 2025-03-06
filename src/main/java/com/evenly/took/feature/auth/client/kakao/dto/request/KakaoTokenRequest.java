@@ -3,7 +3,7 @@ package com.evenly.took.feature.auth.client.kakao.dto.request;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.evenly.took.global.config.properties.auth.KakaoProperties;
+import com.evenly.took.feature.auth.config.properties.KakaoProperties;
 
 public record KakaoTokenRequest(
 	String grantType,

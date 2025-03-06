@@ -12,12 +12,14 @@ import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 
 import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoUserResponse;
 import com.evenly.took.feature.auth.client.kakao.error.KakaoUserInfoProviderErrorHandler;
+import com.evenly.took.feature.auth.config.properties.KakaoProperties;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
 import com.evenly.took.feature.common.exception.TookException;
-import com.evenly.took.global.config.properties.auth.KakaoProperties;
 import com.evenly.took.global.service.BaseRestClientTest;
 
-@RestClientTest({KakaoUserInfoProvider.class, KakaoUserInfoProviderErrorHandler.class})
+@RestClientTest({KakaoUserInfoProvider.class,
+	KakaoUserInfoProviderErrorHandler.class,
+	KakaoProperties.class})
 class KakaoUserInfoProviderTest extends BaseRestClientTest {
 
 	KakaoUserInfoProvider kakaoUserInfoProvider;

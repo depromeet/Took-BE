@@ -1,15 +1,22 @@
 spring:
-  application:
-    name: took
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    driver-class-name:
+    url:
+    username:
+    password:
+
   jpa:
-    open-in-view: false
     hibernate:
       ddl-auto: create-drop
-    show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        dialect:
         highlight_sql: true
+        default_schema:
+
   data:
     redis:
       host: redis
@@ -33,7 +40,3 @@ oauth:
   kakao:
     client-id: clientId
     redirect-uri: redirectUri
-    url:
-      auth-code-url: https://kauth.kakao.com/oauth/authorize
-      token-url: https://kauth.kakao.com/oauth/token
-      user-info-url: https://kapi.kakao.com/v2/user/me

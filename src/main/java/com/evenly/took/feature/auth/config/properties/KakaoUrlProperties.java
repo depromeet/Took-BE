@@ -1,4 +1,4 @@
-package com.evenly.took.global.config.properties.auth;
+package com.evenly.took.feature.auth.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

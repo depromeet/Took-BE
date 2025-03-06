@@ -8,8 +8,8 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.springframework.web.client.RestClient;
 
-import com.evenly.took.global.config.properties.auth.GoogleProperties;
-import com.evenly.took.global.config.properties.auth.GoogleUrlProperties;
+import com.evenly.took.feature.auth.config.properties.GoogleProperties;
+import com.evenly.took.feature.auth.config.properties.GoogleUrlProperties;
 import com.evenly.took.global.service.MockTest;
 
 public abstract class MockGoogleProviderTest extends MockTest {

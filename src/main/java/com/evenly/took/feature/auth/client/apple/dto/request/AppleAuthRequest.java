@@ -3,7 +3,7 @@ package com.evenly.took.feature.auth.client.apple.dto.request;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.evenly.took.global.config.properties.auth.AppleProperties;
+import com.evenly.took.feature.auth.config.properties.AppleProperties;
 
 public record AppleAuthRequest(
 	String responseType,

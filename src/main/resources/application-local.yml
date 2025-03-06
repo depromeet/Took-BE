@@ -3,47 +3,9 @@ spring:
     activate:
       on-profile: local
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:[forwardedPort]/${DB_DATABASE}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=true
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-        show_sql: true
-        format_sql: true
-        use_sql_comments: true
-        default_schema: development
-
-    open-in-view: false
-
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
-
-swagger:
-  version: 0.0.1
-  server-url: ${SERVER_URL}
-springdoc:
-  default-consumes-media-type: application/json;charset=UTF-8
-  default-produces-media-type: application/json;charset=UTF-8
-  swagger-ui:
-    path: /swagger-ui
-    disable-swagger-default-url: true
-    display-request-duration: true
-    tags-sorter: alpha
-    operations-sorter: alpha
-    syntax-highlight:
-      theme: none
 
 # SSH Tunnel Configuration
 ssh:
@@ -53,38 +15,3 @@ ssh:
   port: ${SSH_PORT}
   db-host: ${DB_HOST}
   db-port: ${DB_PORT}
-
-auth:
-  access-token-secret: ${JWT_ACCESS_TOKEN_SECRET:secret}
-  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME:7200}
-  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
-
-oauth:
-  apple:
-    client-id: ${APPLE_OAUTH_CLIENT_ID}
-    redirect-uri: ${APPLE_OAUTH_REDIRECT_URI}
-    team-id: ${APPLE_OAUTH_TEAM_ID}
-    key-id: ${APPLE_OAUTH_KEY_ID}
-    private-key: ${APPLE_OAUTH_PRIVATE_KEY}
-    url:
-      token-url: ${APPLE_OAUTH_TOKEN_URL}
-      auth-url: ${APPLE_OAUTH_AUTH_URL}
-
-  google:
-    redirect-uri: ${GOOGLE_OAUTH_REDIRECT_URI}
-    client-id: ${GOOGLE_OAUTH_CLIENT_ID}
-    client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET}
-    scope: ${GOOGLE_OAUTH_SCOPE}
-    url:
-      authorization-uri: ${GOOGLE_AUTHORIZATION_URL}
-      token-uri: ${GOOGLE_OAUTH_TOKEN_URI}
-      user-info-url: ${GOOGLE_OAUTH_USER_INFO_URL}
-
-  kakao:
-    client-id: ${KAKAO_CLIENT_ID}
-    redirect-uri: ${KAKAO_REDIRECT_URI}
-    url:
-      auth-code-url: https://kauth.kakao.com/oauth/authorize
-      token-url: https://kauth.kakao.com/oauth/token
-      user-info-url: https://kapi.kakao.com/v2/user/me
-
