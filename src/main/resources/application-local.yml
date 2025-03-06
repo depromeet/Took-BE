@@ -2,6 +2,10 @@ spring:
   config:
     activate:
       on-profile: local
+  datasource:
+    url: jdbc:mysql://127.0.0.1:[forwardedPort]/${DB_DATABASE}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
 # SSH Tunnel Configuration
 ssh:

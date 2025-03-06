@@ -2,10 +2,6 @@ spring:
   config:
     activate:
       on-profile: prod
-  datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=true
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
 
   jpa:
     properties:
