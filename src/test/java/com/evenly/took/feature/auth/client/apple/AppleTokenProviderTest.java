@@ -42,6 +42,8 @@ class AppleTokenProviderTest extends MockTest {
 			RestClient.Builder mockBuilder = mock(RestClient.Builder.class);
 			RestClient mockClient = mock(RestClient.class);
 
+			when(mockBuilder.clone())
+				.thenReturn(mockBuilder);
 			when(mockBuilder.defaultStatusHandler(any(AppleTokenProviderErrorHandler.class)))
 				.thenReturn(mockBuilder);
 			when(mockBuilder.defaultHeader(
@@ -81,6 +83,8 @@ class AppleTokenProviderTest extends MockTest {
 			RestClient mockClient = mock(RestClient.class);
 
 			// 체이닝을 위한 모킹 설정
+			when(mockBuilder.clone())
+				.thenReturn(mockBuilder);
 			when(mockBuilder.defaultStatusHandler(any(AppleTokenProviderErrorHandler.class)))
 				.thenReturn(mockBuilder);
 			when(mockBuilder.defaultHeader(

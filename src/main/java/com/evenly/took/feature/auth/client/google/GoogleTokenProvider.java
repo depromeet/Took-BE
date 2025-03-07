@@ -27,7 +27,7 @@ public class GoogleTokenProvider {
 
 		this.googleProperties = googleProperties;
 		this.googleUrlProperties = googleUrlProperties;
-		this.restClient = restClientBuilder
+		this.restClient = restClientBuilder.clone()
 			.defaultStatusHandler(errorHandler)
 			.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE,
 				StandardCharsets.UTF_8.name())

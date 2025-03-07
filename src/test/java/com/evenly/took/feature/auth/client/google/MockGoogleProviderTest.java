@@ -28,6 +28,7 @@ public abstract class MockGoogleProviderTest extends MockTest {
 
 	@BeforeEach
 	public void setUpCommon() {
+		when(restClientBuilder.clone()).thenReturn(restClientBuilder);
 		when(restClientBuilder.defaultStatusHandler(any())).thenReturn(restClientBuilder);
 		when(restClientBuilder.defaultHeader("Content-Type", "application/x-www-form-urlencoded", "UTF-8"))
 			.thenReturn(restClientBuilder);
