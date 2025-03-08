@@ -63,6 +63,7 @@ public class AppleUserClient implements UserClient {
 
 		return User.builder()
 			.name(response.name() != null ? response.name() : response.email())
+			.email(response.email())
 			.oauthIdentifier(oAuthIdentifier)
 			.build();
 	}
