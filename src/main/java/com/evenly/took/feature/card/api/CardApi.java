@@ -1,7 +1,5 @@
 package com.evenly.took.feature.card.api;
 
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.evenly.took.feature.card.domain.Job;
@@ -30,8 +28,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "직군 목록 조회 성공")
 	})
-	SuccessResponse<JobsResponse> getJobs(
-		@RequestParam(value = "job") Job job);
+	SuccessResponse<JobsResponse> getJobs(Job job);
 
 	@Operation(
 		summary = "내 명함 목록 조회",
@@ -47,9 +44,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "명함 상세 정보 조회 성공")
 	})
-	SuccessResponse<CardDetailResponse> getCardDetail(
-		@ModelAttribute CardDetailRequest request
-	);
+	SuccessResponse<CardDetailResponse> getCardDetail(CardDetailRequest request);
 
 	@Operation(
 		summary = "외부 콘텐츠 링크 스크랩",
@@ -57,9 +52,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "링크 스크랩 성공")
 	})
-	SuccessResponse<ScrapResponse> scrapLink(
-		LinkType type,
-		LinkRequest request);
+	SuccessResponse<ScrapResponse> scrapLink(LinkType type, LinkRequest request);
 
 	@Operation(
 		summary = "명함 생성",
