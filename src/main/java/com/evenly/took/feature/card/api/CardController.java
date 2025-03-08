@@ -38,10 +38,7 @@ public class CardController implements CardApi {
 				new JobResponse(3L, Job.DESIGNER, "Interaction Designer", List.of("인터랙션 디자이너", "인터렉션 디자이너")))));
 	}
 
-	@GetMapping("/api/card/detail")
-	public void getCardDetail() {
-	}
-
+	@GetMapping("/api/card/my")
 	public SuccessResponse<MyCardListResponse> getMyCards() {
 		return SuccessResponse.of(new MyCardListResponse(null));
 	}

@@ -1,6 +1,5 @@
 package com.evenly.took.feature.card.api;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,9 +46,6 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "명함 상세 정보 조회 성공")
 	})
-	void getCardDetail();
-
-	@GetMapping("/api/card/detail")
 	SuccessResponse<CardDetailResponse> getCardDetail(
 		@ModelAttribute CardDetailRequest request
 	);
