@@ -2,6 +2,7 @@ package com.evenly.took.feature.card.dto.response;
 
 import java.util.List;
 
+import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -18,8 +19,8 @@ public record MyCardResponse(
 	@Schema(description = "소속 정보 (nullable)", example = "ABC 회사")
 	String organization,
 
-	@Schema(description = "직군", example = "개발")
-	String job,
+	@Schema(description = "직군", example = "DEVELOPER")
+	Job job,
 
 	@Schema(description = "세부 직군", example = "백엔드 개발자")
 	String detailJob,

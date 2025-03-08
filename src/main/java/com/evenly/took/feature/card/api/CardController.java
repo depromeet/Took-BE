@@ -48,7 +48,7 @@ public class CardController implements CardApi {
 	public SuccessResponse<CardDetailResponse> getCardDetail(@RequestParam CardDetailRequest request) {
 		return SuccessResponse.of(
 			new CardDetailResponse(
-				null, null, null, null, null,
+				null, null, null, null, null, null,
 				null, null, null, null, null, null));
 	}
 
