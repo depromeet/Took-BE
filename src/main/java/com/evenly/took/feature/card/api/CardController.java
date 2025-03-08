@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.evenly.took.feature.card.domain.CardJob;
+import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.LinkType;
+import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.JobResponse;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
@@ -28,22 +30,28 @@ import lombok.extern.slf4j.Slf4j;
 public class CardController implements CardApi {
 
 	@GetMapping("/api/card/register")
-	public SuccessResponse<JobsResponse> getJobs(@RequestParam CardJob job) {
+	public SuccessResponse<JobsResponse> getJobs(@RequestParam Job job) {
 		return SuccessResponse.of(
 			new JobsResponse(List.of(
-				new JobResponse(1L, "designer", "Product Designer", List.of("프로덕트 디자이너")),
-				new JobResponse(2L, "designer", "Graphic Designer", List.of("그래픽 디자이너")),
-				new JobResponse(3L, "designer", "Interaction Designer", List.of("인터랙션 디자이너", "인터렉션 디자이너")))));
-	}
-
-	@GetMapping("/api/card/my")
-	public MyCardListResponse getMyCards() {
-		return null;
+				new JobResponse(1L, Job.DESIGNER, "Product Designer", List.of("프로덕트 디자이너")),
+				new JobResponse(2L, Job.DESIGNER, "Graphic Designer", List.of("그래픽 디자이너")),
+				new JobResponse(3L, Job.DESIGNER, "Interaction Designer", List.of("인터랙션 디자이너", "인터렉션 디자이너")))));
 	}
 
 	@GetMapping("/api/card/detail")
 	public void getCardDetail() {
+	}
 
+	public SuccessResponse<MyCardListResponse> getMyCards() {
+		return SuccessResponse.of(new MyCardListResponse(null));
+	}
+
+	@GetMapping("/api/card/detail")
+	public SuccessResponse<CardDetailResponse> getCardDetail(@RequestParam CardDetailRequest request) {
+		return SuccessResponse.of(
+			new CardDetailResponse(
+				null, null, null, null, null,
+				null, null, null, null, null, null));
 	}
 
 	@PostMapping("/api/card/scrap")
