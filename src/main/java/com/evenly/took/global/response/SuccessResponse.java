@@ -30,4 +30,8 @@ public class SuccessResponse<T> {
 	public static <T> SuccessResponse<T> of(HttpStatus status, T data) {
 		return new SuccessResponse<>(status, DEFAULT_MESSAGE, LocalDateTime.now(), data);
 	}
+
+	public static SuccessResponse<Void> created(String message) {
+		return new SuccessResponse<>(HttpStatus.CREATED, message, LocalDateTime.now(), null);
+	}
 }

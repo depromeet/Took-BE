@@ -2,6 +2,7 @@ package com.evenly.took.global.exception;
 
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -38,6 +39,12 @@ public class GlobalExceptionHandler {
 	public ErrorResponse handle(MethodArgumentTypeMismatchException ex) {
 		ErrorCode errorCode = CommonErrorCode.INVALID_REQUEST_PARAMETER;
 		return RequestParameterErrorResponse.of(errorCode, ex);
+	}
+
+	@ExceptionHandler
+	public ErrorResponse handle(MissingServletRequestParameterException ex) {
+		ErrorCode errorCode = CommonErrorCode.NO_REQUEST_PARAMETER;
+		return ErrorResponse.of(errorCode);
 	}
 
 	@ExceptionHandler
