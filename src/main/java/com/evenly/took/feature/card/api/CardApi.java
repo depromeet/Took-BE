@@ -3,6 +3,8 @@ package com.evenly.took.feature.card.api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.evenly.took.feature.card.dto.response.MyCardListResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,7 +29,7 @@ public interface CardApi {
 		@ApiResponse(responseCode = "200", description = "명함 목록 조회 성공")
 	})
 	@GetMapping("/api/card/my")
-	void getMyCards();
+	MyCardListResponse getMyCards();
 
 	@Operation(
 		summary = "명함 상세 정보 조회",
