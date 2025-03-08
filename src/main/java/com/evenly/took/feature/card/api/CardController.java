@@ -45,7 +45,7 @@ public class CardController implements CardApi {
 	@PostMapping("/api/card/scrap")
 	public SuccessResponse<ScrapResponse> scrapLink(@RequestParam LinkType type, @RequestBody LinkRequest request) {
 		return SuccessResponse.of(
-			new ScrapResponse("blog", "title", "link", "image_url", "description"));
+			new ScrapResponse(LinkType.BLOG, "title", "link", "image_url", "description"));
 	}
 
 	public void createCard() {
