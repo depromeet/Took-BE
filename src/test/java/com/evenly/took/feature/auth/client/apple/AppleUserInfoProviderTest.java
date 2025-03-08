@@ -12,7 +12,7 @@ import org.mockito.Mock;
 
 import com.evenly.took.feature.auth.client.apple.dto.response.AppleUserResponse;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
+import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.service.MockTest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -131,14 +131,14 @@ class AppleUserInfoProviderTest extends MockTest {
 	private static String createValidIdToken() {
 		try {
 			// 헤더
-			String header = Base64.getUrlEncoder().encodeToString("{\"alg\":\"ES256\",\"kid\":\"test\"}" .getBytes());
+			String header = Base64.getUrlEncoder().encodeToString("{\"alg\":\"ES256\",\"kid\":\"test\"}".getBytes());
 
 			// 페이로드
 			String payload = Base64.getUrlEncoder()
-				.encodeToString("{\"sub\":\"apple_user_id\",\"email\":\"user@example.com\"}" .getBytes());
+				.encodeToString("{\"sub\":\"apple_user_id\",\"email\":\"user@example.com\"}".getBytes());
 
 			// 시그니처
-			String signature = Base64.getUrlEncoder().encodeToString("dummy_signature" .getBytes());
+			String signature = Base64.getUrlEncoder().encodeToString("dummy_signature".getBytes());
 
 			return header + "." + payload + "." + signature;
 		} catch (Exception e) {

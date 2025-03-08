@@ -9,8 +9,8 @@ import com.evenly.took.feature.auth.client.apple.dto.response.AppleUserResponse;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.exception.TookException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

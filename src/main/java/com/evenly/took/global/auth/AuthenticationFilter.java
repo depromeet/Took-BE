@@ -10,8 +10,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.evenly.took.feature.auth.api.HeaderHandler;
 import com.evenly.took.feature.auth.application.TokenProvider;
-import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.exception.ErrorCode;
+import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.exception.dto.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
