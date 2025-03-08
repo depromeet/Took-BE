@@ -37,7 +37,7 @@ public class GoogleUserInfoProviderTest extends MockGoogleProviderTest {
 			String userInfoUrl = "http://dummy-userinfo-url";
 			when(googleUrlProperties.userInfoUrl()).thenReturn(userInfoUrl);
 
-			GoogleUserInfoResponse expectedResponse = new GoogleUserInfoResponse("dummySub", "홍길동");
+			GoogleUserInfoResponse expectedResponse = new GoogleUserInfoResponse("dummySub", "홍길동", "홍길동@gmail.com");
 
 			RestClient.RequestHeadersSpec requestSpec = restClient.get().uri(userInfoUrl);
 			when(requestSpec.header("Authorization", "Bearer " + accessToken)).thenReturn(requestSpec);

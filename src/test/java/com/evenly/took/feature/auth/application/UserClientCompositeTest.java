@@ -71,6 +71,7 @@ class UserClientCompositeTest extends MockTest {
 			return User.builder()
 				.oauthIdentifier(oauthIdentifier)
 				.name(testUser.getName())
+				.email(testUser.getEmail())
 				.build();
 		}
 	}

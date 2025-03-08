@@ -20,6 +20,7 @@ public class TestUserFactory {
 		User mcokUser = User.builder()
 			.oauthIdentifier(oauthIdentifier)
 			.name(name)
+			.email("email")
 			.build();
 		ReflectionTestUtils.setField(mcokUser, "id", 1L);
 		return mcokUser;
@@ -33,6 +34,7 @@ public class TestUserFactory {
 		return User.builder()
 			.oauthIdentifier(oauthIdentifier)
 			.name(name)
+			.email("email")
 			.build();
 	}
 }

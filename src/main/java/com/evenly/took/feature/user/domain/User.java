@@ -39,9 +39,14 @@ public class User extends BaseTimeEntity {
 	@NotNull
 	private String name;
 
+	@Column(name = "email")
+	@NotNull
+	private String email;
+
 	@Builder
-	public User(OAuthIdentifier oauthIdentifier, String name) {
+	public User(OAuthIdentifier oauthIdentifier, String name, String email) {
 		this.oauthIdentifier = oauthIdentifier;
 		this.name = name;
+		this.email = email;
 	}
 }

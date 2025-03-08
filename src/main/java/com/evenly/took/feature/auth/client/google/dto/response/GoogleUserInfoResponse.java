@@ -8,6 +8,9 @@ public record GoogleUserInfoResponse(
 	String sub,
 
 	@JsonProperty("name")
-	String name
+	String name,
+
+	@JsonProperty("email")
+	String email
 ) {
 }
