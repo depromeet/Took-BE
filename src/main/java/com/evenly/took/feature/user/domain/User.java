@@ -1,5 +1,7 @@
 package com.evenly.took.feature.user.domain;
 
+import java.time.LocalDateTime;
+
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.common.model.BaseTimeEntity;
 
@@ -39,9 +41,15 @@ public class User extends BaseTimeEntity {
 	@NotNull
 	private String name;
 
-	@Column(name = "email")
+	@Column(name = "email", nullable = false)
 	@NotNull
 	private String email;
+
+	@Column(name = "allow_push_notification")
+	private Boolean allowPushNotification;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 
 	@Builder
 	public User(OAuthIdentifier oauthIdentifier, String name, String email) {
