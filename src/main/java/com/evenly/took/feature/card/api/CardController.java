@@ -30,9 +30,9 @@ public class CardController implements CardApi {
 	public SuccessResponse<JobsResponse> getJobs(@RequestParam CardJob job) {
 		return SuccessResponse.of(
 			new JobsResponse(List.of(
-				new JobResponse("designer", "Product Designer", List.of("프로덕트 디자이너")),
-				new JobResponse("designer", "Graphic Designer", List.of("그래픽 디자이너")),
-				new JobResponse("designer", "Interaction Designer", List.of("인터랙션 디자이너", "인터렉션 디자이너")))));
+				new JobResponse(1L, "designer", "Product Designer", List.of("프로덕트 디자이너")),
+				new JobResponse(2L, "designer", "Graphic Designer", List.of("그래픽 디자이너")),
+				new JobResponse(3L, "designer", "Interaction Designer", List.of("인터랙션 디자이너", "인터렉션 디자이너")))));
 	}
 
 	public MyCardListResponse getMyCards() {
@@ -46,7 +46,7 @@ public class CardController implements CardApi {
 	@PostMapping("/api/card/scrap")
 	public SuccessResponse<ScrapResponse> scrapLink(@RequestParam LinkType type, @RequestBody LinkRequest request) {
 		return SuccessResponse.of(
-			new ScrapResponse("blog", "title", "link", "image_url", "description"));
+			new ScrapResponse(LinkType.BLOG, "title", "link", "image_url", "description"));
 	}
 
 	@Override

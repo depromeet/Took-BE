@@ -1,11 +1,13 @@
 package com.evenly.took.feature.card.dto.response;
 
+import com.evenly.took.feature.card.domain.LinkType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "링크 스크랩 정보 조회 응답")
 public record ScrapResponse(
-	@Schema(description = "플랫폼 종류 (작성한 글, 대표 프로젝트)", example = "project")
-	String type,
+	@Schema(description = "스크랩 대상 (BLOG, PROJECT)", example = "PROJECT")
+	LinkType type,
 
 	@Schema(description = "제목", example = "Took-BE")
 	String title,
