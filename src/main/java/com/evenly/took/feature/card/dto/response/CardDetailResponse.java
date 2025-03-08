@@ -2,11 +2,16 @@ package com.evenly.took.feature.card.dto.response;
 
 import java.util.List;
 
+import com.evenly.took.feature.card.domain.Job;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record CardDetailResponse(
 	@Schema(description = "명함용 이름", example = "홍길동", requiredMode = Schema.RequiredMode.REQUIRED)
 	String nickname,
+
+	@Schema(description = "직군", example = "DEVELOPER")
+	Job job,
 
 	@Schema(description = "세부 직군 영어", example = "Frontend Develop", requiredMode = Schema.RequiredMode.REQUIRED)
 	String detailJob,
