@@ -51,7 +51,7 @@ public class BrunchLinkCrawler implements LinkCrawler {
 	private String link(Elements meta) {
 		return meta.stream()
 			.filter(element -> element.hasAttr("property"))
-			.filter(element -> element.attribute("property").getValue().equals("og:link"))
+			.filter(element -> element.attribute("property").getValue().equals("og:url"))
 			.map(element -> element.attribute("content").getValue())
 			.findAny()
 			.orElse(EMPTY_STRING);
