@@ -1,6 +1,4 @@
-package com.evenly.took.feature.common.exception;
-
-import com.evenly.took.global.exception.ErrorCode;
+package com.evenly.took.global.exception;
 
 import lombok.Getter;
 

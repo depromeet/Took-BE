@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClient;
 import com.evenly.took.feature.auth.client.google.dto.response.GoogleTokenResponse;
 import com.evenly.took.feature.auth.client.google.error.GoogleTokenProviderErrorHandler;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
+import com.evenly.took.global.exception.TookException;
 
 public class GoogleTokenProviderTest extends MockGoogleProviderTest {
 
