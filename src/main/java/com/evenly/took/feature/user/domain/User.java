@@ -1,5 +1,7 @@
 package com.evenly.took.feature.user.domain;
 
+import java.time.LocalDateTime;
+
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.common.model.BaseTimeEntity;
 
@@ -11,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,13 +36,17 @@ public class User extends BaseTimeEntity {
 	@Embedded
 	private OAuthIdentifier oauthIdentifier;
 
-	@Column(name = "name")
-	@NotNull
+	@Column(name = "name", nullable = false)
 	private String name;
 
-	@Column(name = "email")
-	@NotNull
+	@Column(name = "email", nullable = false)
 	private String email;
+
+	@Column(name = "allow_push_notification")
+	private Boolean allowPushNotification;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 
 	@Builder
 	public User(OAuthIdentifier oauthIdentifier, String name, String email) {
