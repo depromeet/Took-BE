@@ -1,7 +1,17 @@
 package com.evenly.took.global.request;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.http.@Component
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.core.convert.converter.GenericConverter;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@Component
 public class StringToListObjectConverter implements GenericConverter {
 
 	private final ObjectMapper objectMapper;
@@ -17,11 +27,8 @@ public class StringToListObjectConverter implements GenericConverter {
 
 	@Override
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-		if (source == null) {
-			return null;
-		}
 
-		String stringValue = (String) source;
+		String stringValue = (String)source;
 		if (stringValue.isEmpty()) {
 			return Collections.emptyList();
 		}

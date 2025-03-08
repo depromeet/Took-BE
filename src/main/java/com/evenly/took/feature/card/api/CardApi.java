@@ -1,8 +1,8 @@
 package com.evenly.took.feature.card.api;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.LinkType;
@@ -16,6 +16,7 @@ import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.global.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,8 +58,8 @@ public interface CardApi {
 		@ApiResponse(responseCode = "200", description = "링크 스크랩 성공")
 	})
 	SuccessResponse<ScrapResponse> scrapLink(
-		@RequestParam LinkType type,
-		@RequestBody LinkRequest request);
+		LinkType type,
+		LinkRequest request);
 
 	@Operation(
 		summary = "명함 생성",
@@ -67,7 +68,8 @@ public interface CardApi {
 		@ApiResponse(responseCode = "201", description = "명함 생성 성공")
 	})
 	SuccessResponse<Void> createCard(
-		@RequestBody CreateCardRequest request
-
+		CreateCardRequest request,
+		@Parameter(hidden = true)
+		MultipartFile profileImage
 	);
 }

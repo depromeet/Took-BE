@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.LinkType;
@@ -58,7 +59,9 @@ public class CardController implements CardApi {
 	}
 
 	@PostMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public SuccessResponse<Void> createCard(@RequestBody CreateCardRequest request) {
+	public SuccessResponse<Void> createCard(CreateCardRequest request,
+		@RequestParam("profileImage") MultipartFile profileImage) {
+
 		return SuccessResponse.created("명함 생성 성공");
 	}
 }
