@@ -11,6 +11,7 @@ import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
+import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +37,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "명함 목록 조회 성공 [null 값은 전달x]")
 	})
-	SuccessResponse<MyCardListResponse> getMyCards();
+	SuccessResponse<MyCardListResponse> getMyCards(User user);
 
 	@Operation(
 		summary = "명함 상세 정보 조회",

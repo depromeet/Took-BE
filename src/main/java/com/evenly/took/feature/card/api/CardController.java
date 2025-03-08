@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.evenly.took.feature.card.application.CardService;
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.LinkType;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
@@ -20,6 +21,8 @@ import com.evenly.took.feature.card.dto.response.JobResponse;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
+import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.response.SuccessResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 public class CardController implements CardApi {
+
+	private final CardService cardService;
 
 	@GetMapping("/api/card/register")
 	public SuccessResponse<JobsResponse> getJobs(@RequestParam Job job) {
@@ -40,8 +45,9 @@ public class CardController implements CardApi {
 	}
 
 	@GetMapping("/api/card/my")
-	public SuccessResponse<MyCardListResponse> getMyCards() {
-		return SuccessResponse.of(new MyCardListResponse(null));
+	public SuccessResponse<MyCardListResponse> getMyCards(@LoginUser User user) {
+		MyCardListResponse response = cardService.findUserCardList(user.getId());
+		return SuccessResponse.of(response);
 	}
 
 	@GetMapping("/api/card/detail")
