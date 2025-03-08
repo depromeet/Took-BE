@@ -9,7 +9,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.evenly.took.feature.common.exception.CommonErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.global.exception.dto.ErrorResponse;
 import com.evenly.took.global.exception.dto.RequestParameterErrorResponse;
 import com.evenly.took.global.exception.dto.ServerErrorResponse;

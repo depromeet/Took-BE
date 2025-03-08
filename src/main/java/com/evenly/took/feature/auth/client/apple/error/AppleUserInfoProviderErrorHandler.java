@@ -6,7 +6,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
+import com.evenly.took.global.exception.TookException;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -15,8 +15,8 @@ import com.evenly.took.feature.auth.client.google.dto.response.GoogleTokenRespon
 import com.evenly.took.feature.auth.client.google.dto.response.GoogleUserInfoResponse;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.service.MockTest;
 
 public class GoogleUserClientTest extends MockTest {
@@ -38,7 +38,7 @@ public class GoogleUserClientTest extends MockTest {
 			String authCode = "validAuthCode";
 			GoogleTokenResponse tokenResponse = new GoogleTokenResponse("dummyAccessToken", 3600, "scope", "Bearer",
 				"dummyIdToken");
-			GoogleUserInfoResponse userInfoResponse = new GoogleUserInfoResponse("dummySub", "홍길동");
+			GoogleUserInfoResponse userInfoResponse = new GoogleUserInfoResponse("dummySub", "홍길동", "홍길동@gmail.com");
 
 			when(googleTokenProvider.fetchAccessToken(authCode)).thenReturn(tokenResponse);
 			when(googleUserInfoProvider.fetchUserInfo(tokenResponse.accessToken())).thenReturn(userInfoResponse);

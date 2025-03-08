@@ -10,8 +10,8 @@ import com.evenly.took.feature.auth.client.google.dto.response.GoogleUserInfoRes
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.exception.TookException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,21 +33,22 @@ public class GoogleUserClient implements UserClient {
 			GoogleTokenResponse tokenResponse = googleTokenProvider.fetchAccessToken(authContext.getAuthCode());
 			GoogleUserInfoResponse userInfoResponse = googleUserInfoProvider.fetchUserInfo(tokenResponse.accessToken());
 
-			return generateUser(userInfoResponse.sub(), userInfoResponse.name());
+			return generateUser(userInfoResponse);
 		} catch (HttpClientErrorException ex) {
 			throw new TookException(AuthErrorCode.INVALID_GOOGLE_CONNECTION);
 		}
 	}
 
-	private User generateUser(String oauthId, String name) {
+	private User generateUser(GoogleUserInfoResponse userInfoResponse) {
 		OAuthIdentifier oauthIdentifier = OAuthIdentifier.builder()
-			.oauthId(oauthId)
+			.oauthId(userInfoResponse.sub())
 			.oauthType(OAuthType.GOOGLE)
 			.build();
 
 		return User.builder()
 			.oauthIdentifier(oauthIdentifier)
-			.name(name)
+			.name(userInfoResponse.name())
+			.email(userInfoResponse.email())
 			.build();
 	}
 }

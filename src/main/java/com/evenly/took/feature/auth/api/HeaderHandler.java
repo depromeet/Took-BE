@@ -3,7 +3,7 @@ package com.evenly.took.feature.auth.api;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
+import com.evenly.took.global.exception.TookException;
 
 import jakarta.servlet.http.HttpServletRequest;
 

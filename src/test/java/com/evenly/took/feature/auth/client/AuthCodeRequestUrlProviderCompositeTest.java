@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
+import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.service.MockTest;
 
 class AuthCodeRequestUrlProviderCompositeTest extends MockTest {

@@ -13,7 +13,7 @@ import org.springframework.web.client.RestClient;
 import com.evenly.took.feature.auth.client.google.dto.response.GoogleUserInfoResponse;
 import com.evenly.took.feature.auth.client.google.error.GoogleUserInfoProviderErrorHandler;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
-import com.evenly.took.feature.common.exception.TookException;
+import com.evenly.took.global.exception.TookException;
 
 public class GoogleUserInfoProviderTest extends MockGoogleProviderTest {
 
@@ -37,7 +37,7 @@ public class GoogleUserInfoProviderTest extends MockGoogleProviderTest {
 			String userInfoUrl = "http://dummy-userinfo-url";
 			when(googleUrlProperties.userInfoUrl()).thenReturn(userInfoUrl);
 
-			GoogleUserInfoResponse expectedResponse = new GoogleUserInfoResponse("dummySub", "홍길동");
+			GoogleUserInfoResponse expectedResponse = new GoogleUserInfoResponse("dummySub", "홍길동", "홍길동@gmail.com");
 
 			RestClient.RequestHeadersSpec requestSpec = restClient.get().uri(userInfoUrl);
 			when(requestSpec.header("Authorization", "Bearer " + accessToken)).thenReturn(requestSpec);

@@ -14,8 +14,8 @@ import com.evenly.took.feature.auth.client.UserClient;
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
-import com.evenly.took.feature.common.exception.TookException;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.service.MockTest;
 
 class UserClientCompositeTest extends MockTest {
@@ -71,6 +71,7 @@ class UserClientCompositeTest extends MockTest {
 			return User.builder()
 				.oauthIdentifier(oauthIdentifier)
 				.name(testUser.getName())
+				.email(testUser.getEmail())
 				.build();
 		}
 	}

@@ -73,3 +73,13 @@ oauth:
       auth-code-url: https://kauth.kakao.com/oauth/authorize
       token-url: https://kauth.kakao.com/oauth/token
       user-info-url: https://kapi.kakao.com/v2/user/me
+
+aws:
+  region: ap-northeast-2
+  credentials:
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
+  s3:
+    bucket: ${BUCKET_NAME}
+    env: ${BUCKET_ENV}
+
