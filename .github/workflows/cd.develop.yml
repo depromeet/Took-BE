@@ -40,8 +40,4 @@ jobs:
           username: ubuntu
           key: ${{ secrets.PEM_KEY }}
           script: |
-            sudo docker stop dev-app
-            sudo docker rm dev-app
-            sudo docker image prune -a -f
-            sudo docker pull public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ secrets.DEV_ECR_REPO }}:latest
-            sudo docker run --name dev-app --network redis-nw --env-file .env -d -p 8080:8080 -t public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ secrets.DEV_ECR_REPO }}:latest
+            ./deploy.sh
