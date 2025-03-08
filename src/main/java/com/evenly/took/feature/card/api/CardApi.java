@@ -2,8 +2,16 @@ package com.evenly.took.feature.card.api;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.evenly.took.feature.card.domain.CardJob;
+import com.evenly.took.feature.card.domain.LinkType;
+import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
+import com.evenly.took.feature.card.dto.response.ScrapResponse;
+import com.evenly.took.global.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,13 +22,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface CardApi {
 
 	@Operation(
-		summary = "명함 생성용 직군 목록 조회",
+		summary = "명함 직군 목록 조회",
 		description = "명함 생성 시 선택 가능한 직군 목록을 조회합니다.")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "직군 목록 조회 성공")
 	})
 	@GetMapping("/api/card/register")
-	void getJobCategories();
+	SuccessResponse<JobsResponse> getJobs(
+		@RequestParam(value = "job") CardJob job);
 
 	@Operation(
 		summary = "내 명함 목록 조회",
@@ -42,12 +51,14 @@ public interface CardApi {
 
 	@Operation(
 		summary = "외부 콘텐츠 링크 스크랩",
-		description = "블로그, SNS, 프로젝트 등의 외부 링크를 명함에 스크랩합니다.")
+		description = "블로그, 프로젝트 링크를 스크랩하여 정보를 조회합니다.")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "콘텐츠 스크랩 성공")
+		@ApiResponse(responseCode = "200", description = "링크 스크랩 성공")
 	})
 	@PostMapping("/api/card/scrap")
-	void scrapExternalContent();
+	SuccessResponse<ScrapResponse> scrapLink(
+		@RequestParam LinkType type,
+		@RequestBody LinkRequest request);
 
 	@Operation(
 		summary = "명함 생성",
