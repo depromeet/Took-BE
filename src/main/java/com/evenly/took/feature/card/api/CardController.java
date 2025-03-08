@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.evenly.took.feature.card.domain.CardJob;
 import com.evenly.took.feature.card.domain.LinkType;
+import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.JobResponse;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
@@ -34,12 +36,17 @@ public class CardController implements CardApi {
 				new JobResponse(3L, "designer", "Interaction Designer", List.of("인터랙션 디자이너", "인터렉션 디자이너")))));
 	}
 
-	public MyCardListResponse getMyCards() {
-		return null;
+	@GetMapping("/api/card/my")
+	public SuccessResponse<MyCardListResponse> getMyCards() {
+		return SuccessResponse.of(new MyCardListResponse(null));
 	}
 
-	public void getCardDetail() {
-
+	@GetMapping("/api/card/detail")
+	public SuccessResponse<CardDetailResponse> getCardDetail(@RequestParam CardDetailRequest request) {
+		return SuccessResponse.of(
+			new CardDetailResponse(
+				null, null, null, null, null,
+				null, null, null, null, null, null));
 	}
 
 	@PostMapping("/api/card/scrap")
