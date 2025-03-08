@@ -56,5 +56,4 @@ public class AuthController implements AuthApi {
 		TokenResponse response = authService.refreshToken(request);
 		return SuccessResponse.of(response);
 	}
-
 }

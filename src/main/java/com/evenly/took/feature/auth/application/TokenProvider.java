@@ -28,4 +28,8 @@ public class TokenProvider {
 		String userId = uuidTokenProvider.getUserId(refreshToken);
 		return jwtTokenProvider.generateAccessToken(userId);
 	}
+
+	public String getUserIdFromAccessToken(String accessToken) {
+		return jwtTokenProvider.getUserId(accessToken);
+	}
 }
