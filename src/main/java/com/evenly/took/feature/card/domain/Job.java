@@ -1,7 +1,8 @@
 package com.evenly.took.feature.card.domain;
 
-public enum CardJob {
+public enum Job {
 
 	DESIGNER,
-	DEVELOPER
+	DEVELOPER,
+	;
 }

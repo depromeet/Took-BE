@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.evenly.took.feature.card.domain.CardJob;
+import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.LinkType;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
@@ -32,7 +32,7 @@ public interface CardApi {
 	})
 	@GetMapping("/api/card/register")
 	SuccessResponse<JobsResponse> getJobs(
-		@RequestParam(value = "job") CardJob job);
+		@RequestParam(value = "job") Job job);
 
 	@Operation(
 		summary = "내 명함 목록 조회",
