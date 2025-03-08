@@ -15,16 +15,13 @@ public record CreateCardRequest(
 	String nickname,
 
 	@Schema(description = "세부직군 ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
-	Integer detailJobId,
+	Long detailJobId,
 
 	@Schema(description = "관심 도메인", example = "[\"웹\", \"모바일\", \"클라우드\"]", requiredMode = Schema.RequiredMode.REQUIRED)
 	List<String> interestDomain,
 
 	@Schema(description = "한 줄 소개", example = "백엔드 개발을 좋아하는 개발자입니다", requiredMode = Schema.RequiredMode.REQUIRED)
 	String summary,
-
-	@Schema(description = "글 설명", example = "description 입니다", requiredMode = Schema.RequiredMode.REQUIRED)
-	String description,
 
 	@Schema(description = "소속 정보", example = "ABC 회사", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
 	String organization,
