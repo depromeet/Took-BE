@@ -1,6 +1,24 @@
 package com.evenly.took.feature.auth.client.kakao.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record KakaoUserAccount(
-	// TODO 기획 결정 후 받아올 회원 정보 추가 및 카카오 동의항목 체크
+
+	@JsonProperty("email")
+	String email,
+
+	@JsonProperty("profile")
+	KakaoProfile profile
 ) {
+
+	public String nickname() {
+		return profile().nickname();
+	}
+
+	private record KakaoProfile(
+
+		@JsonProperty("nickname")
+		String nickname
+	) {
+	}
 }

@@ -37,7 +37,8 @@ public class KakaoUserClient implements UserClient {
 			.oauthType(supportType())
 			.build();
 		return User.builder()
-			.name("dummy_name") // TODO 기획 결정 후 변경
+			.name(response.kakaoAccount().nickname())
+			.email(response.kakaoAccount().email())
 			.oauthIdentifier(oAuthIdentifier)
 			.build();
 	}
