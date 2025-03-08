@@ -8,7 +8,7 @@ import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
-import com.evenly.took.feature.card.dto.response.JobsResponse;
+import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.global.response.SuccessResponse;
@@ -28,7 +28,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "직군 목록 조회 성공")
 	})
-	SuccessResponse<JobsResponse> getJobs(Job job);
+	SuccessResponse<CareersResponse> getCareers(Job job);
 
 	@Operation(
 		summary = "내 명함 목록 조회",

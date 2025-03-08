@@ -2,12 +2,13 @@ package com.evenly.took.feature.card.dto.response;
 
 import java.util.List;
 
+import com.evenly.took.feature.card.domain.Career;
 import com.evenly.took.feature.card.domain.Job;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "명함 직군 조회 응답")
-public record JobResponse(
+public record CareerResponse(
 	@Schema(description = "직군 ID", example = "1")
 	Long id,
 
@@ -20,4 +21,8 @@ public record JobResponse(
 	@Schema(description = "세부 직군 한글", example = "[\"백엔드 개발자\", \"서버 개발자\"]")
 	List<String> detailJobDescriptions
 ) {
+
+	public CareerResponse(Career career) {
+		this(career.getId(), career.getJob(), career.getDetailJobEn(), career.getDetailJobKr());
+	}
 }
