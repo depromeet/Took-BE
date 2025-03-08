@@ -2,6 +2,7 @@ package com.evenly.took.feature.card.api;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,10 +36,12 @@ public class CardController implements CardApi {
 				new JobResponse(3L, "designer", "Interaction Designer", List.of("인터랙션 디자이너", "인터렉션 디자이너")))));
 	}
 
+	@GetMapping("/api/card/my")
 	public MyCardListResponse getMyCards() {
 		return null;
 	}
 
+	@GetMapping("/api/card/detail")
 	public void getCardDetail() {
 
 	}
@@ -49,8 +52,8 @@ public class CardController implements CardApi {
 			new ScrapResponse(LinkType.BLOG, "title", "link", "image_url", "description"));
 	}
 
-	@Override
-	public void createCard(@RequestBody CreateCardRequest request) {
-
+	@PostMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public SuccessResponse<Void> createCard(@RequestBody CreateCardRequest request) {
+		return SuccessResponse.created("명함 생성 성공");
 	}
 }

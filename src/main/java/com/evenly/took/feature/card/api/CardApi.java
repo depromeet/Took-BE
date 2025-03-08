@@ -1,8 +1,5 @@
 package com.evenly.took.feature.card.api;
 
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -29,7 +26,6 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "직군 목록 조회 성공")
 	})
-	@GetMapping("/api/card/register")
 	SuccessResponse<JobsResponse> getJobs(
 		@RequestParam(value = "job") CardJob job);
 
@@ -39,7 +35,6 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "명함 목록 조회 성공")
 	})
-	@GetMapping("/api/card/my")
 	MyCardListResponse getMyCards();
 
 	@Operation(
@@ -48,7 +43,6 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "명함 상세 정보 조회 성공")
 	})
-	@GetMapping("/api/card/detail")
 	void getCardDetail();
 
 	@Operation(
@@ -57,7 +51,6 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "링크 스크랩 성공")
 	})
-	@PostMapping("/api/card/scrap")
 	SuccessResponse<ScrapResponse> scrapLink(
 		@RequestParam LinkType type,
 		@RequestBody LinkRequest request);
@@ -68,8 +61,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "명함 생성 성공")
 	})
-	@PostMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	void createCard(
+	SuccessResponse<Void> createCard(
 		@RequestBody CreateCardRequest request
 
 	);

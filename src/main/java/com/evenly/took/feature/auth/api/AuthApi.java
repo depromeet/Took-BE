@@ -1,8 +1,6 @@
 package com.evenly.took.feature.auth.api;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -31,7 +29,6 @@ public interface AuthApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "302", description = "리다이렉트 성공")
 	})
-	@GetMapping("/api/auth/{oauthType}")
 	SuccessResponse<OAuthUrlResponse> redirectAuthRequestUrl(
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType);
@@ -42,7 +39,6 @@ public interface AuthApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "로그인 성공")
 	})
-	@PostMapping("/api/auth/login/{oauthType}")
 	SuccessResponse<AuthResponse> login( // TODO 에러 응답 추가
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		@PathVariable OAuthType oauthType,
@@ -59,7 +55,6 @@ public interface AuthApi {
 		@ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
 		@ApiResponse(responseCode = "401", description = "Refresh Token 만료", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
-	@PostMapping("/api/auth/refresh")
 	SuccessResponse<TokenResponse> refreshToken(
 		@RequestBody RefreshTokenRequest request);
 }
