@@ -11,6 +11,7 @@ import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
+import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,6 +62,7 @@ public interface CardApi {
 		@ApiResponse(responseCode = "201", description = "명함 생성 성공")
 	})
 	SuccessResponse<Void> createCard(
+		User user,
 		CreateCardRequest request,
 		@Parameter(hidden = true)
 		MultipartFile profileImage

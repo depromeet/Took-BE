@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.evenly.took.feature.card.application.CardService;
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.LinkType;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
@@ -20,6 +21,8 @@ import com.evenly.took.feature.card.dto.response.JobResponse;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
+import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.response.SuccessResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 public class CardController implements CardApi {
+
+	private final CardService cardService;
 
 	@GetMapping("/api/card/register")
 	public SuccessResponse<JobsResponse> getJobs(@RequestParam Job job) {
@@ -59,9 +64,13 @@ public class CardController implements CardApi {
 	}
 
 	@PostMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public SuccessResponse<Void> createCard(CreateCardRequest request,
+	public SuccessResponse<Void> createCard(
+		@LoginUser User user,
+		CreateCardRequest request,
 		@RequestParam("profileImage") MultipartFile profileImage) {
 
+		String profileImageKey = this.cardService.uploadProfileImage(profileImage);
+		this.cardService.createCard(user, request, profileImageKey);
 		return SuccessResponse.created("명함 생성 성공");
 	}
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.evenly.took.feature.card.domain.PreviewInfoType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "명함을 추가하기 위한 정보", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -42,6 +44,9 @@ public record CreateCardRequest(
 	List<ContentRequest> content,
 
 	@Schema(description = "프로젝트 정보", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-	List<ProjectRequest> project
+	List<ProjectRequest> project,
+
+	@Schema(description = "대표 썸네일 타입", example = "SNS", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+	PreviewInfoType previewInfoType
 ) {
 }

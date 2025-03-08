@@ -47,4 +47,10 @@ public class Career extends BaseTimeEntity {
 		this.detailJobKr = detailJobKr;
 		this.detailJobEn = detailJobEn;
 	}
+
+	public static Career toEntity(Long id) {
+		Career careerEntity = new Career();
+		careerEntity.id = id;
+		return careerEntity;
+	}
 }
