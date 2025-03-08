@@ -15,6 +15,7 @@ import com.evenly.took.feature.card.client.dto.CrawledDto;
 public class VelogLinkCrawler implements LinkCrawler {
 
 	private static final int TIMEOUT_MILLISECONDS = 10000;
+	private static final String EMPTY_STRING = "";
 
 	@Override
 	public CrawledType supportType() {
@@ -39,7 +40,7 @@ public class VelogLinkCrawler implements LinkCrawler {
 		Element image = document.selectFirst(
 			"body > div > div:nth-child(2) > div:nth-child(2) > main > div > div:nth-child(1) > div:nth-child(1) > div > a > img");
 		if (image == null) {
-			return "";
+			return EMPTY_STRING;
 		}
 		return image.attr("src");
 	}
@@ -48,7 +49,7 @@ public class VelogLinkCrawler implements LinkCrawler {
 		Element description = document.selectFirst(
 			"body > div > div:nth-child(2) > div:nth-child(2) > main > div > div:nth-child(1) > div:nth-child(1) > div > div > div:nth-child(2)");
 		if (description == null) {
-			return "";
+			return EMPTY_STRING;
 		}
 		return description.text();
 	}
