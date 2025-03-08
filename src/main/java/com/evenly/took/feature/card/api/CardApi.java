@@ -1,13 +1,16 @@
 package com.evenly.took.feature.card.api;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.evenly.took.feature.card.domain.CardJob;
 import com.evenly.took.feature.card.domain.LinkType;
+import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
@@ -35,10 +38,10 @@ public interface CardApi {
 		summary = "내 명함 목록 조회",
 		description = "현재 로그인한 사용자가 소유한 모든 명함 목록을 조회합니다.")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "명함 목록 조회 성공")
+		@ApiResponse(responseCode = "200", description = "명함 목록 조회 성공 [null 값은 전달x]")
 	})
 	@GetMapping("/api/card/my")
-	MyCardListResponse getMyCards();
+	SuccessResponse<MyCardListResponse> getMyCards();
 
 	@Operation(
 		summary = "명함 상세 정보 조회",
@@ -47,7 +50,9 @@ public interface CardApi {
 		@ApiResponse(responseCode = "200", description = "명함 상세 정보 조회 성공")
 	})
 	@GetMapping("/api/card/detail")
-	void getCardDetail();
+	SuccessResponse<CardDetailResponse> getCardDetail(
+		@ModelAttribute CardDetailRequest request
+	);
 
 	@Operation(
 		summary = "외부 콘텐츠 링크 스크랩",
