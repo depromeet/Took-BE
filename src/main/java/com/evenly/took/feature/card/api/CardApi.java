@@ -1,5 +1,6 @@
 package com.evenly.took.feature.card.api;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.evenly.took.feature.card.domain.CardJob;
 import com.evenly.took.feature.card.domain.LinkType;
+import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
@@ -66,6 +68,9 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "명함 생성 성공")
 	})
-	@PostMapping("/api/card")
-	void createCard();
+	@PostMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	void createCard(
+		@RequestBody CreateCardRequest request
+
+	);
 }

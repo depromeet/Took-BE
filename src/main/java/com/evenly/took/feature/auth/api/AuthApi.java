@@ -3,6 +3,7 @@ package com.evenly.took.feature.auth.api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
@@ -17,7 +18,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -61,6 +61,5 @@ public interface AuthApi {
 	})
 	@PostMapping("/api/auth/refresh")
 	SuccessResponse<TokenResponse> refreshToken(
-		@RequestBody(description = "Access Token을 재발급 받기 위한 Refresh Token", required = true)
-		@org.springframework.web.bind.annotation.RequestBody RefreshTokenRequest request);
+		@RequestBody RefreshTokenRequest request);
 }

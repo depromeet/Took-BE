@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.evenly.took.feature.card.domain.CardJob;
 import com.evenly.took.feature.card.domain.LinkType;
+import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.response.JobResponse;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
@@ -48,7 +49,8 @@ public class CardController implements CardApi {
 			new ScrapResponse("blog", "title", "link", "image_url", "description"));
 	}
 
-	public void createCard() {
+	@Override
+	public void createCard(@RequestBody CreateCardRequest request) {
 
 	}
 }
