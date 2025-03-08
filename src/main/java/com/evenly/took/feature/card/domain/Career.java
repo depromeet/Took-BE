@@ -15,7 +15,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,18 +30,15 @@ public class Career extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "job")
+	@Column(name = "job", nullable = false)
 	@Enumerated(EnumType.STRING)
-	@NotNull
 	private Job job;
 
-	@Column(name = "detail_job_kr")
+	@Column(name = "detail_job_kr", nullable = false)
 	@JdbcTypeCode(SqlTypes.JSON)
-	@NotNull
 	private List<String> detailJobKr;
 
-	@Column(name = "detail_job_en")
-	@NotNull
+	@Column(name = "detail_job_en", nullable = false)
 	private String detailJobEn;
 
 	@Builder

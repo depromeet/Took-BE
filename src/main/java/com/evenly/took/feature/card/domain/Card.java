@@ -24,8 +24,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +33,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "cards")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
 public class Card extends BaseTimeEntity {
 
@@ -48,23 +49,21 @@ public class Card extends BaseTimeEntity {
 	@JoinColumn(name = "career_id")
 	private Career career;
 
-	@Column(name = "preview_info")
+	@Column(name = "preview_info", nullable = false)
 	@Enumerated(EnumType.STRING)
-	@NotNull
 	private PreviewInfoType previewInfo;
 
-	@Column(name = "nickname")
-	@NotNull
+	@Column(name = "nickname", nullable = false)
 	private String nickname;
 
 	@Column(name = "image_path")
 	private String imagePath;
 
-	@Column(name = "interest_domain")
+	@Column(name = "interest_domain", nullable = false)
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<String> interestDomain;
 
-	@Column(name = "summary")
+	@Column(name = "summary", nullable = false)
 	private String summary;
 
 	@Column(name = "organization")

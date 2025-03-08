@@ -13,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,12 +36,10 @@ public class User extends BaseTimeEntity {
 	@Embedded
 	private OAuthIdentifier oauthIdentifier;
 
-	@Column(name = "name")
-	@NotNull
+	@Column(name = "name", nullable = false)
 	private String name;
 
 	@Column(name = "email", nullable = false)
-	@NotNull
 	private String email;
 
 	@Column(name = "allow_push_notification")
