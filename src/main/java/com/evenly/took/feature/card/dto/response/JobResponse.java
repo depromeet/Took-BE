@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "명함 직군 조회 응답")
 public record JobResponse(
+	@Schema(description = "직군 ID", example = "1")
+	Long id,
+
 	@Schema(description = "직군 (디자이너, 개발자)", example = "DEVELOPER")
 	String job,
 
