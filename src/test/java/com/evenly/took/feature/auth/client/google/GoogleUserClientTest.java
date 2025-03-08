@@ -38,7 +38,7 @@ public class GoogleUserClientTest extends MockTest {
 			String authCode = "validAuthCode";
 			GoogleTokenResponse tokenResponse = new GoogleTokenResponse("dummyAccessToken", 3600, "scope", "Bearer",
 				"dummyIdToken");
-			GoogleUserInfoResponse userInfoResponse = new GoogleUserInfoResponse("dummySub", "홍길동");
+			GoogleUserInfoResponse userInfoResponse = new GoogleUserInfoResponse("dummySub", "홍길동", "홍길동@gmail.com");
 
 			when(googleTokenProvider.fetchAccessToken(authCode)).thenReturn(tokenResponse);
 			when(googleUserInfoProvider.fetchUserInfo(tokenResponse.accessToken())).thenReturn(userInfoResponse);
