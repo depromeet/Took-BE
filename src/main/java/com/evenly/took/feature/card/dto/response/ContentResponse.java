@@ -19,7 +19,7 @@ public record ContentResponse(
 	String description
 ) {
 
-	public ContentResponse from(Content content) {
+	public static ContentResponse from(Content content) {
 		return new ContentResponse(content.title(), content.link(), content.imageUrl(), content.description());
 	}
 }

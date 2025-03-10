@@ -1,11 +1,16 @@
 package com.evenly.took.feature.card.dto.response;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Job;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Schema(description = "명함 상세 정보")
 public record CardDetailResponse(
 	@Schema(description = "명함용 이름", example = "홍길동", requiredMode = Schema.RequiredMode.REQUIRED)
 	String nickname,
@@ -29,7 +34,7 @@ public record CardDetailResponse(
 	List<String> interestDomain,
 
 	@Schema(description = "SNS 정보 (previewInfoType이 SNS일 때)")
-	SNSResponse sns,
+	List<SNSResponse> sns,
 
 	@Schema(description = "최근 소식 (previewInfoType이 NEWS일 때)", example = "최근 블로그 포스팅 시작했습니다")
 	String news,
@@ -43,4 +48,44 @@ public record CardDetailResponse(
 	@Schema(description = "프로젝트 정보 (previewInfoType이 PROJECT일 때)")
 	List<ProjectResponse> project
 ) {
+	public static CardDetailResponse from(Card card) {
+		Job job = card.getCareer() != null ? card.getCareer().getJob() : null;
+		String detailJob = card.getCareer() != null ? card.getCareer().getDetailJobEn() : null;
+
+		List<ContentResponse> contentResponses = null;
+		if (card.getContent() != null && !card.getContent().isEmpty()) {
+			contentResponses = card.getContent().stream()
+				.map(ContentResponse::from)
+				.collect(Collectors.toList());
+		}
+
+		List<ProjectResponse> projectResponses = null;
+		if (card.getProject() != null && !card.getProject().isEmpty()) {
+			projectResponses = card.getProject().stream()
+				.map(ProjectResponse::from)
+				.collect(Collectors.toList());
+		}
+
+		List<SNSResponse> snsResponses = null;
+		if (card.getSns() != null && !card.getSns().isEmpty()) {
+			snsResponses = card.getSns().stream()
+				.map(SNSResponse::from)
+				.collect(Collectors.toList());
+		}
+
+		return new CardDetailResponse(
+			card.getNickname(),
+			job,
+			detailJob,
+			card.getOrganization(),
+			card.getSummary(),
+			card.getRegion(),
+			card.getInterestDomain(),
+			snsResponses,
+			card.getNews(),
+			card.getHobby(),
+			contentResponses,
+			projectResponses
+		);
+	}
 }

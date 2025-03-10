@@ -13,7 +13,7 @@ public record SNSResponse(
 	@Schema(description = "SNS 링크", example = "https://linkedin.com/in/username")
 	String link
 ) {
-	public SNSResponse form(SNS sns) {
+	public static SNSResponse from(SNS sns) {
 		return new SNSResponse(sns.type(), sns.link());
 	}
 }

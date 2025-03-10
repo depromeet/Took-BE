@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.evenly.took.feature.card.application.CardService;
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.LinkType;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
@@ -20,6 +22,8 @@ import com.evenly.took.feature.card.dto.response.JobResponse;
 import com.evenly.took.feature.card.dto.response.JobsResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
+import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.response.SuccessResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 public class CardController implements CardApi {
+
+	private final CardService cardService;
 
 	@GetMapping("/api/card/register")
 	public SuccessResponse<JobsResponse> getJobs(@RequestParam Job job) {
@@ -45,11 +51,10 @@ public class CardController implements CardApi {
 	}
 
 	@GetMapping("/api/card/detail")
-	public SuccessResponse<CardDetailResponse> getCardDetail(@RequestParam CardDetailRequest request) {
-		return SuccessResponse.of(
-			new CardDetailResponse(
-				null, null, null, null, null, null,
-				null, null, null, null, null, null));
+	public SuccessResponse<CardDetailResponse> getCardDetail(@LoginUser User user,
+		@ModelAttribute CardDetailRequest request) {
+		CardDetailResponse response = cardService.fetchCardDetail(user.getId(), request);
+		return SuccessResponse.of(response);
 	}
 
 	@PostMapping("/api/card/scrap")
