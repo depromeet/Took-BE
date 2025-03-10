@@ -20,12 +20,12 @@ import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.MyCardResponse;
-import com.evenly.took.global.integration.IntegrationTest;
+import com.evenly.took.global.integration.JwtMockIntegrationTest;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
-public class CardControllerIntegrationTest extends IntegrationTest {
+public class CardControllerIntegrationTest extends JwtMockIntegrationTest {
 
 	@MockitoBean
 	private CardService cardService;
