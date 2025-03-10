@@ -132,9 +132,4 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.statusCode(200);
 		}
 	}
-
-	@Nested
-	class 명함 {
-
-	}
 }

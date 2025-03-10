@@ -30,7 +30,7 @@ public class StringToListObjectConverter implements GenericConverter {
 	@Override
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
 		String stringValue = (String)source;
-		if (stringValue == null || stringValue.isEmpty()) {
+		if (stringValue.isEmpty()) {
 			return Collections.emptyList();
 		}
 
