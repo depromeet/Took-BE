@@ -34,7 +34,7 @@ public class TestCardFactory {
 	}
 
 	public static Card createCard(Consumer<Card.CardBuilder> customizer) {
-		User user = createDefaultUser();
+		User user = TestUserFactory.createMockGoogleUser();
 		Career career = createDefaultCareer();
 
 		Card.CardBuilder cardBuilder = Card.builder()
@@ -53,30 +53,6 @@ public class TestCardFactory {
 		ReflectionTestUtils.setField(card, "id", DEFAULT_ID);
 
 		return card;
-	}
-
-	public static User createUser(Consumer<User.UserBuilder> customizer) {
-		User.UserBuilder userBuilder = User.builder()
-			.name("사용자")
-			.email("user@example.com");
-
-		customizer.accept(userBuilder);
-
-		User user = userBuilder.build();
-		ReflectionTestUtils.setField(user, "id", DEFAULT_ID);
-
-		return user;
-	}
-
-	public static User createDefaultUser() {
-		return createUser(userBuilder -> {
-		});
-	}
-
-	public static User createUserWithId(Long id) {
-		User user = createDefaultUser();
-		ReflectionTestUtils.setField(user, "id", id);
-		return user;
 	}
 
 	public static Career createCareer(Consumer<Career.CareerBuilder> customizer) {
