@@ -13,8 +13,8 @@ import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.evenly.took.feature.card.domain.SNSType;
 import com.evenly.took.feature.card.dto.response.MyCardResponse;
 import com.evenly.took.feature.card.dto.response.PreviewInfoResponse;
+import com.evenly.took.global.domain.TestCardFactory;
 import com.evenly.took.global.service.ServiceTest;
-import com.evenly.took.global.testutil.TestCardFactory;
 
 class CardMapperTest extends ServiceTest {
 
