@@ -57,7 +57,7 @@ public class CardControllerIntegrationTest extends JwtMockIntegrationTest {
 				})
 			);
 
-			when(cardService.fetchCardDetail(eq(mockUser.getId()), any(CardDetailRequest.class)))
+			when(cardService.findCardDetail(eq(mockUser.getId()), any(CardDetailRequest.class)))
 				.thenReturn(mockResponse);
 
 			// when
@@ -112,7 +112,7 @@ public class CardControllerIntegrationTest extends JwtMockIntegrationTest {
 
 			CardDetailResponse mockResponse = CardDetailResponse.from(card);
 
-			when(cardService.fetchCardDetail(eq(mockUser.getId()), any(CardDetailRequest.class)))
+			when(cardService.findCardDetail(eq(mockUser.getId()), any(CardDetailRequest.class)))
 				.thenReturn(mockResponse);
 
 			// when

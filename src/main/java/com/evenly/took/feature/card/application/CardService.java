@@ -19,10 +19,9 @@ public class CardService {
 	private final CardRepository cardRepository;
 
 	@Transactional(readOnly = true)
-	public CardDetailResponse fetchCardDetail(Long userId, CardDetailRequest request) {
+	public CardDetailResponse findCardDetail(Long userId, CardDetailRequest request) {
 		Card card = cardRepository.findByUserIdAndIdAndDeletedAtIsNull(userId, request.id())
 			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
 		return CardDetailResponse.from(card);
 	}
-
 }

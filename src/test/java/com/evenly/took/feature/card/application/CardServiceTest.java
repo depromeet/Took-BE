@@ -52,7 +52,7 @@ public class CardServiceTest extends ServiceTest {
 			.thenReturn(Optional.of(card));
 
 		// when
-		CardDetailResponse response = cardService.fetchCardDetail(userId, request);
+		CardDetailResponse response = cardService.findCardDetail(userId, request);
 
 		// then
 		assertThat(response).isNotNull();
@@ -79,7 +79,7 @@ public class CardServiceTest extends ServiceTest {
 			.thenReturn(Optional.of(card));
 
 		// when
-		CardDetailResponse response = cardService.fetchCardDetail(userId, request);
+		CardDetailResponse response = cardService.findCardDetail(userId, request);
 		String jsonResponse = objectMapper.writeValueAsString(response);
 
 		// then
@@ -115,7 +115,7 @@ public class CardServiceTest extends ServiceTest {
 			.thenReturn(Optional.of(card));
 
 		// when
-		CardDetailResponse response = cardService.fetchCardDetail(userId, request);
+		CardDetailResponse response = cardService.findCardDetail(userId, request);
 		String jsonResponse = objectMapper.writeValueAsString(response);
 
 		// then
@@ -140,7 +140,7 @@ public class CardServiceTest extends ServiceTest {
 
 		// when & then
 		TookException exception = assertThrows(TookException.class, () -> {
-			cardService.fetchCardDetail(userId, request);
+			cardService.findCardDetail(userId, request);
 		});
 
 		assertThat(exception.getErrorCode()).isEqualTo(CardErrorCode.CARD_NOT_FOUND);

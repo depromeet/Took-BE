@@ -53,7 +53,7 @@ public class CardController implements CardApi {
 	@GetMapping("/api/card/detail")
 	public SuccessResponse<CardDetailResponse> getCardDetail(@LoginUser User user,
 		@ModelAttribute CardDetailRequest request) {
-		CardDetailResponse response = cardService.fetchCardDetail(user.getId(), request);
+		CardDetailResponse response = cardService.findCardDetail(user.getId(), request);
 		return SuccessResponse.of(response);
 	}
 
