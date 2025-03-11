@@ -5,8 +5,6 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.evenly.took.feature.common.model.BaseTimeEntity;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "careers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Career extends BaseTimeEntity {
+public class Career {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
