@@ -17,7 +17,7 @@ public class CardService {
 
 	private final CareerRepository careerRepository;
 
-	public CareersResponse fetchJobs(Job job) {
+	public CareersResponse findCareers(Job job) {
 		List<Career> careers = careerRepository.findAllByJob(job);
 		return CareersResponse.from(careers);
 	}

@@ -32,7 +32,8 @@ public class CardController implements CardApi {
 
 	@GetMapping("/api/card/register")
 	public SuccessResponse<CareersResponse> getCareers(@RequestParam Job job) {
-		return SuccessResponse.of(cardService.fetchJobs(job));
+		CareersResponse response = cardService.findCareers(job);
+		return SuccessResponse.of(response);
 	}
 
 	@GetMapping("/api/card/my")
