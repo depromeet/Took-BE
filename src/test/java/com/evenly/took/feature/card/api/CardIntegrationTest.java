@@ -25,7 +25,7 @@ import com.evenly.took.global.integration.JwtMockIntegrationTest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
-public class CardControllerIntegrationTest extends JwtMockIntegrationTest {
+public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 	@MockitoBean
 	private CardService cardService;
