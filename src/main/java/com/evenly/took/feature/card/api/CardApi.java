@@ -61,7 +61,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "명함 생성 성공")
 	})
-	SuccessResponse<Void> createCard(
+	SuccessResponse<Void> addCard(
 		User user,
 		CreateCardRequest request,
 		@Parameter(hidden = true)

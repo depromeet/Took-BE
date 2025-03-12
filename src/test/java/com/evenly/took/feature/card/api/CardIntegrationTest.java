@@ -39,12 +39,11 @@ public class CardIntegrationTest extends IntegrationTest {
 	@MockitoBean
 	CardRepository cardRepository;
 
-	// Instead of autowiring the actual S3Service, we can mock it
 	@MockitoBean
 	private S3Service s3Service;
 
 	@Nested
-	class 명함 {
+	class 명함_생성 {
 
 		private MockMultipartFile testImageFile;
 		private final String TEST_PATH = "cards/";

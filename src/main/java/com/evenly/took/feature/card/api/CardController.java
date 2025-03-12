@@ -71,7 +71,7 @@ public class CardController implements CardApi {
 	}
 
 	@PostMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public SuccessResponse<Void> createCard(
+	public SuccessResponse<Void> addCard(
 		@LoginUser User user,
 		@ModelAttribute CreateCardRequest request,
 		@RequestPart("profileImage") MultipartFile profileImage) {
