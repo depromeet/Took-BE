@@ -12,7 +12,7 @@ import com.evenly.took.global.config.testcontainers.RedisTestConfig;
 @Sql(scripts = "classpath:init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Import({RedisTestConfig.class, MySQLTestConfig.class})
 @Component
-public abstract class DatabaseManager {
+public abstract class DatabaseInitializer {
 
 	@Autowired
 	private RedisCleaner redisCleaner;

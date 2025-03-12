@@ -6,14 +6,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.evenly.took.global.helper.DatabaseManager;
+import com.evenly.took.global.helper.DatabaseInitializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.restassured.RestAssured;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public abstract class IntegrationTest extends DatabaseManager {
+public abstract class IntegrationTest extends DatabaseInitializer {
 
 	@LocalServerPort
 	protected int port;
