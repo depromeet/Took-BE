@@ -22,6 +22,8 @@ import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.card.mapper.CardMapper;
 import com.evenly.took.global.domain.TestCardFactory;
 import com.evenly.took.global.exception.TookException;
+import com.evenly.took.feature.card.domain.Job;
+import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.global.service.ServiceTest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +41,24 @@ public class CardServiceTest extends ServiceTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Test
+	void 디자인_직군에_해당하는_모든_커리어를_조회한다() {
+		// given, when
+		CareersResponse response = cardService.findCareers(Job.DESIGNER);
+
+		// then
+		assertThat(response.careers()).hasSize(6);
+	}
+
+	@Test
+	void 개발_직군에_해당하는_모든_커리어를_조회한다() {
+		// given, when
+		CareersResponse response = cardService.findCareers(Job.DEVELOPER);
+
+		// then
+		assertThat(response.careers()).hasSize(11);
+	}
 
 	@Test
 	void 카드_상세_정보_조회시_카드가_존재하면_정상적으로_반환한다() {

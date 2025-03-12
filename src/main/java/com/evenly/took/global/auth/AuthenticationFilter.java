@@ -32,7 +32,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		"/v3/api-docs",
 		"/public",
 		"/api/health",
-		"/api/auth");
+		"/api/auth",
+		"/api/card/register");
 
 	static {
 		OBJECT_MAPPER.registerModule(new JavaTimeModule());
