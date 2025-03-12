@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -24,6 +25,7 @@ import com.evenly.took.feature.card.domain.vo.Project;
 import com.evenly.took.feature.card.domain.vo.SNS;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
+import com.evenly.took.feature.card.mapper.CardMapper;
 import com.evenly.took.global.domain.TestCardFactory;
 import com.evenly.took.global.integration.JwtMockIntegrationTest;
 
@@ -34,6 +36,9 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 	@MockitoBean
 	private CardService cardService;
+
+	@Autowired
+	private CardMapper cardMapper;
 
 	@Nested
 	class 전체_커리어_조회 {
@@ -62,7 +67,7 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			// given
 			Long cardId = 1L;
 
-			CardDetailResponse mockResponse = CardDetailResponse.from(
+			CardDetailResponse mockResponse = cardMapper.toCardDetailResponse(
 				TestCardFactory.createCard(builder -> {
 					builder.nickname("홍길동");
 					builder.summary("한줄 소개입니다.");
@@ -130,7 +135,7 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 				));
 			});
 
-			CardDetailResponse mockResponse = CardDetailResponse.from(card);
+			CardDetailResponse mockResponse = cardMapper.toCardDetailResponse(card);
 
 			when(cardService.findCardDetail(eq(mockUser.getId()), any(CardDetailRequest.class)))
 				.thenReturn(mockResponse);

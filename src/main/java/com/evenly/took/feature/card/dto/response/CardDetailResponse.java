@@ -1,9 +1,7 @@
 package com.evenly.took.feature.card.dto.response;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Job;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -48,44 +46,4 @@ public record CardDetailResponse(
 	@Schema(description = "프로젝트 정보 (previewInfoType이 PROJECT일 때)")
 	List<ProjectResponse> project
 ) {
-	public static CardDetailResponse from(Card card) {
-		Job job = card.getCareer() != null ? card.getCareer().getJob() : null;
-		String detailJob = card.getCareer() != null ? card.getCareer().getDetailJobEn() : null;
-
-		List<ContentResponse> contentResponses = null;
-		if (card.getContent() != null && !card.getContent().isEmpty()) {
-			contentResponses = card.getContent().stream()
-				.map(ContentResponse::from)
-				.collect(Collectors.toList());
-		}
-
-		List<ProjectResponse> projectResponses = null;
-		if (card.getProject() != null && !card.getProject().isEmpty()) {
-			projectResponses = card.getProject().stream()
-				.map(ProjectResponse::from)
-				.collect(Collectors.toList());
-		}
-
-		List<SNSResponse> snsResponses = null;
-		if (card.getSns() != null && !card.getSns().isEmpty()) {
-			snsResponses = card.getSns().stream()
-				.map(SNSResponse::from)
-				.collect(Collectors.toList());
-		}
-
-		return new CardDetailResponse(
-			card.getNickname(),
-			job,
-			detailJob,
-			card.getOrganization(),
-			card.getSummary(),
-			card.getRegion(),
-			card.getInterestDomain(),
-			snsResponses,
-			card.getNews(),
-			card.getHobby(),
-			contentResponses,
-			projectResponses
-		);
-	}
 }

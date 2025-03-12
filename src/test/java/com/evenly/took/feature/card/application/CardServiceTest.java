@@ -14,16 +14,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.evenly.took.feature.card.dao.CardRepository;
 import com.evenly.took.feature.card.domain.Card;
-import com.evenly.took.feature.card.domain.SNSType;
+import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.vo.Content;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
+import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.card.mapper.CardMapper;
 import com.evenly.took.global.domain.TestCardFactory;
 import com.evenly.took.global.exception.TookException;
-import com.evenly.took.feature.card.domain.Job;
-import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.global.service.ServiceTest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +35,7 @@ public class CardServiceTest extends ServiceTest {
 	@MockitoBean
 	private CardRepository cardRepository;
 
-	@MockitoBean
+	@Autowired
 	private CardMapper cardMapper;
 
 	@Autowired
@@ -122,14 +121,11 @@ public class CardServiceTest extends ServiceTest {
 		Long cardId = 1L;
 		CardDetailRequest request = new CardDetailRequest(cardId);
 
-		// SNS 정보가 있는 카드 생성
-		Card card = TestCardFactory.createCardWithSNS(SNSType.GITHUB, "https://github.com/user");
-
 		// 컨텐츠 정보 추가
 		List<Content> contents = List.of(
 			new Content("테스트 글", "https://blog.com/test", "test-blog-image.jpg", "테스트 글 설명")
 		);
-		card = TestCardFactory.createCardWithContents(contents);
+		Card card = TestCardFactory.createCardWithContents(contents);
 
 		when(cardRepository.findByUserIdAndIdAndDeletedAtIsNull(userId, cardId))
 			.thenReturn(Optional.of(card));
