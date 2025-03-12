@@ -1,7 +1,6 @@
 package com.evenly.took.feature.card.api;
 
 import static io.restassured.RestAssured.*;
-<<<<<<< HEAD
 import static org.hamcrest.core.IsEqual.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -22,8 +21,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
+import com.evenly.took.feature.card.dao.CardRepository;
 import com.evenly.took.feature.card.domain.Card;
-import com.evenly.took.feature.card.domain.dao.CardRepository;
 import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.aws.s3.S3Service;
@@ -254,33 +253,25 @@ public class CardIntegrationTest extends IntegrationTest {
 				throw new RuntimeException(e);
 			}
 		}
-=======
 
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+		@Nested
+		class 전체_커리어_조회 {
 
-import com.evenly.took.global.integration.IntegrationTest;
+			@Test
+			void 직군에_따른_전체_커리어를_조회한다() {
+				given().log().all()
+					.when().get("/api/card/register?job=DEVELOPER")
+					.then().log().all()
+					.statusCode(200);
+			}
 
-public class CardIntegrationTest extends IntegrationTest {
-
-	@Nested
-	class 전체_커리어_조회 {
-
-		@Test
-		void 직군에_따른_전체_커리어를_조회한다() {
-			given().log().all()
-				.when().get("/api/card/register?job=DEVELOPER")
-				.then().log().all()
-				.statusCode(200);
+			@Test
+			void 제공하지_않는_직군의_커리어를_요청한_경우_400_예외를_반환한다() {
+				given().log().all()
+					.when().get("/api/card/register?job=INVALID")
+					.then().log().all()
+					.statusCode(400);
+			}
 		}
-
-		@Test
-		void 제공하지_않는_직군의_커리어를_요청한_경우_400_예외를_반환한다() {
-			given().log().all()
-				.when().get("/api/card/register?job=INVALID")
-				.then().log().all()
-				.statusCode(400);
-		}
->>>>>>> 7c7280ea086d5f069997d135f25bd6eb40cd5c60
 	}
 }
