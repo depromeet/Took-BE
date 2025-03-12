@@ -5,8 +5,6 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.evenly.took.feature.common.model.BaseTimeEntity;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "careers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Career extends BaseTimeEntity {
+public class Career {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,18 +32,18 @@ public class Career extends BaseTimeEntity {
 	@Enumerated(EnumType.STRING)
 	private Job job;
 
+	@Column(name = "detail_job_en", nullable = false)
+	private String detailJobEn;
+
 	@Column(name = "detail_job_kr", nullable = false)
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<String> detailJobKr;
 
-	@Column(name = "detail_job_en", nullable = false)
-	private String detailJobEn;
-
 	@Builder
-	public Career(Job job, List<String> detailJobKr, String detailJobEn) {
+	public Career(Job job, String detailJobEn, List<String> detailJobKr) {
 		this.job = job;
-		this.detailJobKr = detailJobKr;
 		this.detailJobEn = detailJobEn;
+		this.detailJobKr = detailJobKr;
 	}
 
 	public static Career toEntity(Long id) {

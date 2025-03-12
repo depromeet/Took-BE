@@ -7,10 +7,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Career;
+import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.dao.CardRepository;
 import com.evenly.took.feature.card.domain.dao.CareerRepository;
 import com.evenly.took.feature.card.dto.request.CreateCardRequest;
+import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
+import com.evenly.took.feature.card.mapper.CareersMapper;
 import com.evenly.took.feature.card.mapper.ContentMapper;
 import com.evenly.took.feature.card.mapper.ProjectMapper;
 import com.evenly.took.feature.card.mapper.SnsMapper;
@@ -30,6 +33,8 @@ public class CardService {
 	private final SnsMapper snsMapper;
 	private final ContentMapper contentMapper;
 	private final ProjectMapper projectMapper;
+	private final CareerRepository careerRepository;
+	private final CareersMapper careersMapper;
 
 	public String uploadProfileImage(MultipartFile profileImage) {
 		return this.s3Service.uploadFile(profileImage, "profile/");
@@ -60,5 +65,10 @@ public class CardService {
 			.build();
 
 		cardRepository.save(newCard);
+	}
+
+	public CareersResponse findCareers(Job job) {
+		List<Career> careers = careerRepository.findAllByJob(job);
+		return careersMapper.toResponse(careers);
 	}
 }
