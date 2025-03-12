@@ -1,7 +1,5 @@
 package com.evenly.took.feature.card.api;
 
-import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +15,7 @@ import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
-import com.evenly.took.feature.card.dto.response.JobResponse;
-import com.evenly.took.feature.card.dto.response.JobsResponse;
+import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.user.domain.User;
@@ -36,12 +33,9 @@ public class CardController implements CardApi {
 	private final CardService cardService;
 
 	@GetMapping("/api/card/register")
-	public SuccessResponse<JobsResponse> getJobs(@RequestParam Job job) {
-		return SuccessResponse.of(
-			new JobsResponse(List.of(
-				new JobResponse(1L, Job.DESIGNER, "Product Designer", List.of("프로덕트 디자이너")),
-				new JobResponse(2L, Job.DESIGNER, "Graphic Designer", List.of("그래픽 디자이너")),
-				new JobResponse(3L, Job.DESIGNER, "Interaction Designer", List.of("인터랙션 디자이너", "인터렉션 디자이너")))));
+	public SuccessResponse<CareersResponse> getCareers(@RequestParam Job job) {
+		CareersResponse response = cardService.findCareers(job);
+		return SuccessResponse.of(response);
 	}
 
 	@GetMapping("/api/card/my")
