@@ -8,11 +8,13 @@ import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
 public class MySQLTestConfig {
-	
+
 	@Bean
 	@ServiceConnection
 	MySQLContainer<?> mysqlContainer() {
-		return new MySQLContainer<>(DockerImageName.parse("mysql/mysql-server:8.0.26"))
+		return new MySQLContainer<>(
+			DockerImageName.parse("mysql/mysql-server:8.0.26")
+				.asCompatibleSubstituteFor("mysql"))
 			.withDatabaseName("testdb")
 			.withUsername("test")
 			.withPassword("test");
