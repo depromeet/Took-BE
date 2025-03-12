@@ -26,6 +26,7 @@ import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.response.SuccessResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,7 +53,7 @@ public class CardController implements CardApi {
 
 	@GetMapping("/api/card/detail")
 	public SuccessResponse<CardDetailResponse> getCardDetail(@LoginUser User user,
-		@ModelAttribute CardDetailRequest request) {
+		@ModelAttribute @Valid CardDetailRequest request) {
 		CardDetailResponse response = cardService.findCardDetail(user.getId(), request);
 		return SuccessResponse.of(response);
 	}

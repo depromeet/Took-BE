@@ -20,7 +20,7 @@ public class CardService {
 
 	@Transactional(readOnly = true)
 	public CardDetailResponse findCardDetail(Long userId, CardDetailRequest request) {
-		Card card = cardRepository.findByUserIdAndIdAndDeletedAtIsNull(userId, request.id())
+		Card card = cardRepository.findByUserIdAndIdAndDeletedAtIsNull(userId, request.cardId())
 			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
 		return CardDetailResponse.from(card);
 	}
