@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.evenly.took.feature.card.dao.CardRepository;
+import com.evenly.took.feature.card.dao.CareerRepository;
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Career;
 import com.evenly.took.feature.card.domain.Job;
-import com.evenly.took.feature.card.domain.dao.CardRepository;
-import com.evenly.took.feature.card.domain.dao.CareerRepository;
 import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
@@ -33,7 +33,6 @@ public class CardService {
 	private final SnsMapper snsMapper;
 	private final ContentMapper contentMapper;
 	private final ProjectMapper projectMapper;
-	private final CareerRepository careerRepository;
 	private final CareersMapper careersMapper;
 
 	public String uploadProfileImage(MultipartFile profileImage) {
