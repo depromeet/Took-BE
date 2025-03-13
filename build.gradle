@@ -64,6 +64,10 @@ dependencies {
     // MapStruct
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    // crawling
+    implementation 'org.seleniumhq.selenium:selenium-java:4.29.0'
+    implementation 'io.github.bonigarcia:webdrivermanager:5.9.2'
 }
 
 tasks.named('test') {
