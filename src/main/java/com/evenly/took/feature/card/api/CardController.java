@@ -2,6 +2,7 @@ package com.evenly.took.feature.card.api;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,8 @@ import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
+import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.response.SuccessResponse;
 
 import jakarta.validation.Valid;
@@ -37,16 +40,17 @@ public class CardController implements CardApi {
 	}
 
 	@GetMapping("/api/card/my")
-	public SuccessResponse<MyCardListResponse> getMyCards() {
-		return SuccessResponse.of(new MyCardListResponse(null));
+	public SuccessResponse<MyCardListResponse> getMyCards(@LoginUser User user) {
+		MyCardListResponse response = cardService.findUserCardList(user.getId());
+		return SuccessResponse.of(response);
 	}
 
 	@GetMapping("/api/card/detail")
-	public SuccessResponse<CardDetailResponse> getCardDetail(@RequestParam CardDetailRequest request) {
-		return SuccessResponse.of(
-			new CardDetailResponse(
-				null, null, null, null, null, null,
-				null, null, null, null, null, null));
+	public SuccessResponse<CardDetailResponse> getCardDetail(@LoginUser User user,
+		@ModelAttribute @Valid CardDetailRequest request) {
+		System.out.println(user.getId());
+		CardDetailResponse response = cardService.findCardDetail(user.getId(), request);
+		return SuccessResponse.of(response);
 	}
 
 	@PostMapping("/api/card/scrap")

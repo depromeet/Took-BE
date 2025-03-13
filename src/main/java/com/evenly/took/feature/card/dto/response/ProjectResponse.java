@@ -18,7 +18,4 @@ public record ProjectResponse(
 	@Schema(description = "프로젝트 설명", example = "Spring Boot 기반 명함 관리 서비스")
 	String description
 ) {
-	public ProjectResponse from(Project project) {
-		return new ProjectResponse(project.title(), project.link(), project.imageUrl(), project.description());
-	}
 }

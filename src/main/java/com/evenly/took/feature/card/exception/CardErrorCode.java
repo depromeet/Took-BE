@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 public enum CardErrorCode implements ErrorCode {
 
 	CANNOT_CRAWL(HttpStatus.BAD_REQUEST, "크롤링에 실패하였습니다."),
+	CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "카드를 찾을 수 없습니다."),
 	;
 
 	private final HttpStatus status;
