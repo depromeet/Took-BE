@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.evenly.took.feature.card.domain.SNSType;
+import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.MyCardResponse;
 import com.evenly.took.feature.card.dto.response.PreviewInfoResponse;
 import com.evenly.took.global.domain.TestCardFactory;
@@ -51,11 +52,11 @@ class CardMapperTest extends ServiceTest {
 		);
 
 		// when
-		List<MyCardResponse> responses = cardMapper.toMyCardResponseList(cards);
+		MyCardListResponse responses = cardMapper.toMyCardListResponse(cards);
 
 		// then
-		assertThat(responses).isNotNull();
-		assertThat(responses).hasSize(2);
+		assertThat(responses.cards()).isNotNull();
+		assertThat(responses.cards()).hasSize(2);
 	}
 
 	@Test

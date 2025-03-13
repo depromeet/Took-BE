@@ -13,6 +13,7 @@ import com.evenly.took.feature.card.domain.vo.Content;
 import com.evenly.took.feature.card.domain.vo.Project;
 import com.evenly.took.feature.card.domain.vo.SNS;
 import com.evenly.took.feature.card.dto.response.ContentResponse;
+import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.MyCardResponse;
 import com.evenly.took.feature.card.dto.response.PreviewInfoResponse;
 import com.evenly.took.feature.card.dto.response.ProjectResponse;
@@ -28,6 +29,10 @@ public interface CardMapper {
 	MyCardResponse toMyCardResponse(Card card);
 
 	List<MyCardResponse> toMyCardResponseList(List<Card> cards);
+
+	default MyCardListResponse toMyCardListResponse(List<Card> cards) {
+		return new MyCardListResponse(toMyCardResponseList(cards));
+	}
 
 	@Named("toPreviewInfoResponse")
 	default PreviewInfoResponse toPreviewInfoResponse(Card card) {

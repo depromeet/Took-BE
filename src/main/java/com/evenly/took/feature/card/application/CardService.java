@@ -12,7 +12,6 @@ import com.evenly.took.feature.card.domain.Career;
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
-import com.evenly.took.feature.card.dto.response.MyCardResponse;
 import com.evenly.took.feature.card.mapper.CardMapper;
 import com.evenly.took.feature.card.mapper.CareersMapper;
 
@@ -30,8 +29,7 @@ public class CardService {
 	@Transactional(readOnly = true)
 	public MyCardListResponse findUserCardList(Long userId) {
 		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
-		List<MyCardResponse> myCardResponses = cardMapper.toMyCardResponseList(cards);
-		return new MyCardListResponse(myCardResponses);
+		return cardMapper.toMyCardListResponse(cards);
 	}
 
 	public CareersResponse findCareers(Job job) {
