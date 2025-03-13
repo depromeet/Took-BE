@@ -49,6 +49,7 @@ public class CardController implements CardApi {
 	@GetMapping("/api/card/detail")
 	public SuccessResponse<CardDetailResponse> getCardDetail(@LoginUser User user,
 		@ModelAttribute @Valid CardDetailRequest request) {
+		System.out.println(user.getId());
 		CardDetailResponse response = cardService.findCardDetail(user.getId(), request);
 		return SuccessResponse.of(response);
 	}
