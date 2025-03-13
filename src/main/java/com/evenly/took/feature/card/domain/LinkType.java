@@ -5,4 +5,8 @@ public enum LinkType {
 	BLOG,
 	PROJECT,
 	;
+
+	public boolean isBlog() {
+		return this == BLOG;
+	}
 }

@@ -20,6 +20,7 @@ import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.global.response.SuccessResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,9 +51,12 @@ public class CardController implements CardApi {
 	}
 
 	@PostMapping("/api/card/scrap")
-	public SuccessResponse<ScrapResponse> scrapLink(@RequestParam LinkType type, @RequestBody LinkRequest request) {
-		return SuccessResponse.of(
-			new ScrapResponse(LinkType.BLOG, "title", "link", "image_url", "description"));
+	public SuccessResponse<ScrapResponse> scrapLink(
+		@RequestParam LinkType type,
+		@RequestBody @Valid LinkRequest request) {
+
+		ScrapResponse response = cardService.scrapLink(type, request);
+		return SuccessResponse.of(response);
 	}
 
 	@PostMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
