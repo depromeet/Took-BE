@@ -1,5 +1,7 @@
 package com.evenly.took.feature.card.dto.response;
 
+import com.evenly.took.feature.card.domain.vo.Project;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "프로젝트 정보")

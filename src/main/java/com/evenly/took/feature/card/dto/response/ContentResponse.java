@@ -17,3 +17,4 @@ public record ContentResponse(
 	String description
 ) {
 }
+

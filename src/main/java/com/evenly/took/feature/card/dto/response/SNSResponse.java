@@ -1,6 +1,7 @@
 package com.evenly.took.feature.card.dto.response;
 
 import com.evenly.took.feature.card.domain.SNSType;
+import com.evenly.took.feature.card.domain.vo.SNS;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

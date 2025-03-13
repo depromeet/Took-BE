@@ -12,6 +12,7 @@ import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.evenly.took.feature.card.domain.vo.Content;
 import com.evenly.took.feature.card.domain.vo.Project;
 import com.evenly.took.feature.card.domain.vo.SNS;
+import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.ContentResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.MyCardResponse;
@@ -81,6 +82,10 @@ public interface CardMapper {
 			.map(this::toSNSResponse)
 			.ifPresent(builder::sns);
 	}
+
+	@Mapping(source = "career.job", target = "job")
+	@Mapping(source = "career.detailJobEn", target = "detailJob")
+	CardDetailResponse toCardDetailResponse(Card card);
 
 	ProjectResponse toProjectResponse(Project project);
 

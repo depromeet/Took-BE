@@ -10,7 +10,7 @@ public class TestUserFactory {
 
 	public static User createMockGoogleUser() {
 		OAuthIdentifier oauthIdentifier = OAuthIdentifier.builder()
-			.oauthId("google-oauth-id")
+			.oauthId("google-oauth-cardId")
 			.oauthType(OAuthType.GOOGLE)
 			.build();
 		return createMockUser("testUser", oauthIdentifier);
@@ -28,7 +28,7 @@ public class TestUserFactory {
 
 	public static User createMockUser(String name) {
 		OAuthIdentifier oauthIdentifier = OAuthIdentifier.builder()
-			.oauthId("oauth-id")
+			.oauthId("oauth-cardId")
 			.oauthType(OAuthType.KAKAO)
 			.build();
 		return User.builder()

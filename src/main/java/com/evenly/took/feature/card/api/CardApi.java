@@ -45,7 +45,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "명함 상세 정보 조회 성공")
 	})
-	SuccessResponse<CardDetailResponse> getCardDetail(CardDetailRequest request);
+	SuccessResponse<CardDetailResponse> getCardDetail(User user, CardDetailRequest request);
 
 	@Operation(
 		summary = "외부 콘텐츠 링크 스크랩",
