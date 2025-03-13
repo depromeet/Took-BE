@@ -2,18 +2,24 @@ package com.evenly.took.feature.card.client;
 
 import java.util.Arrays;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public enum LinkSource {
 
-	VELOG,
-	NAVER, // NAVER_BLOG
-	BRUNCH,
-	BEHANCE, // TODO 추가해야함
-	BASIC, // GITHUB, PLAY_STORE, APPLE_STORE, TISTORY
+	NAVER("https://blog.naver.com/", ""),
+	BRUNCH("https://brunch.co.kr/", ""),
+	BEHANCE("https://www.behance.net/", ""),
+	VELOG_MAIN("https://velog.io/", "/posts"),
+	BASIC("basic", ""),
 	;
 
-	public static LinkSource asLinkSource(String source) {
+	private final String prefix;
+	private final String suffix;
+
+	public static LinkSource parseSource(String link) {
 		return Arrays.stream(values())
-			.filter(value -> source.equals(value.name().toLowerCase())) // TODO
+			.filter(value -> link.startsWith(value.prefix) && link.endsWith(value.suffix))
 			.findAny()
 			.orElse(BASIC);
 	}

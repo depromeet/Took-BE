@@ -14,8 +14,8 @@ public class LinkExtractor {
 
 	private final CrawlerComposite crawlerComposite;
 
-	public CrawledDto extractLink(String rawSource, String link) {
-		LinkSource source = LinkSource.asLinkSource(rawSource);
+	public CrawledDto extractLink(String link) {
+		LinkSource source = LinkSource.parseSource(link);
 		return crawlerComposite.crawl(source, link);
 	}
 }

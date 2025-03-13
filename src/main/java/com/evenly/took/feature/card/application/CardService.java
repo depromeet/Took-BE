@@ -31,7 +31,7 @@ public class CardService {
 	}
 
 	public ScrapResponse scrapLink(LinkRequest request) {
-		CrawledDto crawledDto = linkExtractor.extractLink(request.source(), request.link());
+		CrawledDto crawledDto = linkExtractor.extractLink(request.link());
 		return scrapMapper.toResponse(crawledDto);
 	}
 }

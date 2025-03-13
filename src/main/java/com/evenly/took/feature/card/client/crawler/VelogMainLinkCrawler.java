@@ -12,14 +12,14 @@ import com.evenly.took.feature.card.client.LinkSource;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
 
 @Component
-public class VelogLinkCrawler implements LinkCrawler {
+public class VelogMainLinkCrawler implements LinkCrawler {
 
 	private static final int TIMEOUT_MILLISECONDS = 10000;
 	private static final String EMPTY_STRING = "";
 
 	@Override
 	public LinkSource supportSource() {
-		return LinkSource.VELOG;
+		return LinkSource.VELOG_MAIN;
 	}
 
 	@Override

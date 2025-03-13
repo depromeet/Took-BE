@@ -52,7 +52,14 @@ public class NaverLinkCrawler implements LinkCrawler {
 			throw new TookException(CardErrorCode.CANNOT_CRAWL);
 		}
 		String iframeUrl = iframe.attr("src");
-		return scrap(PREFIX_OF_IFRAME + iframeUrl);
+		return scrap(parseIframeUrl(iframeUrl));
+	}
+
+	private String parseIframeUrl(String iframeUrl) {
+		if (iframeUrl.startsWith(PREFIX_OF_IFRAME)) {
+			return iframeUrl;
+		}
+		return PREFIX_OF_IFRAME + iframeUrl;
 	}
 
 	private String fetchMeta(Document target, String tag) {
