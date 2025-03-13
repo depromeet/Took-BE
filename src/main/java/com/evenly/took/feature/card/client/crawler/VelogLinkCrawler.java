@@ -31,6 +31,12 @@ public class VelogLinkCrawler implements LinkCrawler {
 		return new CrawledDto(title, link, image, description);
 	}
 
+	private Document scrap(String link) throws IOException {
+		return Jsoup.connect(link)
+			.timeout(TIMEOUT_MILLISECONDS)
+			.get();
+	}
+
 	private String extractTitle(Document document) {
 		Element head = document.head();
 		return head.getElementsByTag("title").text();
@@ -52,11 +58,5 @@ public class VelogLinkCrawler implements LinkCrawler {
 			return EMPTY_STRING;
 		}
 		return description.text();
-	}
-
-	private Document scrap(String link) throws IOException {
-		return Jsoup.connect(link)
-			.timeout(TIMEOUT_MILLISECONDS)
-			.get();
 	}
 }

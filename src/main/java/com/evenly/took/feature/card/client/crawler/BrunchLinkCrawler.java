@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.card.client.LinkCrawler;
@@ -25,53 +24,25 @@ public class BrunchLinkCrawler implements LinkCrawler {
 
 	@Override
 	public CrawledDto crawl(String link) throws IOException {
-		String html = scrap(link);
-		Document document = Jsoup.parse(html);
-		Element head = document.head();
-		Elements meta = head.getElementsByTag("meta");
-		return new CrawledDto(title(meta), link(meta), image(meta), description(meta));
+		Document target = scrap(link);
+		String title = fetchMeta(target, "title");
+		String url = fetchMeta(target, "url");
+		String image = "https:" + fetchMeta(target, "image");
+		String description = fetchMeta(target, "description");
+		return new CrawledDto(title, url, image, description);
 	}
 
-	private String scrap(String link) throws IOException {
+	private Document scrap(String link) throws IOException {
 		return Jsoup.connect(link)
 			.timeout(TIMEOUT_MILLISECONDS)
-			.get()
-			.html();
+			.get();
 	}
 
-	private String title(Elements meta) {
-		return meta.stream()
-			.filter(element -> element.hasAttr("property"))
-			.filter(element -> element.attribute("property").getValue().equals("og:title"))
-			.map(element -> element.attribute("content").getValue())
-			.findAny()
-			.orElse(EMPTY_STRING);
-	}
-
-	private String link(Elements meta) {
-		return meta.stream()
-			.filter(element -> element.hasAttr("property"))
-			.filter(element -> element.attribute("property").getValue().equals("og:url"))
-			.map(element -> element.attribute("content").getValue())
-			.findAny()
-			.orElse(EMPTY_STRING);
-	}
-
-	private String image(Elements meta) {
-		return meta.stream()
-			.filter(element -> element.hasAttr("property"))
-			.filter(element -> element.attribute("property").getValue().equals("og:image"))
-			.map(element -> "https://" + element.attribute("content").getValue())
-			.findAny()
-			.orElse(EMPTY_STRING);
-	}
-
-	private String description(Elements meta) {
-		return meta.stream()
-			.filter(element -> element.hasAttr("property"))
-			.filter(element -> element.attribute("property").getValue().equals("og:description"))
-			.map(element -> element.attribute("content").getValue())
-			.findAny()
-			.orElse(EMPTY_STRING);
+	private String fetchMeta(Document target, String tag) {
+		Element element = target.selectFirst("meta[property=og:%s]".formatted(tag));
+		if (element == null) {
+			return EMPTY_STRING;
+		}
+		return element.attr("content");
 	}
 }

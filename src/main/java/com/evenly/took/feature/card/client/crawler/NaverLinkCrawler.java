@@ -55,8 +55,8 @@ public class NaverLinkCrawler implements LinkCrawler {
 		return scrap(PREFIX_OF_IFRAME + iframeUrl);
 	}
 
-	private String fetchMeta(Document iframe, String tag) {
-		Element element = iframe.selectFirst("meta[property=og:%s]".formatted(tag));
+	private String fetchMeta(Document target, String tag) {
+		Element element = target.selectFirst("meta[property=og:%s]".formatted(tag));
 		if (element == null) {
 			return EMPTY_STRING;
 		}
