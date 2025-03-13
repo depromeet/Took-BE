@@ -41,8 +41,9 @@ public class CardController implements CardApi {
 	}
 
 	@GetMapping("/api/card/my")
-	public SuccessResponse<MyCardListResponse> getMyCards() {
-		return SuccessResponse.of(new MyCardListResponse(null));
+	public SuccessResponse<MyCardListResponse> getMyCards(@LoginUser User user) {
+		MyCardListResponse response = cardService.findUserCardList(user.getId());
+		return SuccessResponse.of(response);
 	}
 
 	@GetMapping("/api/card/detail")

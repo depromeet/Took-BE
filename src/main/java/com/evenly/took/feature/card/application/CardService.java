@@ -3,7 +3,6 @@ package com.evenly.took.feature.card.application;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.evenly.took.feature.card.dao.CardRepository;
 import com.evenly.took.feature.card.dao.CareerRepository;
@@ -13,6 +12,7 @@ import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
+import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.card.mapper.CardMapper;
 import com.evenly.took.feature.card.mapper.CareersMapper;
@@ -34,7 +34,11 @@ public class CardService {
 		return careersMapper.toResponse(careers);
 	}
 
-	@Transactional(readOnly = true)
+	public MyCardListResponse findUserCardList(Long userId) {
+		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+		return cardMapper.toMyCardListResponse(cards);
+	}
+
 	public CardDetailResponse findCardDetail(Long userId, CardDetailRequest request) {
 		Card card = cardRepository.findByUserIdAndIdAndDeletedAtIsNull(userId, request.cardId())
 			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
