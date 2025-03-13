@@ -18,6 +18,8 @@ import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
+import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.response.SuccessResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -37,8 +39,9 @@ public class CardController implements CardApi {
 	}
 
 	@GetMapping("/api/card/my")
-	public SuccessResponse<MyCardListResponse> getMyCards() {
-		return SuccessResponse.of(new MyCardListResponse(null));
+	public SuccessResponse<MyCardListResponse> getMyCards(@LoginUser User user) {
+		MyCardListResponse response = cardService.findUserCardList(user.getId());
+		return SuccessResponse.of(response);
 	}
 
 	@GetMapping("/api/card/detail")

@@ -8,5 +8,5 @@ import com.evenly.took.feature.card.domain.Card;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
 
-	List<Card> findAllByUserId(Long userId);
+	List<Card> findAllByUserIdAndDeletedAtIsNull(Long userId);
 }
