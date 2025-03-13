@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.evenly.took.feature.card.application.CardService;
 import com.evenly.took.feature.card.domain.Job;
-import com.evenly.took.feature.card.domain.LinkType;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
@@ -51,11 +50,8 @@ public class CardController implements CardApi {
 	}
 
 	@PostMapping("/api/card/scrap")
-	public SuccessResponse<ScrapResponse> scrapLink(
-		@RequestParam LinkType type,
-		@RequestBody @Valid LinkRequest request) {
-
-		ScrapResponse response = cardService.scrapLink(type, request);
+	public SuccessResponse<ScrapResponse> scrapLink(@RequestBody @Valid LinkRequest request) {
+		ScrapResponse response = cardService.scrapLink(request);
 		return SuccessResponse.of(response);
 	}
 

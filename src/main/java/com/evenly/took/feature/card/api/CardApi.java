@@ -3,7 +3,6 @@ package com.evenly.took.feature.card.api;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.evenly.took.feature.card.domain.Job;
-import com.evenly.took.feature.card.domain.LinkType;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
@@ -52,7 +51,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "링크 스크랩 성공")
 	})
-	SuccessResponse<ScrapResponse> scrapLink(LinkType type, LinkRequest request);
+	SuccessResponse<ScrapResponse> scrapLink(LinkRequest request);
 
 	@Operation(
 		summary = "명함 생성",

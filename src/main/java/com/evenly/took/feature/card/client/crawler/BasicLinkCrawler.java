@@ -8,8 +8,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import com.evenly.took.feature.card.client.CrawledType;
 import com.evenly.took.feature.card.client.LinkCrawler;
+import com.evenly.took.feature.card.client.LinkSource;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
 
 @Component
@@ -19,8 +19,8 @@ public class BasicLinkCrawler implements LinkCrawler {
 	private static final String EMPTY_STRING = "";
 
 	@Override
-	public CrawledType supportType() {
-		return CrawledType.BASIC;
+	public LinkSource supportSource() {
+		return LinkSource.BASIC;
 	}
 
 	@Override

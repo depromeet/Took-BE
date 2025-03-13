@@ -19,16 +19,16 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class CrawlerComposite {
 
-	private final Map<CrawledType, LinkCrawler> mapping;
+	private final Map<LinkSource, LinkCrawler> mapping;
 
 	public CrawlerComposite(Set<LinkCrawler> crawlers) {
 		this.mapping = crawlers.stream()
-			.collect(Collectors.toUnmodifiableMap(LinkCrawler::supportType, Function.identity()));
+			.collect(Collectors.toUnmodifiableMap(LinkCrawler::supportSource, Function.identity()));
 	}
 
-	public CrawledDto crawl(CrawledType crawledType, String link) {
+	public CrawledDto crawl(LinkSource source, String link) {
 		try {
-			return Optional.ofNullable(mapping.get(crawledType))
+			return Optional.ofNullable(mapping.get(source))
 				.orElseGet(BasicLinkCrawler::new)
 				.crawl(link);
 		} catch (Exception ex) {
