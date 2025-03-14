@@ -68,8 +68,8 @@ public class CardIntegrationTest extends IntegrationTest {
 				// Most controllers will use this service internally, so we don't need to upload here
 
 				// Mock the card repository for non-limit test cases
-				BDDMockito.given(cardRepository.findByUserIdAndDeletedAtIsNull(anyLong()))
-					.willReturn(Arrays.asList(mock(Card.class)));
+				BDDMockito.given(cardRepository.countByUserIdAndDeletedAtIsNull(anyLong()))
+					.willReturn(1L);
 
 			} catch (Exception e) {
 				System.err.println("Error setting up test: " + e.getMessage());
@@ -147,8 +147,8 @@ public class CardIntegrationTest extends IntegrationTest {
 			);
 
 			// Mock the cardRepository to return the list of mock cards
-			BDDMockito.given(cardRepository.findByUserIdAndDeletedAtIsNull(anyLong()))
-				.willReturn(mockCards);
+			BDDMockito.given(cardRepository.countByUserIdAndDeletedAtIsNull(anyLong()))
+				.willReturn((long)mockCards.size());
 
 			// When & Then
 			try {

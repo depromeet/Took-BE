@@ -36,13 +36,13 @@ public class CardService {
 	private final CareersMapper careersMapper;
 
 	public String uploadProfileImage(MultipartFile profileImage) {
-		return this.s3Service.uploadFile(profileImage, "profile/");
+		return s3Service.uploadFile(profileImage, "profile/");
 	}
 
 	public void createCard(User user, CreateCardRequest request, String profileImageKey) {
-		List<Card> currentCards = this.cardRepository.findByUserIdAndDeletedAtIsNull(user.getId());
+		Long currentCardCount = cardRepository.countByUserIdAndDeletedAtIsNull(user.getId());
 
-		if (currentCards.size() > 3) {
+		if (currentCardCount > 3) {
 			throw new TookException(CardErrorCode.CARD_LIMIT_EXCEEDED);
 		}
 
@@ -54,12 +54,12 @@ public class CardService {
 			.interestDomain(request.interestDomain())
 			.summary(request.summary())
 			.organization(request.organization())
-			.sns(this.snsMapper.toEntity(request.sns()))
+			.sns(snsMapper.toEntity(request.sns()))
 			.region(request.region())
 			.hobby(request.hobby())
 			.news(request.news())
-			.content(this.contentMapper.toEntity(request.content()))
-			.project(this.projectMapper.toEntity(request.project()))
+			.content(contentMapper.toEntity(request.content()))
+			.project(projectMapper.toEntity(request.project()))
 			.previewInfo(request.previewInfoType())
 			.build();
 

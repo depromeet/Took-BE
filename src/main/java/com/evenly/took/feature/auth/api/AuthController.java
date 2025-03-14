@@ -17,14 +17,12 @@ import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
 import com.evenly.took.global.response.SuccessResponse;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirements
 public class AuthController implements AuthApi {
 
 	private final AuthService authService;
