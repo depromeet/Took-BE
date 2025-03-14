@@ -11,8 +11,6 @@ WORKDIR /app
 
 COPY --from=build /app/build/libs/*.jar app.jar
 
-ENTRYPOINT ["java","-jar","/app/app.jar"]
-
 
 # Install Chrome and dependencies
 RUN apt-get update && apt-get install -y \
@@ -20,3 +18,6 @@ RUN apt-get update && apt-get install -y \
    chromium-driver \
    xvfb \
    && rm -rf /var/lib/apt/lists/*
+
+
+ENTRYPOINT ["java","-jar","/app/app.jar"]
