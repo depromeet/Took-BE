@@ -3,9 +3,12 @@ package com.evenly.took.feature.card.dto.response;
 import java.util.List;
 
 import com.evenly.took.feature.card.domain.Job;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Schema(description = "명함 상세 정보")
 public record CardDetailResponse(
 	@Schema(description = "명함용 이름", example = "홍길동", requiredMode = Schema.RequiredMode.REQUIRED)
 	String nickname,
@@ -29,7 +32,7 @@ public record CardDetailResponse(
 	List<String> interestDomain,
 
 	@Schema(description = "SNS 정보 (previewInfoType이 SNS일 때)")
-	SNSResponse sns,
+	List<SNSResponse> sns,
 
 	@Schema(description = "최근 소식 (previewInfoType이 NEWS일 때)", example = "최근 블로그 포스팅 시작했습니다")
 	String news,

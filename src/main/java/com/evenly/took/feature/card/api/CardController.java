@@ -28,6 +28,7 @@ import com.evenly.took.global.response.SuccessResponse;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -47,16 +48,17 @@ public class CardController implements CardApi {
 	}
 
 	@GetMapping("/api/card/my")
-	public SuccessResponse<MyCardListResponse> getMyCards() {
-		return SuccessResponse.of(new MyCardListResponse(null));
+	public SuccessResponse<MyCardListResponse> getMyCards(@LoginUser User user) {
+		MyCardListResponse response = cardService.findUserCardList(user.getId());
+		return SuccessResponse.of(response);
 	}
 
 	@GetMapping("/api/card/detail")
-	public SuccessResponse<CardDetailResponse> getCardDetail(@RequestParam CardDetailRequest request) {
-		return SuccessResponse.of(
-			new CardDetailResponse(
-				null, null, null, null, null, null,
-				null, null, null, null, null, null));
+	public SuccessResponse<CardDetailResponse> getCardDetail(@LoginUser User user,
+		@ModelAttribute @Valid CardDetailRequest request) {
+		System.out.println(user.getId());
+		CardDetailResponse response = cardService.findCardDetail(user.getId(), request);
+		return SuccessResponse.of(response);
 	}
 
 	@PostMapping("/api/card/scrap")
