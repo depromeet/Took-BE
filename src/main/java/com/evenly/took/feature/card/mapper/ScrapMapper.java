@@ -8,5 +8,5 @@ import com.evenly.took.feature.card.dto.response.ScrapResponse;
 @Mapper(componentModel = "spring")
 public interface ScrapMapper {
 
-	ScrapResponse toResponse(CrawledDto crawledDto);
+	ScrapResponse toScrapResponse(CrawledDto crawledDto);
 }

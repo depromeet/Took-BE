@@ -13,7 +13,7 @@ public interface CareersMapper {
 
 	List<CareerResponse> toCareerResponses(List<Career> entities);
 
-	default CareersResponse toResponse(List<Career> entities) {
+	default CareersResponse toCareersResponse(List<Career> entities) {
 		return new CareersResponse(toCareerResponses(entities));
 	}
 }

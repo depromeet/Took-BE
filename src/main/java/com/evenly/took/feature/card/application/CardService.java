@@ -38,12 +38,12 @@ public class CardService {
 
 	public CareersResponse findCareers(Job job) {
 		List<Career> careers = careerRepository.findAllByJob(job);
-		return careersMapper.toResponse(careers);
+		return careersMapper.toCareersResponse(careers);
 	}
 
 	public ScrapResponse scrapLink(LinkRequest request) {
 		CrawledDto crawledDto = linkExtractor.extractLink(request.link());
-		return scrapMapper.toResponse(crawledDto);
+		return scrapMapper.toScrapResponse(crawledDto);
 	}
 
 	public MyCardListResponse findUserCardList(Long userId) {
