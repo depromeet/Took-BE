@@ -22,7 +22,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -43,7 +42,7 @@ public class Card extends BaseTimeEntity {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "career_id")
 	private Career career;
 
@@ -92,13 +91,12 @@ public class Card extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	public Card(Career career, List<Content> content, String hobby, Long id, String imagePath,
+	public Card(Career career, List<Content> content, String hobby, String imagePath,
 		List<String> interestDomain, LocalDateTime deletedAt, String news, String nickname, String organization,
 		PreviewInfoType previewInfo, List<Project> project, String region, List<SNS> sns, String summary, User user) {
 		this.career = career;
 		this.content = content;
 		this.hobby = hobby;
-		this.id = id;
 		this.imagePath = imagePath;
 		this.interestDomain = interestDomain;
 		this.deletedAt = deletedAt;

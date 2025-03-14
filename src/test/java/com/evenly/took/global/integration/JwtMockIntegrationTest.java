@@ -8,7 +8,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.evenly.took.feature.auth.application.TokenProvider;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.auth.resolver.LoginUserArgumentResolver;
-import com.evenly.took.global.domain.TestUserFactory;
 
 public abstract class JwtMockIntegrationTest extends IntegrationTest {
 
@@ -26,7 +25,7 @@ public abstract class JwtMockIntegrationTest extends IntegrationTest {
 		super.setUp();
 
 		// JWT Mocking
-		mockUser = TestUserFactory.createMockGoogleUser();
+		mockUser = userFixture.createUser("임손나");
 		authToken = "Bearer test-token";
 		when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
 		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUser);

@@ -46,6 +46,7 @@ public class CardService {
 		return scrapMapper.toScrapResponse(crawledDto);
 	}
 
+	@Transactional(readOnly = true)
 	public MyCardListResponse findUserCardList(Long userId) {
 		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
 		return cardMapper.toMyCardListResponse(cards);
