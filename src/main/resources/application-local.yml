@@ -15,3 +15,6 @@ ssh:
   port: ${SSH_PORT}
   db-host: ${DB_HOST}
   db-port: ${DB_PORT}
+
+crawling:
+  chrome-binary:

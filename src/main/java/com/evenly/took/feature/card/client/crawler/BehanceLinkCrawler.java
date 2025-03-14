@@ -5,8 +5,6 @@ import java.time.Duration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
@@ -15,15 +13,18 @@ import com.evenly.took.feature.card.client.LinkCrawler;
 import com.evenly.took.feature.card.client.LinkSource;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class BehanceLinkCrawler implements LinkCrawler {
 
 	private static final int TIMEOUT_MILLISECONDS = 10000;
 	private static final String EMPTY_STRING = "";
+
+	private final WebDriverManager webDriverManager;
 
 	@Override
 	public LinkSource supportSource() {
@@ -32,7 +33,7 @@ public class BehanceLinkCrawler implements LinkCrawler {
 
 	@Override
 	public CrawledDto crawl(String link) {
-		WebDriver driver = fetchWebDriver();
+		WebDriver driver = webDriverManager.fetch();
 		try {
 			scrap(driver, link);
 			String title = fetchMeta(driver, "title");
@@ -44,17 +45,8 @@ public class BehanceLinkCrawler implements LinkCrawler {
 			log.error("비핸스 크롤링에 실패하였습니다.");
 			throw ex;
 		} finally {
-			driver.quit();
+			webDriverManager.quit(driver);
 		}
-	}
-
-	private WebDriver fetchWebDriver() {
-		WebDriverManager.chromedriver().clearDriverCache().setup();
-		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--headless");
-		options.addArguments("--disable-gpu");
-		options.addArguments("--no-sandbox");
-		return new ChromeDriver(options);
 	}
 
 	private void scrap(WebDriver driver, String link) {
