@@ -13,7 +13,7 @@ public class WebDriverManager {
 	private String chromeBinary;
 
 	public WebDriver fetch() {
-		io.github.bonigarcia.wdm.WebDriverManager.chromedriver().clearDriverCache().setup();
+		io.github.bonigarcia.wdm.WebDriverManager.chromedriver().browserVersion("120").clearDriverCache().setup();
 
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--headless");
