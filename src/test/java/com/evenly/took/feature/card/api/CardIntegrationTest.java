@@ -5,19 +5,26 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.evenly.took.feature.card.application.CardService;
+import com.evenly.took.feature.card.dao.CardRepository;
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
@@ -30,12 +37,15 @@ import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.MyCardResponse;
 import com.evenly.took.feature.card.mapper.CardMapper;
+import com.evenly.took.global.aws.s3.S3Service;
+import com.evenly.took.global.config.testcontainers.S3TestConfig;
 import com.evenly.took.global.domain.TestCardFactory;
 import com.evenly.took.global.integration.JwtMockIntegrationTest;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
+@Import(S3TestConfig.class)
 public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 	@MockitoBean
@@ -44,23 +54,152 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 	@Autowired
 	private CardMapper cardMapper;
 
-	@Nested
-	class 전체_커리어_조회 {
+	@MockitoBean
+	CardRepository cardRepository;
 
-		@Test
-		void 직군에_따른_전체_커리어를_조회한다() {
-			given().log().all()
-				.when().get("/api/card/register?job=DEVELOPER")
-				.then().log().all()
-				.statusCode(200);
+	@MockitoBean
+	private S3Service s3Service;
+
+	@Nested
+	class 명함_생성 {
+
+		private MockMultipartFile testImageFile;
+
+		@BeforeEach
+		void setUp() {
+			// Create a mock image file with a unique name to avoid conflicts
+			String fileName = "test-image-" + UUID.randomUUID().toString().substring(0, 8) + ".jpg";
+
+			try {
+				// Use a simple byte array to avoid file system operations
+				byte[] imageContent = "test image content".getBytes();
+
+				testImageFile = new MockMultipartFile(
+					"profileImage",
+					fileName,
+					"image/jpeg",
+					imageContent
+				);
+
+				// Instead of trying to upload the file to S3, let's mock the S3Service
+				// Most controllers will use this service internally, so we don't need to upload here
+
+				// Mock the card repository for non-limit test cases
+				BDDMockito.given(cardRepository.countByUserIdAndDeletedAtIsNull(anyLong()))
+					.willReturn(1L);
+
+			} catch (Exception e) {
+				System.err.println("Error setting up test: " + e.getMessage());
+				e.printStackTrace();
+			}
 		}
 
 		@Test
-		void 제공하지_않는_직군의_커리어를_요청한_경우_400_예외를_반환한다() {
+		void 명함_생성에_성공한다() {
+
+			// When & Then
+			try {
+				given().log().all()
+					.header("Authorization", "Bearer %s".formatted(authToken))
+					.contentType("multipart/form-data")
+					.multiPart("profileImage", testImageFile.getOriginalFilename(),
+						testImageFile.getBytes(), testImageFile.getContentType())
+					.multiPart("nickname", "윤장원")
+					.multiPart("detailJobId", "1")
+					.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
+					.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
+					.multiPart("organization", "ABC 회사")
+					.multiPart("sns", "[{\"type\":\"LINKEDIN\",\"link\":\"https://linkedin.com/in/username\"}]")
+					.multiPart("region", "서울 강남구")
+					.multiPart("hobby", "등산, 독서")
+					.multiPart("news", "최근 블로그 포스팅 시작했습니다")
+					.multiPart("content",
+						"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
+					.multiPart("project",
+						"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
+					.multiPart("previewInfoType", "SNS")
+					.when().post("/api/card")
+					.then().log().all()
+					.statusCode(201);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		@Test
+		void 필수_필드가_누락된_경우_예외를_반환한다() {
+			try {
+				given().log().all()
+					.header("Authorization", "Bearer %s".formatted(authToken))
+					.contentType("multipart/form-data")
+					.multiPart("profileImage", testImageFile.getOriginalFilename(),
+						testImageFile.getBytes(), testImageFile.getContentType())
+					// nickname is missing
+					.multiPart("detailJobId", "1")
+					.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
+					.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
+					.when().post("/api/card")
+					.then().log().all()
+					.statusCode(400);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		@Test
+		void 프로필_이미지가_없는_경우_예외를_반환한다() {
+			// When & Then
 			given().log().all()
-				.when().get("/api/card/register?job=INVALID")
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType("multipart/form-data")
+				// .multiPart("profileImage", )
+				.multiPart("nickname", "윤장원")
+				.multiPart("detailJobId", "1")
+				.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
+				.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
+				.when().post("/api/card")
 				.then().log().all()
 				.statusCode(400);
+		}
+
+		@Test
+		void 인증되지_않은_사용자가_명함_생성을_요청하면_401_예외를_반환한다() {
+			// When & Then
+			try {
+				given().log().all()
+					.contentType("multipart/form-data")
+					.multiPart("profileImage", testImageFile.getOriginalFilename(),
+						testImageFile.getInputStream(), testImageFile.getContentType())
+					.multiPart("nickname", "윤장원")
+					.multiPart("detailJobId", "1")
+					.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
+					.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
+					.when().post("/api/card")
+					.then().log().all()
+					.statusCode(401);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		@Nested
+		class 전체_커리어_조회 {
+
+			@Test
+			void 직군에_따른_전체_커리어를_조회한다() {
+				given().log().all()
+					.when().get("/api/card/register?job=DEVELOPER")
+					.then().log().all()
+					.statusCode(200);
+			}
+
+			@Test
+			void 제공하지_않는_직군의_커리어를_요청한_경우_400_예외를_반환한다() {
+				given().log().all()
+					.when().get("/api/card/register?job=INVALID")
+					.then().log().all()
+					.statusCode(400);
+			}
 		}
 	}
 

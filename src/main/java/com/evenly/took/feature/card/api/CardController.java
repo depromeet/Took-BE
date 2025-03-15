@@ -1,11 +1,14 @@
 package com.evenly.took.feature.card.api;
 
+import java.util.Set;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +26,11 @@ import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.response.SuccessResponse;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,9 +68,21 @@ public class CardController implements CardApi {
 	}
 
 	@PostMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public SuccessResponse<Void> createCard(CreateCardRequest request,
-		@RequestParam("profileImage") MultipartFile profileImage) {
+	public SuccessResponse<Void> addCard(
+		@LoginUser User user,
+		@ModelAttribute CreateCardRequest request,
+		@RequestPart("profileImage") MultipartFile profileImage) {
 
+		// MultiPart 형식의 데이터의 경우, 유효성 검증이 RequestDTO 역직렬화 시, 체크가 안되는 문제가 있어 이후 개별적으로 진행
+		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+		Set<ConstraintViolation<CreateCardRequest>> violations = validator.validate(request);
+
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException("요청 필드 유효성 검사 실패", violations);
+		}
+
+		String profileImageKey = this.cardService.uploadProfileImage(profileImage);
+		this.cardService.createCard(user, request, profileImageKey);
 		return SuccessResponse.created("명함 생성 성공");
 	}
 }
