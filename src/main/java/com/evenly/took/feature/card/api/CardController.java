@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.evenly.took.feature.card.application.CardService;
 import com.evenly.took.feature.card.domain.Job;
-import com.evenly.took.feature.card.domain.LinkType;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
@@ -41,12 +40,6 @@ public class CardController implements CardApi {
 
 	private final CardService cardService;
 
-	@GetMapping("/api/card/register")
-	public SuccessResponse<CareersResponse> getCareers(@RequestParam Job job) {
-		CareersResponse response = cardService.findCareers(job);
-		return SuccessResponse.of(response);
-	}
-
 	@GetMapping("/api/card/my")
 	public SuccessResponse<MyCardListResponse> getMyCards(@LoginUser User user) {
 		MyCardListResponse response = cardService.findUserCardList(user.getId());
@@ -56,15 +49,20 @@ public class CardController implements CardApi {
 	@GetMapping("/api/card/detail")
 	public SuccessResponse<CardDetailResponse> getCardDetail(@LoginUser User user,
 		@ModelAttribute @Valid CardDetailRequest request) {
-		System.out.println(user.getId());
 		CardDetailResponse response = cardService.findCardDetail(user.getId(), request);
 		return SuccessResponse.of(response);
 	}
 
+	@GetMapping("/api/card/register")
+	public SuccessResponse<CareersResponse> getCareers(@RequestParam Job job) {
+		CareersResponse response = cardService.findCareers(job);
+		return SuccessResponse.of(response);
+	}
+
 	@PostMapping("/api/card/scrap")
-	public SuccessResponse<ScrapResponse> scrapLink(@RequestParam LinkType type, @RequestBody LinkRequest request) {
-		return SuccessResponse.of(
-			new ScrapResponse(LinkType.BLOG, "title", "link", "image_url", "description"));
+	public SuccessResponse<ScrapResponse> scrapLink(@RequestBody @Valid LinkRequest request) {
+		ScrapResponse response = cardService.scrapLink(request);
+		return SuccessResponse.of(response);
 	}
 
 	@PostMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -81,8 +79,8 @@ public class CardController implements CardApi {
 			throw new ConstraintViolationException("요청 필드 유효성 검사 실패", violations);
 		}
 
-		String profileImageKey = this.cardService.uploadProfileImage(profileImage);
-		this.cardService.createCard(user, request, profileImageKey);
+		String profileImageKey = cardService.uploadProfileImage(profileImage);
+		cardService.createCard(user, request, profileImageKey);
 		return SuccessResponse.created("명함 생성 성공");
 	}
 }

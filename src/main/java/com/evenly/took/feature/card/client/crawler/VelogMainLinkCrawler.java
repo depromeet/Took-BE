@@ -7,19 +7,19 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
-import com.evenly.took.feature.card.client.CrawledType;
 import com.evenly.took.feature.card.client.LinkCrawler;
+import com.evenly.took.feature.card.client.LinkSource;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
 
 @Component
-public class VelogLinkCrawler implements LinkCrawler {
+public class VelogMainLinkCrawler implements LinkCrawler {
 
 	private static final int TIMEOUT_MILLISECONDS = 10000;
 	private static final String EMPTY_STRING = "";
 
 	@Override
-	public CrawledType supportType() {
-		return CrawledType.VELOG;
+	public LinkSource supportSource() {
+		return LinkSource.VELOG_MAIN;
 	}
 
 	@Override
@@ -29,6 +29,12 @@ public class VelogLinkCrawler implements LinkCrawler {
 		String image = extractImage(document);
 		String description = extractDescription(document);
 		return new CrawledDto(title, link, image, description);
+	}
+
+	private Document scrap(String link) throws IOException {
+		return Jsoup.connect(link)
+			.timeout(TIMEOUT_MILLISECONDS)
+			.get();
 	}
 
 	private String extractTitle(Document document) {
@@ -52,11 +58,5 @@ public class VelogLinkCrawler implements LinkCrawler {
 			return EMPTY_STRING;
 		}
 		return description.text();
-	}
-
-	private Document scrap(String link) throws IOException {
-		return Jsoup.connect(link)
-			.timeout(TIMEOUT_MILLISECONDS)
-			.get();
 	}
 }

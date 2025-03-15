@@ -1,5 +1,6 @@
 package com.evenly.took.feature.card.client;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -10,8 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.card.client.crawler.BasicLinkCrawler;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
-import com.evenly.took.feature.card.exception.CardErrorCode;
-import com.evenly.took.global.exception.TookException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,21 +18,16 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class CrawlerComposite {
 
-	private final Map<CrawledType, LinkCrawler> mapping;
+	private final Map<LinkSource, LinkCrawler> mapping;
 
 	public CrawlerComposite(Set<LinkCrawler> crawlers) {
 		this.mapping = crawlers.stream()
-			.collect(Collectors.toUnmodifiableMap(LinkCrawler::supportType, Function.identity()));
+			.collect(Collectors.toUnmodifiableMap(LinkCrawler::supportSource, Function.identity()));
 	}
 
-	public CrawledDto crawl(CrawledType crawledType, String link) {
-		try {
-			return Optional.ofNullable(mapping.get(crawledType))
-				.orElseGet(BasicLinkCrawler::new)
-				.crawl(link);
-		} catch (Exception ex) {
-			log.error("크롤링에 실패하였습니다: ", ex);
-			throw new TookException(CardErrorCode.CANNOT_CRAWL);
-		}
+	public CrawledDto crawl(LinkSource source, String link) throws IOException {
+		return Optional.ofNullable(mapping.get(source))
+			.orElseGet(BasicLinkCrawler::new)
+			.crawl(link);
 	}
 }

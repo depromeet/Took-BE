@@ -1,9 +1,9 @@
 package com.evenly.took.feature.card.api;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.evenly.took.feature.card.domain.Job;
-import com.evenly.took.feature.card.domain.LinkType;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
@@ -45,7 +45,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "명함 상세 정보 조회 성공")
 	})
-	SuccessResponse<CardDetailResponse> getCardDetail(User user, CardDetailRequest request);
+	SuccessResponse<CardDetailResponse> getCardDetail(User user, @ParameterObject CardDetailRequest request);
 
 	@Operation(
 		summary = "외부 콘텐츠 링크 스크랩",
@@ -53,7 +53,7 @@ public interface CardApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "링크 스크랩 성공")
 	})
-	SuccessResponse<ScrapResponse> scrapLink(LinkType type, LinkRequest request);
+	SuccessResponse<ScrapResponse> scrapLink(LinkRequest request);
 
 	@Operation(
 		summary = "명함 생성",

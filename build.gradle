@@ -42,7 +42,6 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // DB
-    runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     // SSH Tunneling
@@ -65,6 +64,9 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
+    // crawling
+    implementation 'org.seleniumhq.selenium:selenium-java:4.29.0'
+    implementation 'io.github.bonigarcia:webdrivermanager:5.9.3'
 }
 
 tasks.named('test') {

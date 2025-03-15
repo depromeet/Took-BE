@@ -2,21 +2,20 @@ spring:
   config:
     activate:
       on-profile: test
-  datasource:
-    driver-class-name:
-    url:
-    username:
-    password:
 
   jpa:
     hibernate:
       ddl-auto: create-drop
     properties:
       hibernate:
-        dialect:
         highlight_sql: true
         default_schema:
+    defer-datasource-initialization: true
 
+  sql:
+    init:
+      mode: always
+  
   data:
     redis:
       host: redis
@@ -40,3 +39,6 @@ oauth:
   kakao:
     client-id: clientId
     redirect-uri: redirectUri
+
+crawling:
+  chrome-binary:

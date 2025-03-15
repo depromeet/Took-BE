@@ -14,7 +14,7 @@ public class RedisCleaner {
 		this.redisTemplate = redisTemplate;
 	}
 
-	public void deleteAllKeys() {
+	public void execute() {
 		redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
 	}
 }

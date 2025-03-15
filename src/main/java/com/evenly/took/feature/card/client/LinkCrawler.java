@@ -6,7 +6,7 @@ import com.evenly.took.feature.card.client.dto.CrawledDto;
 
 public interface LinkCrawler {
 
-	CrawledType supportType();
+	LinkSource supportSource();
 
 	CrawledDto crawl(String link) throws IOException;
 }

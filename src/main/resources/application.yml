@@ -83,3 +83,5 @@ aws:
     bucket: ${BUCKET_NAME}
     env: ${BUCKET_ENV}
 
+crawling:
+  chrome-binary: /usr/bin/chromium-browser
