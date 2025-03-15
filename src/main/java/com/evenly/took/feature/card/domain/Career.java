@@ -45,4 +45,10 @@ public class Career {
 		this.detailJobEn = detailJobEn;
 		this.detailJobKr = detailJobKr;
 	}
+
+	public static Career toEntity(Long id) {
+		Career careerEntity = new Career();
+		careerEntity.id = id;
+		return careerEntity;
+	}
 }

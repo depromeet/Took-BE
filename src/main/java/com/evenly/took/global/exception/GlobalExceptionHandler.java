@@ -6,6 +6,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.evenly.took.feature.common.exception.CommonErrorCode;
@@ -13,6 +14,8 @@ import com.evenly.took.global.exception.dto.ErrorResponse;
 import com.evenly.took.global.exception.dto.RequestParameterErrorResponse;
 import com.evenly.took.global.exception.dto.ServerErrorResponse;
 import com.evenly.took.global.exception.dto.ValidationErrorResponse;
+
+import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -58,6 +61,18 @@ public class GlobalExceptionHandler {
 		// TODO: 로그 추가
 		ex.printStackTrace();
 		ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
+		return ServerErrorResponse.of(errorCode, ex);
+	}
+
+	@ExceptionHandler
+	public ErrorResponse handle(MissingServletRequestPartException ex) {
+		ErrorCode errorCode = CommonErrorCode.NO_REQUEST_MULTIPART_PARAMETER;
+		return ServerErrorResponse.of(errorCode, ex);
+	}
+
+	@ExceptionHandler
+	public ErrorResponse handle(ConstraintViolationException ex) {
+		ErrorCode errorCode = CommonErrorCode.CONSTRAINT_VIOLATION;
 		return ServerErrorResponse.of(errorCode, ex);
 	}
 }

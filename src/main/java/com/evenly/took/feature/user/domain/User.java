@@ -54,4 +54,10 @@ public class User extends BaseTimeEntity {
 		this.name = name;
 		this.email = email;
 	}
+
+	public static User toEntity(Long id) {
+		User userEntity = new User();
+		userEntity.id = id;
+		return userEntity;
+	}
 }

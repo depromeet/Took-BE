@@ -4,22 +4,31 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.evenly.took.feature.card.domain.PreviewInfoType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "명함을 추가하기 위한 정보", requiredMode = Schema.RequiredMode.REQUIRED)
 public record CreateCardRequest(
 	@Schema(description = "사용자 프로필 이미지", requiredMode = Schema.RequiredMode.REQUIRED)
 	MultipartFile profileImage,
 
+	@NotBlank()
 	@Schema(description = "이름", example = "윤장원", requiredMode = Schema.RequiredMode.REQUIRED)
 	String nickname,
 
+	@NotNull()
 	@Schema(description = "세부직군 ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
 	Long detailJobId,
 
+	@NotEmpty()
 	@Schema(description = "관심 도메인", example = "[\"웹\", \"모바일\", \"클라우드\"]", requiredMode = Schema.RequiredMode.REQUIRED)
 	List<String> interestDomain,
 
+	@NotBlank()
 	@Schema(description = "한 줄 소개", example = "백엔드 개발을 좋아하는 개발자입니다", requiredMode = Schema.RequiredMode.REQUIRED)
 	String summary,
 
@@ -42,6 +51,9 @@ public record CreateCardRequest(
 	List<ContentRequest> content,
 
 	@Schema(description = "프로젝트 정보", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-	List<ProjectRequest> project
+	List<ProjectRequest> project,
+
+	@Schema(description = "대표 썸네일 타입", example = "SNS", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+	PreviewInfoType previewInfoType
 ) {
 }
