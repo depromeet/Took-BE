@@ -21,7 +21,7 @@ import com.evenly.took.global.redis.dto.NearbyUserDto;
 @SpringBootTest
 @ActiveProfiles("test")
 @Import(RedisTestConfig.class)
-class PreciseGeoSpatialTest {
+class RedisGeoSpatialTest {
 
 	@Autowired
 	private RedisGeoSpatialService redisGeoSpatialService;
