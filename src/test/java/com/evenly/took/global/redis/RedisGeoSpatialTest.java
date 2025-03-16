@@ -313,6 +313,139 @@ class RedisGeoSpatialTest {
 		}
 	}
 
+	@Nested
+	class 정밀도_오차범위_테스트 {
+
+		@BeforeEach
+		void setUpPrecisionTestData() {
+			redisGeoSpatialService.registerUserLocation(
+				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE, TEST_SESSION_ID);
+
+			for (int distance = 1; distance <= 10; distance++) {
+				String userId = "user_" + distance + "m";
+				double longitude = BASE_LONGITUDE + (distance * METER_TO_LONGITUDE_DEGREE);
+				double latitude = BASE_LATITUDE;
+				redisGeoSpatialService.registerUserLocation(userId, longitude, latitude, TEST_SESSION_ID);
+			}
+		}
+
+		@AfterEach
+		void cleanUpPrecisionTestData() {
+			redisGeoSpatialService.removeUserLocation(CENTER_USER, TEST_SESSION_ID);
+
+			for (int distance = 1; distance <= 10; distance++) {
+				String userId = "user_" + distance + "m";
+				redisGeoSpatialService.removeUserLocation(userId, TEST_SESSION_ID);
+			}
+		}
+
+		@Test
+		void 거리_정확도_테스트() {
+			for (int expectedDistance = 1; expectedDistance <= 10; expectedDistance++) {
+				// given
+				String userId = "user_" + expectedDistance + "m";
+				double actualDistance = redisGeoSpatialService.calculateDistance(
+					CENTER_USER, userId, TEST_SESSION_ID);
+
+				// when
+				double lowerBound = expectedDistance * 0.7;
+				double upperBound = expectedDistance * 1.3;
+
+				// then
+				assertThat(actualDistance)
+					.as("거리 %dm의 사용자 거리 계산 검증", expectedDistance)
+					.isBetween(lowerBound, upperBound);
+
+				// 결과 view
+				System.out.printf("예상 거리 %dm, 실제 측정 거리: %.2fm (오차: %.2f%%)\n",
+					expectedDistance, actualDistance,
+					((actualDistance - expectedDistance) / expectedDistance) * 100);
+			}
+		}
+
+		@Test
+		void 반경_3m_검색_테스트() {
+			// when
+			List<NearbyUserDto> nearbyUsers = redisGeoSpatialService.findNearbyUsers(
+				BASE_LONGITUDE, BASE_LATITUDE, 3.0, TEST_SESSION_ID);
+
+			// then
+			// 3m 이내 사용자들만 조회되어야 함 (center + 1m, 2m, 3m = 총 4명)
+			assertThat(nearbyUsers).hasSize(4);
+
+			assertThat(nearbyUsers.get(0).userId()).isEqualTo(CENTER_USER);
+			assertThat(nearbyUsers.get(1).userId()).isEqualTo("user_1m");
+			assertThat(nearbyUsers.get(2).userId()).isEqualTo("user_2m");
+			assertThat(nearbyUsers.get(3).userId()).isEqualTo("user_3m");
+
+			assertThat(nearbyUsers.get(0).distance()).isLessThan(0.2);  // 중심점
+			assertThat(nearbyUsers.get(1).distance()).isBetween(0.7, 1.5);    // 1m
+			assertThat(nearbyUsers.get(2).distance()).isBetween(1.5, 2.6);    // 2m
+			assertThat(nearbyUsers.get(3).distance()).isBetween(2.5, 3.8);    // 3m
+		}
+
+		/**
+		 * 로그 결과 반영: 7m 이내에는 center + 1m~6m 사용자만 조회됨 (총 7명)
+		 * 7m 사용자는 실제 측정값이 7.10m로 경계를 약간 넘어 제외됨
+		 */
+		@Test
+		void 반경_7m_검색_테스트() {
+			// when
+			List<NearbyUserDto> nearbyUsers = redisGeoSpatialService.findNearbyUsers(
+				BASE_LONGITUDE, BASE_LATITUDE, 7.0, TEST_SESSION_ID);
+
+			// then
+			assertThat(nearbyUsers).hasSize(7);
+
+			assertThat(nearbyUsers).extracting(NearbyUserDto::userId)
+				.containsExactly(CENTER_USER, "user_1m", "user_2m", "user_3m", "user_4m", "user_5m", "user_6m");
+
+			for (int i = 1; i < nearbyUsers.size(); i++) {
+				assertThat(nearbyUsers.get(i).distance())
+					.isGreaterThanOrEqualTo(nearbyUsers.get(i - 1).distance());
+			}
+
+			assertThat(nearbyUsers.get(1).distance()).isCloseTo(1.01, within(0.1));
+			assertThat(nearbyUsers.get(2).distance()).isCloseTo(1.96, within(0.1));
+			assertThat(nearbyUsers.get(3).distance()).isCloseTo(2.90, within(0.1));
+			assertThat(nearbyUsers.get(4).distance()).isCloseTo(3.85, within(0.1));
+			assertThat(nearbyUsers.get(5).distance()).isCloseTo(4.80, within(0.1));
+			assertThat(nearbyUsers.get(6).distance()).isCloseTo(5.74, within(0.1));
+
+			assertThat(nearbyUsers).extracting(NearbyUserDto::userId)
+				.doesNotContain("user_7m", "user_8m", "user_9m", "user_10m");
+		}
+
+		@Test
+		void 소수점_반경_검색_정확도_테스트() {
+			// 2.5m 반경 검색 - 이론상 center + 1m, 2m이 조회되고 3m는 경계에 있을 수 있음
+			List<NearbyUserDto> users2_5m = redisGeoSpatialService.findNearbyUsers(
+				BASE_LONGITUDE, BASE_LATITUDE, 2.5, TEST_SESSION_ID);
+
+			// 최소 3명(center, 1m, 2m)은 포함되어야 함
+			assertThat(users2_5m).hasSizeGreaterThanOrEqualTo(3);
+			assertThat(users2_5m).extracting(NearbyUserDto::userId)
+				.contains(CENTER_USER, "user_1m", "user_2m");
+
+			// 4m 이상은 절대 포함되면 안 됨
+			assertThat(users2_5m).extracting(NearbyUserDto::userId)
+				.doesNotContain("user_4m", "user_5m", "user_6m", "user_7m", "user_8m", "user_9m", "user_10m");
+
+			// 5.5m 반경 검색 - 이론상 center + 1m ~ 5m이 조회되고 6m는 경계에 있을 수 있음
+			List<NearbyUserDto> users5_5m = redisGeoSpatialService.findNearbyUsers(
+				BASE_LONGITUDE, BASE_LATITUDE, 5.5, TEST_SESSION_ID);
+
+			// 최소 6명(center, 1m ~ 5m)은 포함되어야 함
+			assertThat(users5_5m).hasSizeGreaterThanOrEqualTo(6);
+			assertThat(users5_5m).extracting(NearbyUserDto::userId)
+				.contains(CENTER_USER, "user_1m", "user_2m", "user_3m", "user_4m", "user_5m");
+
+			// 7m 이상은 절대 포함되면 안 됨
+			assertThat(users5_5m).extracting(NearbyUserDto::userId)
+				.doesNotContain("user_7m", "user_8m", "user_9m", "user_10m");
+		}
+	}
+
 	// @Nested
 	// @DisplayName("TTL 및 세션 관리 테스트")
 	// class TTLTest {
@@ -323,29 +456,29 @@ class RedisGeoSpatialTest {
 	// 		// given
 	// 		String tempSessionId = "temp-session-ttl";
 	//
-	// 		geoSpatialService.registerUserLocation(
+	// 		redisGeoSpatialService.registerUserLocation(
 	// 			CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE, tempSessionId);
 	//
 	// 		// when
-	// 		boolean expired = geoSpatialService.expireSessionData(tempSessionId, Duration.ofSeconds(1));
+	// 		boolean expired = redisGeoSpatialService.expireSessionData(tempSessionId, Duration.ofSeconds(1));
 	//
 	// 		// then
 	// 		assertThat(expired).isTrue();
 	//
 	// 		// 위치 확인 (만료 전)
-	// 		Point position = geoSpatialService.getUserPosition(CENTER_USER, tempSessionId);
+	// 		Point position = redisGeoSpatialService.getUserPosition(CENTER_USER, tempSessionId);
 	// 		assertThat(position).isNotNull();
 	//
 	// 		// 1초 이상 대기 후 만료 확인
 	// 		Thread.sleep(1500);
 	//
 	// 		// 위치 재확인 (만료 후)
-	// 		Point positionAfterExpire = geoSpatialService.getUserPosition(CENTER_USER, tempSessionId);
+	// 		Point positionAfterExpire = redisGeoSpatialService.getUserPosition(CENTER_USER, tempSessionId);
 	// 		// 만료되었으므로 null이어야 함
 	// 		assertThat(positionAfterExpire).isNull();
 	//
 	// 		// 주변 사용자 검색 - 결과가 없어야 함
-	// 		List<NearbyUserDto> nearbyUsers = geoSpatialService.findNearbyUsers(
+	// 		List<NearbyUserDto> nearbyUsers = redisGeoSpatialService.findNearbyUsers(
 	// 			BASE_LONGITUDE, BASE_LATITUDE, 100.0, tempSessionId);
 	// 		assertThat(nearbyUsers).isEmpty();
 	// 	}
