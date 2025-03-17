@@ -18,7 +18,7 @@ COPY --from=build /app/build/libs/*.jar app.jar
 
 # Install Chrome Browser
 RUN apt-get update && apt-get install -y \
-   chromium \
+   google-chrome-stable \
    && rm -rf /var/lib/apt/lists/*
 
 
