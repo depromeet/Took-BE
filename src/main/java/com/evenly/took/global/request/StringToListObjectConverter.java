@@ -11,7 +11,9 @@ import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 @Component
 public class StringToListObjectConverter implements GenericConverter {
@@ -29,47 +31,102 @@ public class StringToListObjectConverter implements GenericConverter {
 
 	@Override
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		if (source == null) {
+			return Collections.emptyList();
+		}
+
 		String stringValue = (String)source;
 		if (stringValue.isEmpty()) {
 			return Collections.emptyList();
 		}
 
 		try {
-			// Check if the string already looks like a JSON array
-			if (stringValue.trim().startsWith("[") && stringValue.trim().endsWith("]")) {
-				// List의 제네릭 타입 가져오기
-				Class<?> elementType = targetType.getElementTypeDescriptor().getType();
+			stringValue = stringValue.trim();
+			Class<?> elementType = targetType.getElementTypeDescriptor().getType();
+			JavaType javaType = objectMapper.getTypeFactory()
+				.constructCollectionType(List.class, elementType);
 
-				// TypeFactory를 사용하여 제네릭 타입 생성
-				JavaType javaType = objectMapper.getTypeFactory()
-					.constructCollectionType(List.class, elementType);
+			if (stringValue.startsWith("\"[") && stringValue.endsWith("]\"")) {
+				stringValue = stringValue.substring(1, stringValue.length() - 1)
+					.replace("\\\"", "\"")
+					.replace("\\n", "")
+					.replace("\\\\", "\\");
+			}
 
-				// JSON 문자열을 List<T>로 변환
-				return objectMapper.readValue(stringValue, javaType);
-			} else {
-				// Handle comma-separated values
-				Class<?> elementType = targetType.getElementTypeDescriptor().getType();
+			if (stringValue.startsWith("[") && stringValue.endsWith("]")) {
+				try {
+					JsonNode arrayNode = objectMapper.readTree(stringValue);
 
-				if (elementType == String.class) {
-					// If the target is List<String>, simply split by comma
-					return Arrays.stream(stringValue.split(","))
-						.map(String::trim)
-						.collect(Collectors.toList());
-				} else {
-					// For other types, first split by comma, then convert each value using ObjectMapper
-					JavaType elementJavaType = objectMapper.getTypeFactory().constructType(elementType);
+					if (arrayNode.isArray()) {
+						ArrayNode newArrayNode = objectMapper.createArrayNode();
 
-					return Arrays.stream(stringValue.split(","))
-						.map(String::trim)
-						.map(item -> {
-							try {
-								return objectMapper.readValue("\"" + item + "\"", elementJavaType);
-							} catch (Exception e) {
-								throw new IllegalArgumentException(
-									"Failed to convert item '" + item + "' to " + elementType.getSimpleName(), e);
+						for (JsonNode node : arrayNode) {
+							if (node.isTextual()) {
+								String nodeText = node.asText();
+								if (nodeText.trim().startsWith("{") && nodeText.trim().endsWith("}")) {
+									try {
+										JsonNode objNode = objectMapper.readTree(nodeText);
+										newArrayNode.add(objNode);
+									} catch (Exception e) {
+										newArrayNode.add(node);
+									}
+								} else {
+									newArrayNode.add(node);
+								}
+							} else {
+								newArrayNode.add(node);
 							}
-						})
-						.collect(Collectors.toList());
+						}
+
+						return objectMapper.readValue(
+							objectMapper.writeValueAsString(newArrayNode),
+							javaType
+						);
+					}
+				} catch (Exception e) {
+					// 실패 시 계속 진행
+				}
+			} else if (stringValue.startsWith("{") && stringValue.endsWith("}")) {
+				stringValue = "[" + stringValue + "]";
+			} else if (stringValue.startsWith("{") && stringValue.contains("},{")) {
+				stringValue = "[" + stringValue + "]";
+			}
+
+			try {
+				return objectMapper.readValue(stringValue, javaType);
+			} catch (Exception e) {
+				if (stringValue.contains(",")) {
+					if (elementType == String.class) {
+						return Arrays.stream(stringValue.split(","))
+							.map(String::trim)
+							.filter(s -> !s.isEmpty())
+							.collect(Collectors.toList());
+					} else {
+						JavaType elementJavaType = objectMapper.getTypeFactory().constructType(elementType);
+
+						return Arrays.stream(stringValue.split(","))
+							.map(String::trim)
+							.filter(s -> !s.isEmpty())
+							.map(item -> {
+								try {
+									if (!item.startsWith("\"") && !item.startsWith("{")) {
+										item = "\"" + item + "\"";
+									}
+									return objectMapper.readValue(item, elementJavaType);
+								} catch (Exception ex) {
+									throw new IllegalArgumentException(
+										"Failed to convert item '" + item + "' to " + elementType.getSimpleName(), ex);
+								}
+							})
+							.collect(Collectors.toList());
+					}
+				}
+
+				try {
+					Object singleObject = objectMapper.readValue(stringValue, elementType);
+					return Collections.singletonList(singleObject);
+				} catch (Exception ex) {
+					throw e;
 				}
 			}
 		} catch (Exception e) {
