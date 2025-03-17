@@ -22,9 +22,9 @@ public class WebDriverHandler {
 		options.addArguments("--disable-gpu");
 		options.addArguments("--no-sandbox");
 
-		// if (!chromeBinary.isEmpty()) {
-		// 	options.setBinary(chromeBinary);
-		// }
+		if (!chromeBinary.isEmpty()) {
+			options.setBinary(chromeBinary);
+		}
 
 		return new ChromeDriver(options);
 	}
