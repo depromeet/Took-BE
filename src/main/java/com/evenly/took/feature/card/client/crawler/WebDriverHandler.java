@@ -6,14 +6,16 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
+
 @Component
-public class WebDriverManager {
+public class WebDriverHandler {
 
 	@Value("${crawling.chrome-binary}")
 	private String chromeBinary;
 
 	public WebDriver fetch() {
-		io.github.bonigarcia.wdm.WebDriverManager.chromedriver().browserVersion("120").clearDriverCache().setup();
+		WebDriverManager.chromedriver().browserVersion("120").clearDriverCache().setup();
 
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--headless");

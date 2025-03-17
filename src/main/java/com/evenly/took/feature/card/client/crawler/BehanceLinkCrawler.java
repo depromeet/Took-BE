@@ -24,7 +24,7 @@ public class BehanceLinkCrawler implements LinkCrawler {
 	private static final int TIMEOUT_MILLISECONDS = 10000;
 	private static final String EMPTY_STRING = "";
 
-	private final WebDriverManager webDriverManager;
+	private final WebDriverHandler webDriverHandler;
 
 	@Override
 	public LinkSource supportSource() {
@@ -33,7 +33,7 @@ public class BehanceLinkCrawler implements LinkCrawler {
 
 	@Override
 	public CrawledDto crawl(String link) {
-		WebDriver driver = webDriverManager.fetch();
+		WebDriver driver = webDriverHandler.fetch();
 		try {
 			scrap(driver, link);
 			String title = fetchMeta(driver, "title");
@@ -45,7 +45,7 @@ public class BehanceLinkCrawler implements LinkCrawler {
 			log.error("비핸스 크롤링에 실패하였습니다.");
 			throw ex;
 		} finally {
-			webDriverManager.quit(driver);
+			webDriverHandler.quit(driver);
 		}
 	}
 
