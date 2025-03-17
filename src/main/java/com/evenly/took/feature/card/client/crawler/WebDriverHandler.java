@@ -11,7 +11,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class WebDriverHandler {
 
 	public WebDriver fetch() {
-		WebDriverManager.chromedriver().clearDriverCache().setup();
+		WebDriverManager.chromedriver().setup();
 
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--headless");
