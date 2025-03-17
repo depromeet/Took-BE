@@ -11,7 +11,10 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class WebDriverHandler {
 
 	public WebDriver fetch() {
-		WebDriverManager.chromedriver().setup();
+		WebDriverManager.chromedriver().clearDriverCache().setup();
+
+		String driverVersion = WebDriverManager.chromedriver().getDownloadedDriverVersion();
+		System.out.println("✅ 설치된 ChromeDriver 버전: " + driverVersion);
 
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--headless");
