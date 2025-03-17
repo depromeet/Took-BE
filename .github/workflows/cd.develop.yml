@@ -2,7 +2,7 @@ name: Development deploy workflow
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     branches:
       - 'develop'
 
