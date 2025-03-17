@@ -16,5 +16,10 @@ WORKDIR /app
 
 COPY --from=build /app/build/libs/*.jar app.jar
 
+# Install Chrome Browser
+RUN apt-get update && apt-get install -y \
+   chromium \
+   && rm -rf /var/lib/apt/lists/*
+
 
 ENTRYPOINT ["java","-jar","/app/app.jar"]
