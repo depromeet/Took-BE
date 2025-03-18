@@ -5,8 +5,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Component;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-
 @Component
 public class WebDriverHandler {
 
@@ -16,7 +14,6 @@ public class WebDriverHandler {
 		.addArguments("--no-sandbox");
 
 	public WebDriver fetch() {
-		WebDriverManager.chromedriver().setup();
 		return new ChromeDriver(OPTIONS);
 	}
 
