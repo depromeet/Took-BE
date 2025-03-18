@@ -1,7 +1,7 @@
 FROM openjdk:17-jdk-slim AS build
 WORKDIR /app
 COPY . /app
-RUN apt-get update && apt-get install -y curl unzip
+RUN apt-get update && apt-get install -y curl unzip wget
 RUN ./gradlew build -x test
 
 
@@ -21,14 +21,16 @@ COPY --from=build /app/build/libs/*.jar app.jar
 #   chromium \
 #   && rm -rf /var/lib/apt/lists/*
 
-# 최신 Chromium
-RUN apt-get update && apt-get install -y wget unzip curl && rm -rf /var/lib/apt/lists/*
+# Install Google Chrome
+#RUN curl -LO https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+#RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+#RUN apt-get update && apt-get install -y -f
+#RUN rm google-chrome-stable_current_amd64.deb
+#RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN CHROMIUM_LATEST=$(curl -s https://versionhistory.googleapis.com/v1/chrome/platforms/linux/channels/stable/versions | jq -r '.versions[0].version') \
-    && wget -q "https://commondatastorage.googleapis.com/chromium-browser-snapshots/Linux_x64/${CHROMIUM_LATEST}/chrome-linux.zip" -O /tmp/chromium.zip \
-    && unzip /tmp/chromium.zip -d /opt/chromium \
-    && ln -s /opt/chromium/chrome /usr/local/bin/chromium \
-    && rm /tmp/chromium.zip
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+RUN rm ./google-chrome-stable_current_amd64.deb
 
 
 ENTRYPOINT ["java","-jar","/app/app.jar"]
