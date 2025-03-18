@@ -1,7 +1,7 @@
 name: CI test run workflow
 
 on:
-  push: # TODO 임시 변경 !!!!
+  pull_request:
     branches: [ 'main', 'develop' ]
 
 jobs:
