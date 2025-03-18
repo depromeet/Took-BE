@@ -21,11 +21,6 @@ public class WebDriverHandler {
 		options.addArguments("--headless");
 		options.addArguments("--disable-gpu");
 		options.addArguments("--no-sandbox");
-
-		if (!chromeBinary.isEmpty()) {
-			options.setBinary(chromeBinary);
-		}
-
 		return new ChromeDriver(options);
 	}
 
