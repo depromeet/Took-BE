@@ -82,6 +82,3 @@ aws:
   s3:
     bucket: ${BUCKET_NAME}
     env: ${BUCKET_ENV}
-
-crawling:
-  chrome-browser-path: /usr/bin/google-chrome

@@ -3,7 +3,6 @@ package com.evenly.took.feature.card.client.crawler;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -11,17 +10,14 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 @Component
 public class WebDriverHandler {
 
-	@Value("${crawling.chrome-browser-path}")
-	private String chromeBinary;
+	private static final ChromeOptions OPTIONS = new ChromeOptions()
+		.addArguments("--headless")
+		.addArguments("--disable-gpu")
+		.addArguments("--no-sandbox");
 
 	public WebDriver fetch() {
-		WebDriverManager.chromedriver().clearDriverCache().setup();
-
-		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--headless");
-		options.addArguments("--disable-gpu");
-		options.addArguments("--no-sandbox");
-		return new ChromeDriver(options);
+		WebDriverManager.chromedriver().setup();
+		return new ChromeDriver(OPTIONS);
 	}
 
 	public void quit(WebDriver webDriver) {
