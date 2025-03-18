@@ -15,7 +15,7 @@ public class WebDriverHandler {
 	private String chromeBinary;
 
 	public WebDriver fetch() {
-		WebDriverManager.chromedriver().clearDriverCache().setup();
+		WebDriverManager.chromedriver().clearDriverCache().clearResolutionCache().setup();
 
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--headless");
