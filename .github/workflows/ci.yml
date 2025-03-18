@@ -1,9 +1,9 @@
 name: CI test run workflow
 
 on:
-  pull_request:
+  push: # TODO 임시 변경 !!!!
     branches: [ 'main', 'develop' ]
-  
+
 jobs:
   test:
     runs-on: ubuntu-latest
