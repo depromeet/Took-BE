@@ -84,4 +84,4 @@ aws:
     env: ${BUCKET_ENV}
 
 crawling:
-  chrome-browser-path: /usr/bin/chromium
+  chrome-browser-path: /usr/bin/google-chrome
