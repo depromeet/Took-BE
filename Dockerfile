@@ -16,13 +16,11 @@ WORKDIR /app
 
 COPY --from=build /app/build/libs/*.jar app.jar
 
-
-# Install Chrome and dependencies
-RUN apt-get update && apt-get install -y \
-   chromium \
-   chromium-driver \
-   xvfb \
-   && rm -rf /var/lib/apt/lists/*
+# Install Google Chrome
+RUN apt-get update && apt-get install -y wget
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+RUN rm ./google-chrome-stable_current_amd64.deb
 
 
 ENTRYPOINT ["java","-jar","/app/app.jar"]
