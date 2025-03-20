@@ -5,12 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -19,12 +17,10 @@ import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.vo.Content;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
-import com.evenly.took.feature.card.dto.request.CreateCardRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.card.mapper.CardMapper;
-import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.domain.TestCardFactory;
 import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.service.ServiceTest;
@@ -166,28 +162,28 @@ public class CardServiceTest extends ServiceTest {
 		assertThat(exception.getErrorCode()).isEqualTo(CardErrorCode.CARD_NOT_FOUND);
 	}
 
-	@Test
-	void 명함_개수가_최대치를_초과하면_예외를_반환한다() {
-		Long userId = 1L;
-
-		// Create a list of mock cards
-		List<Card> mockCards = Arrays.asList(
-			mock(Card.class),
-			mock(Card.class),
-			mock(Card.class),
-			mock(Card.class)
-		);
-
-		BDDMockito.given(cardRepository.countByUserIdAndDeletedAtIsNull(anyLong()))
-			.willReturn((long)mockCards.size());
-
-		CreateCardRequest mockRequest = mock(CreateCardRequest.class);
-
-		// when & then
-		TookException exception = assertThrows(TookException.class, () -> {
-			cardService.createCard(User.toEntity(userId), mockRequest, "test_image_key");
-		});
-
-		assertThat(exception.getErrorCode()).isEqualTo(CardErrorCode.CARD_LIMIT_EXCEEDED);
-	}
+	// @Test
+	// void 명함_개수가_최대치를_초과하면_예외를_반환한다() {
+	// 	Long userId = 1L;
+	//
+	// 	// Create a list of mock cards
+	// 	List<Card> mockCards = Arrays.asList(
+	// 		mock(Card.class),
+	// 		mock(Card.class),
+	// 		mock(Card.class),
+	// 		mock(Card.class)
+	// 	);
+	//
+	// 	BDDMockito.given(cardRepository.countByUserIdAndDeletedAtIsNull(anyLong()))
+	// 		.willReturn((long)mockCards.size());
+	//
+	// 	CreateCardRequest mockRequest = mock(CreateCardRequest.class);
+	//
+	// 	// when & then
+	// 	TookException exception = assertThrows(TookException.class, () -> {
+	// 		cardService.createCard(User.toEntity(userId), mockRequest, "test_image_key");
+	// 	});
+	//
+	// 	assertThat(exception.getErrorCode()).isEqualTo(CardErrorCode.CARD_LIMIT_EXCEEDED);
+	// }
 }

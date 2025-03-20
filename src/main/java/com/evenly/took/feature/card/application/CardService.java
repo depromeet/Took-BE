@@ -79,9 +79,9 @@ public class CardService {
 	public void createCard(User user, CreateCardRequest request, String profileImageKey) {
 		Long currentCardCount = cardRepository.countByUserIdAndDeletedAtIsNull(user.getId());
 
-		if (currentCardCount >= 3) {
-			throw new TookException(CardErrorCode.CARD_LIMIT_EXCEEDED);
-		}
+		// if (currentCardCount >= 3) {
+		// 	throw new TookException(CardErrorCode.CARD_LIMIT_EXCEEDED);
+		// }
 
 		Card newCard = Card.builder()
 			.user(user)
