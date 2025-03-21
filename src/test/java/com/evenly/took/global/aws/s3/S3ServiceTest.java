@@ -4,17 +4,11 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 
-import com.evenly.took.global.config.testcontainers.S3TestConfig;
+import com.evenly.took.global.service.ServiceTest;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Import(S3TestConfig.class)
-class S3ServiceTest {
+class S3ServiceTest extends ServiceTest {
 
 	@Autowired
 	private S3Service s3Service;

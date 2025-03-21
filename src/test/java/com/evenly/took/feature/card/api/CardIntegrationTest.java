@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -29,7 +28,6 @@ import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.global.aws.s3.S3Service;
-import com.evenly.took.global.config.testcontainers.S3TestConfig;
 import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.integration.JwtMockIntegrationTest;
 
@@ -37,7 +35,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
-@Import(S3TestConfig.class)
 public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 	@MockitoBean

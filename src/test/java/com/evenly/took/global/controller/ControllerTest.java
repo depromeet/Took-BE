@@ -10,9 +10,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.evenly.took.global.config.TestConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringBootTest
+@SpringBootTest(classes = TestConfig.class)
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
 @Transactional

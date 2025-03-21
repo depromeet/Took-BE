@@ -82,3 +82,6 @@ aws:
   s3:
     bucket: ${BUCKET_NAME}
     env: ${BUCKET_ENV}
+
+fcm:
+  secret-key: ${FCM_SECRET_KEY_DEV} # TODO prod 환경 분리

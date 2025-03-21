@@ -6,16 +6,10 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
-import com.evenly.took.global.config.testcontainers.RedisTestConfig;
+import com.evenly.took.global.service.ServiceTest;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Import(RedisTestConfig.class)
-class RedisTest {
+class RedisServiceTest extends ServiceTest {
 
 	@Autowired
 	private RedisService redisService;
