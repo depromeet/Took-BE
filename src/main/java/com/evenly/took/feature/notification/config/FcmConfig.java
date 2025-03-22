@@ -1,5 +1,6 @@
 package com.evenly.took.feature.notification.config;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,7 +29,7 @@ public class FcmConfig {
 			log.info("FCM 앱 실행 성공");
 			return;
 		}
-		try (InputStream key = this.getClass().getResourceAsStream(keyPath)) {
+		try (InputStream key = new FileInputStream(keyPath)) {
 			FirebaseApp.initializeApp(options(key));
 			log.info("FCM 앱 초기화 성공");
 		} catch (IOException ex) {
