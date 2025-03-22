@@ -39,3 +39,6 @@ oauth:
   kakao:
     client-id: clientId
     redirect-uri: redirectUri
+
+fcm:
+  secret-key: test

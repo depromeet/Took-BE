@@ -42,6 +42,7 @@ public class AuthService {
 		User user = userClientComposite.fetch(oauthType, context);
 		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
 			.orElseGet(() -> userRepository.save(user));
+		// TODO UserDevice (token, user) 필드로 조회한 게 없으면 추가하거나 주인 변경 (멀티디바이스 & 한 기기 당 여러 사용자 상황 고려)
 		TokenDto tokens = tokenProvider.provideTokens(savedUser);
 		return new AuthResponse(tokens, savedUser);
 	}

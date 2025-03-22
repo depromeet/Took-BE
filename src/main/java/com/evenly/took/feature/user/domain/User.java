@@ -42,9 +42,6 @@ public class User extends BaseTimeEntity {
 	@Column(name = "email", nullable = false)
 	private String email;
 
-	@Column(name = "allow_push_notification")
-	private Boolean allowPushNotification;
-
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
