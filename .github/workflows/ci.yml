@@ -1,7 +1,7 @@
 name: CI test run workflow
 
 on:
-  push: # TODO 원상복구 필수
+  pull_request:
     branches: [ 'main', 'develop' ]
 
 jobs:
