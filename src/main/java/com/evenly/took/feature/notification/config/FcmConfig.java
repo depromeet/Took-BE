@@ -1,7 +1,7 @@
 package com.evenly.took.feature.notification.config;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class FcmConfig {
 
-	@Value("${fcm.secret-key}")
-	private String secretKey;
+	@Value("${fcm.key-path}")
+	private String keyPath;
 
 	@PostConstruct
 	public void initialize() {
@@ -28,8 +28,8 @@ public class FcmConfig {
 			log.info("FCM 앱 실행 성공");
 			return;
 		}
-		try {
-			FirebaseApp.initializeApp(options());
+		try (InputStream key = this.getClass().getResourceAsStream(keyPath)) {
+			FirebaseApp.initializeApp(options(key));
 			log.info("FCM 앱 초기화 성공");
 		} catch (IOException ex) {
 			log.error("FCM 앱 초기화 실패", ex);
@@ -37,11 +37,9 @@ public class FcmConfig {
 		}
 	}
 
-	private FirebaseOptions options() throws IOException {
-		try (ByteArrayInputStream credentials = new ByteArrayInputStream(secretKey.getBytes())) {
-			return FirebaseOptions.builder()
-				.setCredentials(GoogleCredentials.fromStream(credentials))
-				.build();
-		}
+	private FirebaseOptions options(InputStream key) throws IOException {
+		return FirebaseOptions.builder()
+			.setCredentials(GoogleCredentials.fromStream(key))
+			.build();
 	}
 }

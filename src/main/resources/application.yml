@@ -84,4 +84,4 @@ aws:
     env: ${BUCKET_ENV}
 
 fcm:
-  secret-key: ${FCM_SECRET_KEY_DEV} # TODO prod 환경 분리
+  key-path: ${FCM_KEY_PATH} # TODO prod 환경 분리

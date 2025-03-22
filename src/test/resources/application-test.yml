@@ -41,4 +41,4 @@ oauth:
     redirect-uri: redirectUri
 
 fcm:
-  secret-key: test
+  key-path: test
