@@ -12,7 +12,6 @@ import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.user.domain.User;
-import com.evenly.took.global.domain.TestUserFactory;
 import com.evenly.took.global.service.ServiceTest;
 
 class AuthServiceTest extends ServiceTest {
@@ -26,7 +25,7 @@ class AuthServiceTest extends ServiceTest {
 	@Test
 	void 로그인시_토큰과_사용자_정보를_반환한다() {
 		// given
-		User user = TestUserFactory.createMockUser("took");
+		User user = userFixture.create();
 		given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 			.willReturn(user);
 
@@ -36,6 +35,6 @@ class AuthServiceTest extends ServiceTest {
 		// then
 		assertThat(response.token().accessToken()).containsAnyOf(".");
 		assertThat(response.token().refreshToken()).isNotBlank();
-		assertThat(response.user().name()).isEqualTo("took");
+		assertThat(response.user().name()).isEqualTo(user.getName());
 	}
 }

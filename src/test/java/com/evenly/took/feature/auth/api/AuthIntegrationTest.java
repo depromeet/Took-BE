@@ -13,7 +13,6 @@ import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
 import com.evenly.took.feature.user.domain.User;
-import com.evenly.took.global.domain.TestUserFactory;
 import com.evenly.took.global.integration.IntegrationTest;
 
 import io.restassured.http.ContentType;
@@ -48,7 +47,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
 		@Test
 		void 로그인시_사용자_정보를_반환한다() {
-			User user = TestUserFactory.createMockUser("took");
+			User user = userFixture.create();
 			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 				.willReturn(user);
 
@@ -60,7 +59,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
 		@Test
 		void 유효하지_않은_액세스_토큰으로_API를_요청할_경우_401_예외를_반환한다() {
-			User user = TestUserFactory.createMockUser("took");
+			User user = userFixture.create();
 			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 				.willReturn(user);
 
@@ -73,7 +72,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
 		@Test
 		void 토큰_갱신_요청시_유효한_리프레쉬_토큰일_경우_액세스_토큰을_갱신한다() {
-			User user = TestUserFactory.createMockUser("took");
+			User user = userFixture.create();
 			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 				.willReturn(user);
 
@@ -97,7 +96,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
 		@Test
 		void 토큰_갱신_요청시_유효하지_않은_리프레쉬_토큰일_경우_401_예외를_반환한다() {
-			User user = TestUserFactory.createMockUser("took");
+			User user = userFixture.create();
 			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 				.willReturn(user);
 
@@ -112,7 +111,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
 		@Test
 		void 유효한_액세스_토큰으로_API를_요청할_경우_예외를_반환하지_않는다() {
-			User user = TestUserFactory.createMockUser("took");
+			User user = userFixture.create();
 			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 				.willReturn(user);
 

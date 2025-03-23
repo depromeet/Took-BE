@@ -1,6 +1,5 @@
 package com.evenly.took.feature.auth.application;
 
-import static com.evenly.took.global.domain.TestUserFactory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,14 +19,14 @@ import com.evenly.took.global.service.MockTest;
 
 class UserClientCompositeTest extends MockTest {
 
-	private static User testUser;
+	static User testUser;
 
-	private UserClientComposite composite;
-	private final UserClient stubGoogleUserClient = new StubGoogleUserClient();
+	UserClientComposite composite;
+	UserClient stubGoogleUserClient = new StubGoogleUserClient();
 
 	@BeforeEach
 	void setUp() {
-		testUser = createMockGoogleUser();
+		testUser = userFactory.create();
 		composite = new UserClientComposite(Set.of(stubGoogleUserClient));
 	}
 

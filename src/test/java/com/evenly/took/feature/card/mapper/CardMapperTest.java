@@ -2,7 +2,6 @@ package com.evenly.took.feature.card.mapper;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -10,22 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
-import com.evenly.took.feature.card.domain.SNSType;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.MyCardResponse;
 import com.evenly.took.feature.card.dto.response.PreviewInfoResponse;
-import com.evenly.took.global.domain.TestCardFactory;
+import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.service.ServiceTest;
 
 class CardMapperTest extends ServiceTest {
 
 	@Autowired
-	private CardMapper cardMapper;
+	CardMapper cardMapper;
 
 	@Test
 	void 카드를_MyCardResponse로_변환시_기본필드_매핑_검증() {
 		// given
-		Card card = TestCardFactory.createDefaultCard();
+		Card card = cardFixture.create();
 
 		// when
 		MyCardResponse response = cardMapper.toMyCardResponse(card);
@@ -46,23 +44,29 @@ class CardMapperTest extends ServiceTest {
 	@Test
 	void 카드리스트를_MyCardResponse리스트로_변환() {
 		// given
-		List<Card> cards = Arrays.asList(
-			TestCardFactory.createDefaultCard(),
-			TestCardFactory.createDefaultCard()
-		);
+		User user = userFixture.create();
+		Card card1 = cardFixture.creator()
+			.user(user)
+			.create();
+		Card card2 = cardFixture.creator()
+			.user(user)
+			.create();
+		List<Card> cards = List.of(card1, card2);
 
 		// when
 		MyCardListResponse responses = cardMapper.toMyCardListResponse(cards);
 
 		// then
 		assertThat(responses.cards()).isNotNull();
-		assertThat(responses.cards()).hasSize(2);
+		assertThat(responses.cards()).hasSize(cards.size());
 	}
 
 	@Test
 	void 미리보기정보_PROJECT_변환검증() {
 		// given
-		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.PROJECT);
+		Card card = cardFixture.creator()
+			.previewInfo(PreviewInfoType.PROJECT)
+			.create();
 
 		// when
 		MyCardResponse response = cardMapper.toMyCardResponse(card);
@@ -70,16 +74,18 @@ class CardMapperTest extends ServiceTest {
 		// then
 		assertThat(response.previewInfo()).isNotNull();
 		assertThat(response.previewInfo().getProject()).isNotNull();
-		assertThat(response.previewInfo().getProject().title()).isEqualTo("테스트 프로젝트");
-		assertThat(response.previewInfo().getProject().link()).isEqualTo("https://github.com/test");
-		assertThat(response.previewInfo().getProject().imageUrl()).isEqualTo("test-image.jpg");
-		assertThat(response.previewInfo().getProject().description()).isEqualTo("테스트 프로젝트 설명");
+		assertThat(response.previewInfo().getProject().title()).isEqualTo(card.getProject().get(0).title());
+		assertThat(response.previewInfo().getProject().link()).isEqualTo(card.getProject().get(0).link());
+		assertThat(response.previewInfo().getProject().imageUrl()).isEqualTo(card.getProject().get(0).imageUrl());
+		assertThat(response.previewInfo().getProject().description()).isEqualTo(card.getProject().get(0).description());
 	}
 
 	@Test
 	void 미리보기정보_CONTENT_변환검증() {
 		// given
-		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.CONTENT);
+		Card card = cardFixture.creator()
+			.previewInfo(PreviewInfoType.CONTENT)
+			.create();
 
 		// when
 		MyCardResponse response = cardMapper.toMyCardResponse(card);
@@ -87,29 +93,33 @@ class CardMapperTest extends ServiceTest {
 		// then
 		assertThat(response.previewInfo()).isNotNull();
 		assertThat(response.previewInfo().getContent()).isNotNull();
-		assertThat(response.previewInfo().getContent().title()).isEqualTo("테스트 글");
-		assertThat(response.previewInfo().getContent().link()).isEqualTo("https://blog.com/test");
-		assertThat(response.previewInfo().getContent().imageUrl()).isEqualTo("test-blog-image.jpg");
-		assertThat(response.previewInfo().getContent().description()).isEqualTo("테스트 글 설명");
+		assertThat(response.previewInfo().getContent().title()).isEqualTo(card.getContent().get(0).title());
+		assertThat(response.previewInfo().getContent().link()).isEqualTo(card.getContent().get(0).link());
+		assertThat(response.previewInfo().getContent().imageUrl()).isEqualTo(card.getContent().get(0).imageUrl());
+		assertThat(response.previewInfo().getContent().description()).isEqualTo(card.getContent().get(0).description());
 	}
 
 	@Test
 	void 미리보기정보_HOBBY_변환검증() {
 		// given
-		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.HOBBY);
+		Card card = cardFixture.creator()
+			.previewInfo(PreviewInfoType.HOBBY)
+			.create();
 
 		// when
 		MyCardResponse response = cardMapper.toMyCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
-		assertThat(response.previewInfo().getHobby()).isEqualTo("등산, 독서");
+		assertThat(response.previewInfo().getHobby()).isEqualTo(card.getHobby());
 	}
 
 	@Test
 	void 미리보기정보_SNS_변환검증() {
 		// given
-		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.SNS);
+		Card card = cardFixture.creator()
+			.previewInfo(PreviewInfoType.SNS)
+			.create();
 
 		// when
 		MyCardResponse response = cardMapper.toMyCardResponse(card);
@@ -117,43 +127,47 @@ class CardMapperTest extends ServiceTest {
 		// then
 		assertThat(response.previewInfo()).isNotNull();
 		assertThat(response.previewInfo().getSns()).isNotNull();
-		assertThat(response.previewInfo().getSns().type()).isEqualTo(SNSType.GITHUB);
-		assertThat(response.previewInfo().getSns().link()).isEqualTo("https://github.com/user");
+		assertThat(response.previewInfo().getSns().type()).isEqualTo(card.getSns().get(0).type());
+		assertThat(response.previewInfo().getSns().link()).isEqualTo(card.getSns().get(0).link());
 	}
 
 	@Test
 	void 미리보기정보_NEWS_변환검증() {
 		// given
-		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.NEWS);
+		Card card = cardFixture.creator()
+			.previewInfo(PreviewInfoType.NEWS)
+			.create();
 
 		// when
 		MyCardResponse response = cardMapper.toMyCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
-		assertThat(response.previewInfo().getNews()).isEqualTo("최근 블로그 포스팅 시작했습니다");
+		assertThat(response.previewInfo().getNews()).isEqualTo(card.getNews());
 	}
 
 	@Test
 	void 미리보기정보_REGION_변환검증() {
 		// given
-		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.REGION);
+		Card card = cardFixture.creator()
+			.previewInfo(PreviewInfoType.REGION)
+			.create();
 
 		// when
 		MyCardResponse response = cardMapper.toMyCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
-		assertThat(response.previewInfo().getRegion()).isEqualTo("서울 강남구");
+		assertThat(response.previewInfo().getRegion()).isEqualTo(card.getRegion());
 	}
 
 	@Test
 	void 빈데이터_NULL데이터_처리_검증() {
 		// given
-		Card card = TestCardFactory.createCard(cardBuilder ->
-			cardBuilder.previewInfo(PreviewInfoType.PROJECT)
-				.project(null)
-		);
+		Card card = cardFixture.creator()
+			.previewInfo(PreviewInfoType.PROJECT)
+			.projects(null)
+			.create();
 
 		// when
 		MyCardResponse response = cardMapper.toMyCardResponse(card);
