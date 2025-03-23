@@ -76,8 +76,8 @@ public class CardServiceTest extends ServiceTest {
 		Card card = cardFixture.creator()
 			.user(user)
 			.sns(List.of())
-			.content(List.of())
-			.project(List.of())
+			.contents(List.of())
+			.projects(List.of())
 			.create();
 		CardDetailRequest request = new CardDetailRequest(card.getId());
 

@@ -212,8 +212,8 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			// given
 			Card card = cardFixture.creator()
 				.user(mockUser)
-				.content(List.of())
-				.project(List.of())
+				.contents(List.of())
+				.projects(List.of())
 				.sns(List.of())
 				.create();
 

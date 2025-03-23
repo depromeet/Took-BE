@@ -166,7 +166,7 @@ class CardMapperTest extends ServiceTest {
 		// given
 		Card card = cardFixture.creator()
 			.previewInfo(PreviewInfoType.PROJECT)
-			.project(null)
+			.projects(null)
 			.create();
 
 		// when

@@ -136,12 +136,12 @@ public abstract class CardBase {
 		return this;
 	}
 
-	public CardBase content(List<Content> contents) {
+	public CardBase contents(List<Content> contents) {
 		this.contents = contents;
 		return this;
 	}
 
-	public CardBase project(List<Project> projects) {
+	public CardBase projects(List<Project> projects) {
 		this.projects = projects;
 		return this;
 	}

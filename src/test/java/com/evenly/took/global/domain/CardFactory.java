@@ -16,7 +16,7 @@ public class CardFactory extends CardBase {
 	@Override
 	public Card create() {
 		if (user == null) {
-			userFactory.create();
+			user = userFactory.create();
 		}
 		if (career == null) {
 			career = careerFactory.create();
