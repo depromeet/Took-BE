@@ -18,6 +18,7 @@ import com.evenly.took.feature.card.dto.response.ContentResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.PreviewInfoResponse;
 import com.evenly.took.feature.card.dto.response.ProjectResponse;
+import com.evenly.took.feature.card.dto.response.ReceivedCardListResponse;
 import com.evenly.took.feature.card.dto.response.SNSResponse;
 
 @Mapper(componentModel = "spring", imports = {Optional.class})
@@ -29,10 +30,14 @@ public interface CardMapper {
 	@Mapping(source = "previewInfo", target = "previewInfoType")
 	CardResponse toCardResponse(Card card);
 
-	List<CardResponse> toMyCardResponseList(List<Card> cards);
+	List<CardResponse> toCardResponseList(List<Card> cards);
 
 	default MyCardListResponse toMyCardListResponse(List<Card> cards) {
-		return new MyCardListResponse(toMyCardResponseList(cards));
+		return new MyCardListResponse(toCardResponseList(cards));
+	}
+
+	default ReceivedCardListResponse toCardListResponse(List<Card> cards) {
+		return new ReceivedCardListResponse(toCardResponseList(cards));
 	}
 
 	@Named("toPreviewInfoResponse")

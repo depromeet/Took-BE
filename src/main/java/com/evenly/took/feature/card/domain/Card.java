@@ -90,13 +90,10 @@ public class Card extends BaseTimeEntity {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
-	@Column(name = "memo")
-	private String memo;
-
 	@Builder
 	public Card(Career career, List<Content> content, String hobby, String imagePath,
 		List<String> interestDomain, LocalDateTime deletedAt, String news, String nickname, String organization,
-		PreviewInfoType previewInfo, List<Project> project, String region, List<SNS> sns, String summary, String memo,
+		PreviewInfoType previewInfo, List<Project> project, String region, List<SNS> sns, String summary,
 		User user) {
 		this.career = career;
 		this.content = content;
@@ -112,7 +109,6 @@ public class Card extends BaseTimeEntity {
 		this.region = region;
 		this.sns = sns;
 		this.summary = summary;
-		this.memo = memo;
 		this.user = user;
 	}
 }

@@ -22,6 +22,7 @@ import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
+import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
@@ -141,7 +142,7 @@ public class CardController implements CardApi {
 		@LoginUser User user,
 		@RequestBody @Valid ReceiveCardRequest request
 	) {
-		// cardService.receiveCard(user, request);
+		cardService.receiveCard(user, request);
 		return SuccessResponse.created("명함 수신 성공");
 	}
 
@@ -150,7 +151,7 @@ public class CardController implements CardApi {
 		@LoginUser User user,
 		@RequestBody @Valid SetReceivedCardsFolderRequest request
 	) {
-		// cardService.setReceivedCardsFolder(user, request);
+		cardService.setReceivedCardsFolder(user, request);
 		return SuccessResponse.ok("명함 폴더 설정 성공");
 	}
 
@@ -159,8 +160,8 @@ public class CardController implements CardApi {
 		@LoginUser User user,
 		@ParameterObject ReceivedCardsRequest request
 	) {
-		// ReceivedCardListResponse response = cardService.getReceivedCards(user, request);
-		return SuccessResponse.of(null);
+		ReceivedCardListResponse response = cardService.findReceivedCards(user, request);
+		return SuccessResponse.of(response);
 	}
 
 	@DeleteMapping("/api/card/receive")
@@ -168,7 +169,16 @@ public class CardController implements CardApi {
 		@LoginUser User user,
 		@RequestBody @Valid RemoveReceivedCardsRequest request
 	) {
-		// cardService.removeReceivedCards(user, request);
+		cardService.removeReceivedCards(user, request);
 		return SuccessResponse.ok("명함 삭제 성공");
+	}
+
+	@PutMapping("/api/card/receive")
+	public SuccessResponse<Void> fixReceivedCard(
+		@LoginUser User user,
+		@RequestBody @Valid FixReceivedCardRequest request
+	) {
+		cardService.updateReceivedCard(user, request);
+		return SuccessResponse.ok("명함 업데이트 성공");
 	}
 }

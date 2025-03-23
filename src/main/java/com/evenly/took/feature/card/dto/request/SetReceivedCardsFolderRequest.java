@@ -13,7 +13,7 @@ public record SetReceivedCardsFolderRequest(
 	Long folderId,
 
 	@NotEmpty
-	@Schema(description = "받은 명함 ID 목록", example = "[1, 2, 3]", requiredMode = Schema.RequiredMode.REQUIRED)
-	List<Long> receivedCardIds
+	@Schema(description = "명함 ID 목록", example = "[1, 2, 3]", requiredMode = Schema.RequiredMode.REQUIRED)
+	List<Long> cardIds
 ) {
 }

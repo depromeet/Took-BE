@@ -9,6 +9,7 @@ import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
+import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
@@ -221,4 +222,18 @@ public interface CardApi {
 		RemoveReceivedCardsRequest request
 	);
 
+	@Operation(
+		summary = "받은 명함 업데이트",
+		description = "수신한 명함을 업데이트합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "받은 명함 업데이트 성공"),
+		@ApiResponse(responseCode = "404", description = "받은 명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "권한이 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> fixReceivedCard(
+		User user,
+		FixReceivedCardRequest request
+	);
 }
