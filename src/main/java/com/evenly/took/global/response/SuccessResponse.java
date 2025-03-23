@@ -34,4 +34,8 @@ public class SuccessResponse<T> {
 	public static SuccessResponse<Void> created(String message) {
 		return new SuccessResponse<>(HttpStatus.CREATED, message, LocalDateTime.now(), null);
 	}
+
+	public static SuccessResponse<Void> ok(String message) {
+		return new SuccessResponse<>(HttpStatus.OK, message, LocalDateTime.now(), null);
+	}
 }
