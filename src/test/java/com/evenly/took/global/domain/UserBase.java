@@ -6,13 +6,29 @@ import com.evenly.took.feature.user.domain.User;
 
 public abstract class UserBase {
 
-	protected Long id = 1L;
-	protected String name = "임손나";
-	protected String email = "took@google.com";
-	protected OAuthIdentifier oauthIdentifier = OAuthIdentifier.builder()
+	static Long DEFAULT_ID = 1L;
+	static String DEFAULT_NAME = "임손나";
+	static String DEFAULT_EMAIL = "took@google.com";
+	static OAuthIdentifier DEFAULT_OAUTH_IDENTIFIER = OAuthIdentifier.builder()
 		.oauthId("oauth-id")
 		.oauthType(OAuthType.GOOGLE)
 		.build();
+
+	Long id;
+	String name;
+	String email;
+	OAuthIdentifier oauthIdentifier;
+
+	protected UserBase() {
+		init();
+	}
+
+	protected void init() {
+		this.id = DEFAULT_ID;
+		this.name = DEFAULT_NAME;
+		this.email = DEFAULT_EMAIL;
+		this.oauthIdentifier = DEFAULT_OAUTH_IDENTIFIER;
+	}
 
 	public UserBase id(Long id) {
 		this.id = id;

@@ -1,39 +1,29 @@
 package com.evenly.took.global.domain;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import com.evenly.took.feature.card.dao.CardRepository;
 import com.evenly.took.feature.card.domain.Card;
 
-@Component
-public class CardFixture extends CardBase {
+public class CardFactory extends CardBase {
 
-	@Autowired
-	CardRepository cardRepository;
-
-	@Autowired
-	UserFixture userFixture;
-
-	@Autowired
-	CareerFixture careerFixture;
+	UserFactory userFactory;
+	CareerFactory careerFactory;
 
 	public CardBase creator() {
-		init();
-		return this;
+		return new CardFactory();
 	}
 
 	@Override
 	public Card create() {
 		if (user == null) {
-			userFixture.create();
+			userFactory.create();
 		}
 		if (career == null) {
-			career = careerFixture.serverDeveloper();
+			career = careerFactory.create();
 		}
 		Card card = Card.builder()
 			.user(user)
-			.career(careerFixture.serverDeveloper())
+			.career(career)
 			.previewInfo(previewInfo)
 			.nickname(nickname)
 			.imagePath(imagePath)
@@ -47,6 +37,7 @@ public class CardFixture extends CardBase {
 			.content(contents)
 			.project(projects)
 			.build();
-		return cardRepository.save(card);
+		ReflectionTestUtils.setField(card, "id", id);
+		return card;
 	}
 }

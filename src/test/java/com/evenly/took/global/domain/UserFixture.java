@@ -1,7 +1,6 @@
 package com.evenly.took.global.domain;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.evenly.took.feature.user.dao.UserRepository;
@@ -11,13 +10,11 @@ import com.evenly.took.feature.user.domain.User;
 public class UserFixture extends UserBase {
 
 	@Autowired
-	ApplicationContext context;
-
-	@Autowired
 	UserRepository userRepository;
 
 	public UserBase creator() {
-		return context.getBean(UserFixture.class);
+		init();
+		return this;
 	}
 
 	@Override
