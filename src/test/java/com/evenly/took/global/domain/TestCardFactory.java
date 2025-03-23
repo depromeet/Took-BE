@@ -34,7 +34,8 @@ public class TestCardFactory {
 	}
 
 	public static Card createCard(Consumer<Card.CardBuilder> customizer) {
-		User user = TestUserFactory.createMockGoogleUser();
+		UserFactory userFactory = new UserFactory(); // TODO remove
+		User user = userFactory.create();
 		Career career = createDefaultCareer();
 
 		Card.CardBuilder cardBuilder = Card.builder()
