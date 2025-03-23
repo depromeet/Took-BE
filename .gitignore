@@ -68,3 +68,6 @@ bin/
 
 # SSH Tunneling
 *.pem
+
+# FCM
+src/main/resources/fcm
