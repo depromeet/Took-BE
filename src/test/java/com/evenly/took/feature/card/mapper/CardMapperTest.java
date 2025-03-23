@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.evenly.took.feature.card.domain.SNSType;
+import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
-import com.evenly.took.feature.card.dto.response.MyCardResponse;
 import com.evenly.took.feature.card.dto.response.PreviewInfoResponse;
 import com.evenly.took.global.domain.TestCardFactory;
 import com.evenly.took.global.service.ServiceTest;
@@ -28,7 +28,7 @@ class CardMapperTest extends ServiceTest {
 		Card card = TestCardFactory.createDefaultCard();
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response).isNotNull();
@@ -65,7 +65,7 @@ class CardMapperTest extends ServiceTest {
 		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.PROJECT);
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -82,7 +82,7 @@ class CardMapperTest extends ServiceTest {
 		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.CONTENT);
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -99,7 +99,7 @@ class CardMapperTest extends ServiceTest {
 		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.HOBBY);
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -112,7 +112,7 @@ class CardMapperTest extends ServiceTest {
 		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.SNS);
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -127,7 +127,7 @@ class CardMapperTest extends ServiceTest {
 		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.NEWS);
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -140,7 +140,7 @@ class CardMapperTest extends ServiceTest {
 		Card card = TestCardFactory.createCardWithPreviewType(PreviewInfoType.REGION);
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -156,7 +156,7 @@ class CardMapperTest extends ServiceTest {
 		);
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response).isNotNull();

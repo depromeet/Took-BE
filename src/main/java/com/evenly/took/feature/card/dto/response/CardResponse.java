@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record MyCardResponse(
+public record CardResponse(
 	@Schema(description = "명함 ID", example = "1")
 	Long id,
 

@@ -17,4 +17,5 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
 	List<Card> findAllByUserIdAndDeletedAtIsNull(Long userId);
 
+	Optional<Card> findByIdAndDeletedAtIsNull(Long cardId);
 }

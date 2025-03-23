@@ -17,10 +17,12 @@ import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
+import com.evenly.took.feature.card.dto.request.CardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
+import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.dto.response.FoldersResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
@@ -68,6 +70,20 @@ public class CardService {
 	@Transactional(readOnly = true)
 	public CardDetailResponse findCardDetail(Long userId, CardDetailRequest request) {
 		Card card = cardRepository.findByUserIdAndIdAndDeletedAtIsNull(userId, request.cardId())
+			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
+		return cardMapper.toCardDetailResponse(card);
+	}
+
+	@Transactional(readOnly = true)
+	public CardResponse findCardOpen(CardRequest request) {
+		Card card = cardRepository.findByIdAndDeletedAtIsNull(request.cardId())
+			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
+		return cardMapper.toCardResponse(card);
+	}
+
+	@Transactional(readOnly = true)
+	public CardDetailResponse findCardDetailOpen(CardDetailRequest request) {
+		Card card = cardRepository.findByIdAndDeletedAtIsNull(request.cardId())
 			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
 		return cardMapper.toCardDetailResponse(card);
 	}

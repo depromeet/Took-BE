@@ -7,13 +7,20 @@ import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
+import com.evenly.took.feature.card.dto.request.CardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
+import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
+import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
+import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.dto.response.FoldersResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
+import com.evenly.took.feature.card.dto.response.ReceivedCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.exception.dto.ErrorResponse;
@@ -25,11 +32,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "[2. Card]")
 public interface CardApi {
 
+	@SecurityRequirements
 	@Operation(
 		summary = "명함 직군 목록 조회",
 		description = "명함 생성 시 선택 가능한 직군 목록을 조회합니다.")
@@ -129,4 +138,87 @@ public interface CardApi {
 		User user,
 		RemoveFolderRequest request
 	);
+
+	@SecurityRequirements()
+	@Operation(
+		summary = "명함 기본 정보 조회 (토큰 체크 X => 외부조회 목적)",
+		description = "특정 명함의 기본 정보를 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "명함 기본 정보 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<CardResponse> getCardOpen(
+		@ParameterObject CardRequest request
+	);
+
+	@SecurityRequirements()
+	@Operation(
+		summary = "명함 상세 정보 조회  (토큰 체크 X => 외부조회 목적)",
+		description = "특정 명함의 모든 상세 정보를 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "명함 상세 정보 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<CardDetailResponse> getCardDetailOpen(
+		@ParameterObject CardDetailRequest request
+	);
+
+	@Operation(
+		summary = "명함 수신",
+		description = "다른 사용자의 명함을 수신합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "201", description = "명함 수신 성공"),
+		@ApiResponse(responseCode = "400", description = "이미 수신한 명함",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "404", description = "명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> receiveCard(
+		User user,
+		ReceiveCardRequest request
+	);
+
+	@Operation(
+		summary = "받은 명함을 폴더에 저장",
+		description = "수신한 명함을 특정 폴더에 저장합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "명함 폴더 설정 성공"),
+		@ApiResponse(responseCode = "404", description = "명함 또는 폴더를 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "권한이 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> setReceivedCardsFolder(
+		User user,
+		SetReceivedCardsFolderRequest request
+	);
+
+	@Operation(
+		summary = "받은 명함 목록 조회",
+		description = "현재 로그인한 사용자가 받은 모든 명함 목록을 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "받은 명함 목록 조회 성공")
+	})
+	SuccessResponse<ReceivedCardListResponse> getReceivedCards(
+		User user,
+		@ParameterObject ReceivedCardsRequest request
+	);
+
+	@Operation(
+		summary = "받은 명함 삭제",
+		description = "수신한 명함을 삭제합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "명함 삭제 성공"),
+		@ApiResponse(responseCode = "404", description = "명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "권한이 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> removeReceivedCards(
+		User user,
+		RemoveReceivedCardsRequest request
+	);
+
 }

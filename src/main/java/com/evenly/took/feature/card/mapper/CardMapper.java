@@ -13,9 +13,9 @@ import com.evenly.took.feature.card.domain.vo.Content;
 import com.evenly.took.feature.card.domain.vo.Project;
 import com.evenly.took.feature.card.domain.vo.SNS;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
+import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.ContentResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
-import com.evenly.took.feature.card.dto.response.MyCardResponse;
 import com.evenly.took.feature.card.dto.response.PreviewInfoResponse;
 import com.evenly.took.feature.card.dto.response.ProjectResponse;
 import com.evenly.took.feature.card.dto.response.SNSResponse;
@@ -27,9 +27,9 @@ public interface CardMapper {
 	@Mapping(source = "career.job", target = "job")
 	@Mapping(source = "career.detailJobEn", target = "detailJob")
 	@Mapping(source = "previewInfo", target = "previewInfoType")
-	MyCardResponse toMyCardResponse(Card card);
+	CardResponse toCardResponse(Card card);
 
-	List<MyCardResponse> toMyCardResponseList(List<Card> cards);
+	List<CardResponse> toMyCardResponseList(List<Card> cards);
 
 	default MyCardListResponse toMyCardListResponse(List<Card> cards) {
 		return new MyCardListResponse(toMyCardResponseList(cards));
