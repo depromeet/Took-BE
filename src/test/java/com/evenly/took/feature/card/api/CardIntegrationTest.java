@@ -49,9 +49,21 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 내_명함이_여러개_있을때_모두_조회() {
 			// given
-			Card card1 = cardFixture.createCard(mockUser, "닉네임1", PreviewInfoType.PROJECT);
-			Card card2 = cardFixture.createCard(mockUser, "닉네임2", PreviewInfoType.SNS);
-			Card card3 = cardFixture.createCard(mockUser, "닉네임3", PreviewInfoType.CONTENT);
+			Card card1 = cardFixture.creator()
+				.user(mockUser)
+				.nickname("닉네임1")
+				.previewInfo(PreviewInfoType.PROJECT)
+				.create();
+			Card card2 = cardFixture.creator()
+				.user(mockUser)
+				.nickname("닉네임2")
+				.previewInfo(PreviewInfoType.SNS)
+				.create();
+			Card card3 = cardFixture.creator()
+				.user(mockUser)
+				.nickname("닉네임3")
+				.previewInfo(PreviewInfoType.CONTENT)
+				.create();
 
 			// when
 			ExtractableResponse<Response> response = given()
@@ -122,8 +134,14 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 직군별로_필터링된_명함_조회() {
 			// given
-			Card card1 = cardFixture.createCard(mockUser, "닉네임1", PreviewInfoType.PROJECT);
-			Card card2 = cardFixture.createCard(mockUser, "닉네임2", PreviewInfoType.PROJECT);
+			Card card1 = cardFixture.creator()
+				.user(mockUser)
+				.nickname("닉네임1")
+				.create();
+			Card card2 = cardFixture.creator()
+				.user(mockUser)
+				.nickname("닉네임2")
+				.create();
 
 			// when
 			ExtractableResponse<Response> response = given()
@@ -152,7 +170,12 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void null_필드_응답에서_제외() {
 			// given
-			Card card = cardFixture.createCard(mockUser, "닉네임", null, null);
+			Card card = cardFixture.creator()
+				.user(mockUser)
+				.nickname("닉네임")
+				.organization(null)
+				.region(null)
+				.create();
 
 			// when
 			ExtractableResponse<Response> response = given()
@@ -187,7 +210,12 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 명함_상세_정보를_조회하면_빈_배열은_응답에_포함되지_않음() {
 			// given
-			Card card = cardFixture.createCard(mockUser, List.of(), List.of(), List.of());
+			Card card = cardFixture.creator()
+				.user(mockUser)
+				.contents(List.of())
+				.projects(List.of())
+				.sns(List.of())
+				.create();
 
 			// when
 			ExtractableResponse<Response> response = given()
@@ -217,7 +245,9 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 명함_상세_정보_조회시_데이터가_있는_배열은_응답에_포함() {
 			// given
-			Card card = cardFixture.createCard(mockUser);
+			Card card = cardFixture.creator()
+				.user(mockUser)
+				.create();
 
 			// when
 			ExtractableResponse<Response> response = given()

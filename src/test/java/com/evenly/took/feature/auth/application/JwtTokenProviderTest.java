@@ -1,6 +1,5 @@
 package com.evenly.took.feature.auth.application;
 
-import static com.evenly.took.global.domain.TestUserFactory.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,7 @@ class JwtTokenProviderTest extends MockTest {
 
 	@BeforeEach
 	void setUp() {
-		testUser = createMockGoogleUser();
+		testUser = userFactory.create();
 
 		String accessTokenSecret = "secretKey123secretKey123secretKey123";
 
