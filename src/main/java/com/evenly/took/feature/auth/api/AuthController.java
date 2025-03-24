@@ -15,6 +15,8 @@ import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
+import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.response.SuccessResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -61,5 +63,11 @@ public class AuthController implements AuthApi {
 	public SuccessResponse<Void> logout(@RequestBody RefreshTokenRequest request) {
 		authService.logout(request.refreshToken());
 		return SuccessResponse.ok("로그아웃 성공");
+	}
+
+	@PostMapping("/api/auth/withdraw")
+	public SuccessResponse<Void> withdraw(@LoginUser User user, @RequestBody RefreshTokenRequest request) {
+		authService.withdraw(user.getId(), request.refreshToken());
+		return SuccessResponse.ok("회원탈퇴 성공");
 	}
 }

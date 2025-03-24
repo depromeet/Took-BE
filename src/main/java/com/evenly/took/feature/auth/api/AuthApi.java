@@ -5,6 +5,7 @@ import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
+import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.exception.dto.ErrorResponse;
 import com.evenly.took.global.response.SuccessResponse;
 
@@ -63,4 +64,14 @@ public interface AuthApi {
 		@ApiResponse(responseCode = "401", description = "유효하지 않은 Refresh Token", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
 	SuccessResponse<Void> logout(RefreshTokenRequest request);
+
+	@Operation(
+		summary = "회원탈퇴",
+		description = "사용자 계정을 비활성화하고 토큰을 무효화합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "회원탈퇴 성공"),
+		@ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> withdraw(User user, RefreshTokenRequest request);
 }
