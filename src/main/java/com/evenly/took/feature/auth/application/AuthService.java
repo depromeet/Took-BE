@@ -52,4 +52,8 @@ public class AuthService {
 		String accessToken = tokenProvider.provideAccessTokenByRefreshToken(refreshToken);
 		return new TokenResponse(accessToken, refreshToken);
 	}
+
+	public void logout(String refreshToken) {
+		tokenProvider.invalidateRefreshToken(refreshToken);
+	}
 }

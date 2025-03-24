@@ -54,4 +54,13 @@ public interface AuthApi {
 		@ApiResponse(responseCode = "401", description = "Refresh Token 만료", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
 	SuccessResponse<TokenResponse> refreshToken(RefreshTokenRequest request);
+
+	@Operation(
+		summary = "로그아웃",
+		description = "사용자 로그아웃을 처리하고 Refresh Token을 무효화합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "로그아웃 성공"),
+		@ApiResponse(responseCode = "401", description = "유효하지 않은 Refresh Token", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> logout(RefreshTokenRequest request);
 }

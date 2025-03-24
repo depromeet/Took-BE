@@ -56,4 +56,10 @@ public class AuthController implements AuthApi {
 		TokenResponse response = authService.refreshToken(request);
 		return SuccessResponse.of(response);
 	}
+
+	@PostMapping("/api/auth/logout")
+	public SuccessResponse<Void> logout(@RequestBody RefreshTokenRequest request) {
+		authService.logout(request.refreshToken());
+		return SuccessResponse.ok("로그아웃 성공");
+	}
 }

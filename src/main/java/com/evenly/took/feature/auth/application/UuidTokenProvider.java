@@ -33,4 +33,8 @@ public class UuidTokenProvider {
 		}
 		return userId.toString();
 	}
+
+	public void revokeRefreshToken(String token) {
+		redisService.deleteKey(token);
+	}
 }
