@@ -1,7 +1,8 @@
 package com.evenly.took.feature.auth.api;
 
-import static io.restassured.RestAssured.*;
-import static org.mockito.ArgumentMatchers.*;
+import static io.restassured.RestAssured.given;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -127,6 +128,76 @@ public class AuthIntegrationTest extends IntegrationTest {
 			given().log().all()
 				.header("Authorization", "Bearer %s".formatted(tokens.accessToken()))
 				.when().get("/api/test")
+				.then().log().all()
+				.statusCode(200);
+		}
+	}
+
+	@Nested
+	class 로그아웃 {
+		@Test
+		void 로그아웃_요청시_성공적으로_처리된다() {
+			// given
+			User user = userFixture.create();
+			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
+				.willReturn(user);
+
+			TokenResponse tokens = given().log().all()
+				.when().post("/api/auth/login/KAKAO?code=code")
+				.then().log().all()
+				.statusCode(200)
+				.extract()
+				.body()
+				.jsonPath()
+				.getObject("data.token", TokenResponse.class);
+
+			// when, then
+			RefreshTokenRequest request = new RefreshTokenRequest(tokens.refreshToken());
+			given().log().all()
+				.contentType(ContentType.JSON)
+				.body(request)
+				.when().post("/api/auth/logout")
+				.then().log().all()
+				.statusCode(200);
+
+			// then
+			given().log().all()
+				.contentType(ContentType.JSON)
+				.body(request)
+				.when().post("/api/auth/refresh")
+				.then().log().all()
+				.statusCode(401);
+		}
+	}
+
+	@Nested
+	class 회원탈퇴 {
+		@Test
+		void 회원탈퇴_요청시_성공적으로_처리된다() {
+			// given
+			User user = userFixture.create();
+			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
+				.willReturn(user);
+
+			// 카드 생성
+			cardFixture.creator().user(user).create();
+
+			TokenResponse tokens = given().log().all()
+				.when().post("/api/auth/login/KAKAO?code=code")
+				.then().log().all()
+				.statusCode(200)
+				.extract()
+				.body()
+				.jsonPath()
+				.getObject("data.token", TokenResponse.class);
+
+			// when, then
+			RefreshTokenRequest request = new RefreshTokenRequest(tokens.refreshToken());
+			given().log().all()
+				.contentType(ContentType.JSON)
+				.header("Authorization", "Bearer " + tokens.accessToken())
+				.body(request)
+				.when().post("/api/auth/withdraw")
 				.then().log().all()
 				.statusCode(200);
 		}
