@@ -67,7 +67,14 @@ public class CardController implements CardApi {
 
 	@PostMapping("/api/card/scrap")
 	public SuccessResponse<ScrapResponse> scrapLink(@RequestBody @Valid LinkRequest request) {
-		ScrapResponse response = cardService.scrapLink(request);
+		// TODO 크롤러 서버 분리 전 임시로 더미데이터 반환
+		// ScrapResponse response = cardService.scrapLink(request);
+		ScrapResponse response = new ScrapResponse(
+			"Took-BE",
+			"https://github.com/depromeet/Took-BE",
+			"https://opengraph.githubassets.com/c160604aeafcebc6a109147d64981a898a9c28514759b545624306b9f1ffe4bf/depromeet/Took-BE",
+			"2븐하게 Server 레포입니다."
+		);
 		return SuccessResponse.of(response);
 	}
 

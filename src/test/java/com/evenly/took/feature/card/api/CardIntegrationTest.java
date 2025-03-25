@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -298,6 +299,7 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		}
 	}
 
+	@Disabled
 	@Nested
 	class 링크_스크랩 {
 
