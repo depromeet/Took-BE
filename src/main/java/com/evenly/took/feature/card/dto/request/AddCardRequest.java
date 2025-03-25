@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "명함을 추가하기 위한 정보", requiredMode = Schema.RequiredMode.REQUIRED)
-public record CreateCardRequest(
+public record AddCardRequest(
 	@Schema(description = "사용자 프로필 이미지", requiredMode = Schema.RequiredMode.REQUIRED)
 	MultipartFile profileImage,
 

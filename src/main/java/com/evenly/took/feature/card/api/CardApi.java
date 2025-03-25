@@ -4,18 +4,25 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.evenly.took.feature.card.domain.Job;
+import com.evenly.took.feature.card.dto.request.AddCardRequest;
+import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
-import com.evenly.took.feature.card.dto.request.CreateCardRequest;
+import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
+import com.evenly.took.feature.card.dto.response.FoldersResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.exception.dto.ErrorResponse;
 import com.evenly.took.global.response.SuccessResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,8 +70,63 @@ public interface CardApi {
 	})
 	SuccessResponse<Void> addCard(
 		User user,
-		CreateCardRequest request,
+		AddCardRequest request,
 		@Parameter(hidden = true)
 		MultipartFile profileImage
+	);
+
+	@Operation(
+		summary = "폴더 생성",
+		description = "새로운 폴더를 생성합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "201", description = "폴더 생성 성공")
+	})
+	SuccessResponse<Void> addFolder(
+		User user,
+		AddFolderRequest request
+	);
+
+	@Operation(
+		summary = "폴더 목록 조회",
+		description = "모든 폴더 목록을 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "폴더 목록 조회")
+	})
+	SuccessResponse<FoldersResponse> getFolders(
+		User user
+	);
+
+	@Operation(
+		summary = "폴더 이름 변경",
+		description = "폴더 이름을 변경합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "폴더 이름 변경 성공"),
+		@ApiResponse(responseCode = "404", description = "폴더를 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "폴더에 대한 권한 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "400", description = "이미 삭제된 폴더",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> fixFolder(
+		User user,
+		FixFolderRequest request
+	);
+
+	@Operation(
+		summary = "폴더 제거",
+		description = "명함 폴더를 제거합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "폴더 제거 성공"),
+		@ApiResponse(responseCode = "404", description = "폴더를 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "폴더에 대한 권한 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "400", description = "이미 삭제된 폴더",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> removeFolder(
+		User user,
+		RemoveFolderRequest request
 	);
 }
