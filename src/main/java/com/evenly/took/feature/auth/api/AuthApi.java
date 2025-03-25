@@ -19,9 +19,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "[1. Auth]")
-@SecurityRequirements
 public interface AuthApi {
 
+	@SecurityRequirements
 	@Operation(
 		summary = "소셜 로그인 인가 URL 리다이렉트",
 		description = "지정된 OAuthType에 따른 소셜 로그인 인가 코드 요청 URL로 클라이언트를 리다이렉트합니다.")
@@ -32,6 +32,7 @@ public interface AuthApi {
 		@Parameter(description = "소셜 공급자 타입 (예: GOOGLE, KAKAO, APPLE)", required = true, example = "GOOGLE")
 		OAuthType oauthType);
 
+	@SecurityRequirements
 	@Operation(
 		summary = "소셜 로그인 및 토큰 발급",
 		description = "소셜 로그인 인가 코드를 통해 토큰(Access Token & Refresh Token)을 발급받습니다.")
@@ -47,6 +48,7 @@ public interface AuthApi {
 		String name
 	);
 
+	@SecurityRequirements
 	@Operation(
 		summary = "토큰 재발급",
 		description = "토큰(Access Token)을 재발급받습니다.")
