@@ -51,7 +51,7 @@ oauth:
     redirect-uri: ${APPLE_OAUTH_REDIRECT_URI}
     team-id: ${APPLE_OAUTH_TEAM_ID}
     key-id: ${APPLE_OAUTH_KEY_ID}
-    private-key: ${APPLE_OAUTH_PRIVATE_KEY}
+    private-key-path: ${APPLE_OAUTH_PRIVATE_KEY_PATH} # TODO prod 환경 분리
     url:
       token-url: ${APPLE_OAUTH_TOKEN_URL}
       auth-url: ${APPLE_OAUTH_AUTH_URL}

@@ -8,6 +8,6 @@ public record AppleProperties(
 	String redirectUri,
 	String teamId,
 	String keyId,
-	String privateKey
+	String privateKeyPath
 ) {
 }
