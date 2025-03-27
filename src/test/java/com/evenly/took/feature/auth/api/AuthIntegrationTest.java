@@ -1,18 +1,21 @@
 package com.evenly.took.feature.auth.api;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
+import com.evenly.took.feature.user.dao.UserRepository;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.integration.IntegrationTest;
 
@@ -22,6 +25,9 @@ public class AuthIntegrationTest extends IntegrationTest {
 
 	@MockitoBean
 	UserClientComposite userClientComposite;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	@Nested
 	class 인증_코드_경로_조회 {
@@ -155,6 +161,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 			RefreshTokenRequest request = new RefreshTokenRequest(tokens.refreshToken());
 			given().log().all()
 				.contentType(ContentType.JSON)
+				.header("Authorization", "Bearer " + tokens.accessToken())
 				.body(request)
 				.when().post("/api/auth/logout")
 				.then().log().all()
@@ -172,6 +179,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
 	@Nested
 	class 회원탈퇴 {
+
 		@Test
 		void 회원탈퇴_요청시_성공적으로_처리된다() {
 			// given
@@ -200,6 +208,49 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.when().post("/api/auth/withdraw")
 				.then().log().all()
 				.statusCode(200);
+		}
+
+		@Test
+		void 회원탈퇴_요청시_성공적으로_처리되고_사용자_정보에_탈퇴일자가_설정된다() {
+			// given
+			User user = userFixture.create();
+			Long userId = user.getId();
+			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
+				.willReturn(user);
+
+			// 카드 생성
+			cardFixture.creator().user(user).create();
+
+			TokenResponse tokens = given().log().all()
+				.when().post("/api/auth/login/KAKAO?code=code")
+				.then().log().all()
+				.statusCode(200)
+				.extract()
+				.body()
+				.jsonPath()
+				.getObject("data.token", TokenResponse.class);
+
+			// when
+			RefreshTokenRequest request = new RefreshTokenRequest(tokens.refreshToken());
+			given().log().all()
+				.contentType(ContentType.JSON)
+				.header("Authorization", "Bearer " + tokens.accessToken())
+				.body(request)
+				.when().post("/api/auth/withdraw")
+				.then().log().all()
+				.statusCode(200);
+
+			// then
+			User withdrawnUser = userRepository.findById(userId).orElseThrow();
+			assertThat(withdrawnUser.getDeletedAt()).isNotNull();
+
+			// 리프레시 토큰도 무효화 됐는지 확인
+			given().log().all()
+				.contentType(ContentType.JSON)
+				.body(request)
+				.when().post("/api/auth/refresh")
+				.then().log().all()
+				.statusCode(401);
 		}
 	}
 }
