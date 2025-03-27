@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
+import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
-import com.evenly.took.feature.card.dto.response.MyCardResponse;
 import com.evenly.took.feature.card.dto.response.PreviewInfoResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.service.ServiceTest;
@@ -26,7 +26,7 @@ class CardMapperTest extends ServiceTest {
 		Card card = cardFixture.create();
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response).isNotNull();
@@ -69,7 +69,7 @@ class CardMapperTest extends ServiceTest {
 			.create();
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -88,7 +88,7 @@ class CardMapperTest extends ServiceTest {
 			.create();
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -107,7 +107,7 @@ class CardMapperTest extends ServiceTest {
 			.create();
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -122,7 +122,7 @@ class CardMapperTest extends ServiceTest {
 			.create();
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -139,7 +139,7 @@ class CardMapperTest extends ServiceTest {
 			.create();
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -154,7 +154,7 @@ class CardMapperTest extends ServiceTest {
 			.create();
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response.previewInfo()).isNotNull();
@@ -170,7 +170,7 @@ class CardMapperTest extends ServiceTest {
 			.create();
 
 		// when
-		MyCardResponse response = cardMapper.toMyCardResponse(card);
+		CardResponse response = cardMapper.toCardResponse(card);
 
 		// then
 		assertThat(response).isNotNull();
