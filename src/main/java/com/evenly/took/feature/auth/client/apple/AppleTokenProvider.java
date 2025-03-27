@@ -1,10 +1,12 @@
 package com.evenly.took.feature.auth.client.apple;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
 import java.util.Date;
 
 import org.springframework.http.HttpHeaders;
@@ -76,11 +78,9 @@ public class AppleTokenProvider {
 	}
 
 	private PrivateKey getPrivateKey() throws Exception {
-		String privateKeyContent = appleProperties.privateKey().replaceAll("-----BEGIN PRIVATE KEY-----", "")
-			.replaceAll("-----END PRIVATE KEY-----", "")
-			.replaceAll("\\s+", "");
+		Path path = Paths.get(appleProperties.privateKeyPath());
+		byte[] keyBytes = Files.readAllBytes(path);
 
-		byte[] keyBytes = Base64.getDecoder().decode(privateKeyContent);
 		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		return keyFactory.generatePrivate(keySpec);
