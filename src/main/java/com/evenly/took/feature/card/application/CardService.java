@@ -1,5 +1,6 @@
 package com.evenly.took.feature.card.application;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -143,6 +144,7 @@ public class CardService {
 		return cardMapper.toCardDetailResponse(card);
 	}
 
+	@Transactional(readOnly = true)
 	public CareersResponse findCareers(Job job) {
 		List<Career> careers = careerRepository.findAllByJob(job);
 		return careersMapper.toCareersResponse(careers);
@@ -157,6 +159,7 @@ public class CardService {
 		return s3Service.uploadFile(profileImage, "profile/");
 	}
 
+	@Transactional
 	public void createCard(User user, AddCardRequest request, String profileImageKey) {
 		Long currentCardCount = cardRepository.countByUserIdAndDeletedAtIsNull(user.getId());
 
@@ -306,6 +309,26 @@ public class CardService {
 	public void updateReceivedCard(User user, FixReceivedCardRequest request) {
 		ReceivedCard receivedCard = findReceivedCardByUserAndCardId(user.getId(), request.cardId());
 		receivedCard.updateMemo(request.memo());
+	}
+
+	@Transactional
+	public void softDeleteAllCards(Long userId, LocalDateTime now) {
+		cardRepository.softDeleteAllByUserId(userId, now);
+	}
+
+	@Transactional
+	public void softDeleteAllFolders(Long userId, LocalDateTime now) {
+		folderRepository.softDeleteAllByUserId(userId, now);
+	}
+
+	@Transactional
+	public void softDeleteAllReceivedCards(Long userId, LocalDateTime now) {
+		receivedCardRepository.softDeleteAllByUserId(userId, now);
+	}
+
+	@Transactional
+	public void softDeleteAllReceivedCardFolders(Long userId, LocalDateTime now) {
+		receivedCardFolderRepository.softDeleteAllByUserId(userId, now);
 	}
 
 	private Folder verifyFolderAccess(User user, Long folderId) {

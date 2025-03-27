@@ -57,4 +57,8 @@ public class User extends BaseTimeEntity {
 		userEntity.id = id;
 		return userEntity;
 	}
+
+	public void withdraw() {
+		this.deletedAt = LocalDateTime.now();
+	}
 }

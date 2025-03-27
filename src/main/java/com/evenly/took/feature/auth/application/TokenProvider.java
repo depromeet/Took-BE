@@ -32,4 +32,8 @@ public class TokenProvider {
 	public String getUserIdFromAccessToken(String accessToken) {
 		return jwtTokenProvider.getUserId(accessToken);
 	}
+
+	public void invalidateRefreshToken(String token) {
+		uuidTokenProvider.revokeRefreshToken(token);
+	}
 }

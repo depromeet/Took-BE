@@ -24,6 +24,7 @@ public class AuthService {
 	private final UserClientComposite userClientComposite;
 	private final UserRepository userRepository;
 	private final TokenProvider tokenProvider;
+	private final WithdrawService withdrawService;
 
 	public OAuthUrlResponse getAuthCodeRequestUrl(OAuthType oauthType) {
 		String url = authCodeComposite.provide(oauthType);
@@ -51,5 +52,13 @@ public class AuthService {
 		String refreshToken = request.refreshToken();
 		String accessToken = tokenProvider.provideAccessTokenByRefreshToken(refreshToken);
 		return new TokenResponse(accessToken, refreshToken);
+	}
+
+	public void logout(String refreshToken) {
+		tokenProvider.invalidateRefreshToken(refreshToken);
+	}
+
+	public void withdraw(Long userId, String refreshToken) {
+		withdrawService.withdraw(userId, refreshToken);
 	}
 }
