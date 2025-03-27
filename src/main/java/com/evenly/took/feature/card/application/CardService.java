@@ -363,5 +363,6 @@ public class CardService {
 		for (ReceivedCardFolder relation : relations) {
 			relation.softDelete();
 		}
+
 	}
 }

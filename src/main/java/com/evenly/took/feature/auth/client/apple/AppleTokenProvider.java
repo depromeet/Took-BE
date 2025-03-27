@@ -1,6 +1,9 @@
 package com.evenly.took.feature.auth.client.apple;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -76,11 +79,15 @@ public class AppleTokenProvider {
 	}
 
 	private PrivateKey getPrivateKey() throws Exception {
-		String privateKeyContent = appleProperties.privateKey().replaceAll("-----BEGIN PRIVATE KEY-----", "")
+		Path path = Paths.get(appleProperties.privateKeyPath());
+		String keyContent = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+
+		// PEM 형식 제거
+		keyContent = keyContent.replaceAll("-----BEGIN PRIVATE KEY-----", "")
 			.replaceAll("-----END PRIVATE KEY-----", "")
 			.replaceAll("\\s+", "");
 
-		byte[] keyBytes = Base64.getDecoder().decode(privateKeyContent);
+		byte[] keyBytes = Base64.getDecoder().decode(keyContent);
 		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		return keyFactory.generatePrivate(keySpec);

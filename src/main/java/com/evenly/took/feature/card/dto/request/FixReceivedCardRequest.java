@@ -3,7 +3,7 @@ package com.evenly.took.feature.card.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
-@Schema(description = "폴더를 수정하기 위한 정보", requiredMode = Schema.RequiredMode.REQUIRED)
+@Schema(description = "수신된 명함을 수정하기 위한 정보", requiredMode = Schema.RequiredMode.REQUIRED)
 public record FixReceivedCardRequest(
 
 	@NotNull
