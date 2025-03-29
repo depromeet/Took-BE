@@ -13,9 +13,6 @@ public class CardFixture extends CardBase {
 	CardRepository cardRepository;
 
 	@Autowired
-	UserFixture userFixture;
-
-	@Autowired
 	CareerFixture careerFixture;
 
 	public CardBase creator() {
@@ -26,7 +23,7 @@ public class CardFixture extends CardBase {
 	@Override
 	public Card create() {
 		if (user == null) {
-			userFixture.creator().create();
+			throw new IllegalStateException("user를 함께 입력해주세요.");
 		}
 		if (career == null) {
 			career = careerFixture.serverDeveloper();

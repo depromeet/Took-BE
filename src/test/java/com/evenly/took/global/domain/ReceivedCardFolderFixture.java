@@ -2,7 +2,6 @@ package com.evenly.took.global.domain;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.evenly.took.feature.card.dao.ReceivedCardFolderRepository;
 import com.evenly.took.feature.card.domain.Folder;
@@ -15,12 +14,6 @@ public class ReceivedCardFolderFixture extends ReceivedCardFolderBase {
 	@Autowired
 	ReceivedCardFolderRepository receivedCardFolderRepository;
 
-	@Autowired
-	FolderFixture folderFixture;
-
-	@Autowired
-	ReceivedCardFixture receivedCardFixture;
-
 	public ReceivedCardFolderBase creator() {
 		init();
 		return this;
@@ -29,26 +22,17 @@ public class ReceivedCardFolderFixture extends ReceivedCardFolderBase {
 	@Override
 	public ReceivedCardFolder create() {
 		if (folder == null) {
-			folder = folderFixture.create(); // TODO 예외 던지기
+			throw new IllegalStateException("folder를 함께 입력해주세요.");
 		}
 		if (receivedCard == null) {
-			// 폴더와 수신된 카드는 동일한 사용자에게 속해야 함
-			receivedCard = receivedCardFixture.creator().user(folder.getUser()).create();
+			throw new IllegalStateException("receivedCard를 함께 입력해주세요.");
 		}
-
 		ReceivedCardFolder relation = ReceivedCardFolder.builder()
 			.folder(folder)
 			.receivedCard(receivedCard)
+			.deletedAt(deletedAt)
 			.build();
-
-		ReceivedCardFolder savedRelation = receivedCardFolderRepository.save(relation);
-
-		if (deletedAt != null) {
-			ReflectionTestUtils.setField(savedRelation, "deletedAt", deletedAt);
-			return receivedCardFolderRepository.save(savedRelation);
-		}
-
-		return savedRelation;
+		return receivedCardFolderRepository.save(relation);
 	}
 
 	// 편의 메서드
