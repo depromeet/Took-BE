@@ -68,6 +68,7 @@ oauth:
 
   kakao:
     client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
     redirect-uri: ${KAKAO_REDIRECT_URI}
     url:
       auth-code-url: https://kauth.kakao.com/oauth/authorize

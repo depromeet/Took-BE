@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class WithdrawService {
+
 	private final UserService userService;
 	private final CardService cardService;
 	private final TokenProvider tokenProvider;
