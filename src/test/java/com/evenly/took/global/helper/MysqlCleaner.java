@@ -1,11 +1,14 @@
 package com.evenly.took.global.helper;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 
 @Component
 @ActiveProfiles("test")
@@ -17,16 +20,22 @@ public class MysqlCleaner {
 	@Transactional
 	public void execute() {
 		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
-		clearCard();
-		clearUser();
+		clearAll();
 		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
 	}
 
-	private void clearCard() {
-		entityManager.createNativeQuery("TRUNCATE TABLE cards").executeUpdate();
-	}
+	private void clearAll() {
+		Query query = entityManager.createNativeQuery(
+			"SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()",
+			String.class
+		);
+		List<String> tables = query.getResultList();
 
-	private void clearUser() {
-		entityManager.createNativeQuery("TRUNCATE TABLE users").executeUpdate();
+		for (String table : tables) {
+			if (table.contains("careers")) {
+				continue;
+			}
+			entityManager.createNativeQuery("TRUNCATE TABLE " + table).executeUpdate();
+		}
 	}
 }

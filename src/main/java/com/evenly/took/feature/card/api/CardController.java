@@ -2,7 +2,6 @@ package com.evenly.took.feature.card.api;
 
 import java.util.Set;
 
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -168,7 +167,7 @@ public class CardController implements CardApi {
 	@GetMapping("/api/card/receive")
 	public SuccessResponse<ReceivedCardListResponse> getReceivedCards(
 		@LoginUser User user,
-		@ParameterObject ReceivedCardsRequest request
+		@ModelAttribute ReceivedCardsRequest request
 	) {
 		ReceivedCardListResponse response = cardService.findReceivedCards(user, request);
 		return SuccessResponse.of(response);

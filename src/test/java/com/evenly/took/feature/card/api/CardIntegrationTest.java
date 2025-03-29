@@ -1,11 +1,10 @@
 package com.evenly.took.feature.card.api;
 
-import static io.restassured.RestAssured.given;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static io.restassured.RestAssured.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +27,6 @@ import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Folder;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.evenly.took.feature.card.domain.ReceivedCard;
-import com.evenly.took.feature.card.domain.ReceivedCardFolder;
 import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
@@ -37,9 +35,11 @@ import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
+import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.card.exception.FolderErrorCode;
+import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.aws.s3.S3Service;
 import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.integration.JwtMockIntegrationTest;
@@ -409,60 +409,50 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		}
 
 		@Test
-		void 명함_생성에_성공한다() {
+		void 명함_생성에_성공한다() throws IOException {
 
-			// When & Then
-			try {
-				given().log().all()
-					.header("Authorization", "Bearer %s".formatted(authToken))
-					.contentType("multipart/form-data")
-					.multiPart("profileImage", testImageFile.getOriginalFilename(),
-						testImageFile.getBytes(), testImageFile.getContentType())
-					.multiPart("nickname", "윤장원")
-					.multiPart("detailJobId", "1")
-					.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
-					.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
-					.multiPart("organization", "ABC 회사")
-					.multiPart("sns", "[{\"type\":\"LINKEDIN\",\"link\":\"https://linkedin.com/in/username\"}]")
-					.multiPart("region", "서울 강남구")
-					.multiPart("hobby", "등산, 독서")
-					.multiPart("news", "최근 블로그 포스팅 시작했습니다")
-					.multiPart("content",
-						"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
-					.multiPart("project",
-						"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
-					.multiPart("previewInfoType", "SNS")
-					.when().post("/api/card")
-					.then().log().all()
-					.statusCode(201);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType("multipart/form-data")
+				.multiPart("profileImage", testImageFile.getOriginalFilename(),
+					testImageFile.getBytes(), testImageFile.getContentType())
+				.multiPart("nickname", "윤장원")
+				.multiPart("detailJobId", "1")
+				.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
+				.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
+				.multiPart("organization", "ABC 회사")
+				.multiPart("sns", "[{\"type\":\"LINKEDIN\",\"link\":\"https://linkedin.com/in/username\"}]")
+				.multiPart("region", "서울 강남구")
+				.multiPart("hobby", "등산, 독서")
+				.multiPart("news", "최근 블로그 포스팅 시작했습니다")
+				.multiPart("content",
+					"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
+				.multiPart("project",
+					"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
+				.multiPart("previewInfoType", "SNS")
+				.when().post("/api/card")
+				.then().log().all()
+				.statusCode(201);
 		}
 
 		@Test
-		void 필수_필드가_누락된_경우_예외를_반환한다() {
-			try {
-				given().log().all()
-					.header("Authorization", "Bearer %s".formatted(authToken))
-					.contentType("multipart/form-data")
-					.multiPart("profileImage", testImageFile.getOriginalFilename(),
-						testImageFile.getBytes(), testImageFile.getContentType())
-					// nickname is missing
-					.multiPart("detailJobId", "1")
-					.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
-					.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
-					.when().post("/api/card")
-					.then().log().all()
-					.statusCode(400);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+		void 필수_필드가_누락된_경우_예외를_반환한다() throws IOException {
+			given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType("multipart/form-data")
+				.multiPart("profileImage", testImageFile.getOriginalFilename(),
+					testImageFile.getBytes(), testImageFile.getContentType())
+				// nickname is missing
+				.multiPart("detailJobId", "1")
+				.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
+				.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
+				.when().post("/api/card")
+				.then().log().all()
+				.statusCode(400);
 		}
 
 		@Test
 		void 프로필_이미지가_없는_경우_예외를_반환한다() {
-			// When & Then
 			given().log().all()
 				.header("Authorization", "Bearer %s".formatted(authToken))
 				.contentType("multipart/form-data")
@@ -477,23 +467,18 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		}
 
 		@Test
-		void 인증되지_않은_사용자가_명함_생성을_요청하면_401_예외를_반환한다() {
-			// When & Then
-			try {
-				given().log().all()
-					.contentType("multipart/form-data")
-					.multiPart("profileImage", testImageFile.getOriginalFilename(),
-						testImageFile.getInputStream(), testImageFile.getContentType())
-					.multiPart("nickname", "윤장원")
-					.multiPart("detailJobId", "1")
-					.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
-					.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
-					.when().post("/api/card")
-					.then().log().all()
-					.statusCode(401);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+		void 인증되지_않은_사용자가_명함_생성을_요청하면_401_예외를_반환한다() throws IOException {
+			given().log().all()
+				.contentType("multipart/form-data")
+				.multiPart("profileImage", testImageFile.getOriginalFilename(),
+					testImageFile.getInputStream(), testImageFile.getContentType())
+				.multiPart("nickname", "윤장원")
+				.multiPart("detailJobId", "1")
+				.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
+				.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
+				.when().post("/api/card")
+				.then().log().all()
+				.statusCode(401);
 		}
 	}
 
@@ -704,8 +689,11 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 다른_사용자의_폴더_이름_변경시_403_예외를_반환한다() {
 			// given
+			User other = userFixture.creator()
+				.name("다른 사용자")
+				.create();
 			Folder folder = folderFixture.creator()
-				.user(mockUser)
+				.user(other)
 				.name("다른 사용자의 폴더")
 				.create();
 
@@ -802,8 +790,11 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 다른_사용자의_폴더_제거시_403_예외를_반환한다() {
 			// given
+			User other = userFixture.creator()
+				.name("다른 사용자")
+				.create();
 			Folder folder = folderFixture.creator()
-				.user(mockUser)
+				.user(other)
 				.name("다른 사용자의 폴더")
 				.create();
 
@@ -832,12 +823,18 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 명함_수신_성공() {
 			// given
-			ReceiveCardRequest request = new ReceiveCardRequest(mockCard.getId());
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card card = cardFixture.creator()
+				.user(cardOwner)
+				.create();
+			ReceiveCardRequest request = new ReceiveCardRequest(card.getId());
 
 			// when
 			ExtractableResponse<Response> response = given()
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.header("Authorization", authToken)  // Another user receives the card
+				.header("Authorization", authToken)
 				.body(request)
 				.when()
 				.post("/api/card/receive")
@@ -875,7 +872,10 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 자신의_명함_수신시_400_예외를_반환한다() {
 			// given
-			ReceiveCardRequest request = new ReceiveCardRequest(mockCard.getId());
+			Card card = cardFixture.creator()
+				.user(mockUser)
+				.create();
+			ReceiveCardRequest request = new ReceiveCardRequest(card.getId());
 
 			// when
 			ExtractableResponse<Response> response = given()
@@ -895,26 +895,19 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 		@Test
 		void 이미_수신한_명함_다시_수신시_400_예외를_반환한다() {
-			// Create another test user for card receive tests
-			mockUser = userFixture.creator()
-				.email("another@example.com")
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
 				.create();
-
-			// Create a test card that belongs to the main mock user (for receiving)
-			Card testCard = cardFixture.creator()
-				.user(mockUser)
-				.nickname("테스트 명함")
+			Card card = cardFixture.creator()
+				.user(cardOwner)
 				.create();
-
-			// given - First receive the card
 			receivedCardFixture.creator()
 				.user(mockUser)
-				.card(testCard)
+				.card(card)
 				.create();
+			ReceiveCardRequest request = new ReceiveCardRequest(card.getId());
 
-			ReceiveCardRequest request = new ReceiveCardRequest(mockCard.getId());
-
-			// when - Try to receive again
+			// when
 			ExtractableResponse<Response> response = given()
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.header("Authorization", authToken)
@@ -936,22 +929,24 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 		@Test
 		void 받은_명함을_폴더에_저장_성공() {
-			// given - Create folder
+			// given
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card card = cardFixture.creator()
+				.user(cardOwner)
+				.create();
 			Folder folder = folderFixture.creator()
 				.user(mockUser)
-				.name("중요 명함")
+				.name("폴더")
 				.create();
-
-			// given - Receive card
-			ReceivedCard receivedCard = receivedCardFixture.creator()
+			receivedCardFixture.creator()
 				.user(mockUser)
-				.card(mockCard)
+				.card(card)
 				.create();
-
-			// given - Set folder request
 			SetReceivedCardsFolderRequest request = new SetReceivedCardsFolderRequest(
 				folder.getId(),
-				List.of(mockCard.getId())
+				List.of(card.getId())
 			);
 
 			// when
@@ -973,16 +968,20 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 		@Test
 		void 존재하지_않는_폴더에_명함_추가시_404_예외를_반환한다() {
-			// given - Receive card
-			ReceivedCard receivedCard = receivedCardFixture.creator()
-				.user(mockUser)
-				.card(mockCard)
+			// given
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
 				.create();
-
-			// given - Set folder request with non-existent folder
+			Card card = cardFixture.creator()
+				.user(cardOwner)
+				.create();
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(card)
+				.create();
 			SetReceivedCardsFolderRequest request = new SetReceivedCardsFolderRequest(
 				9999L,
-				List.of(mockCard.getId())
+				List.of(card.getId())
 			);
 
 			// when
@@ -1007,10 +1006,16 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 		@Test
 		void 받은_명함_목록_조회_성공() {
-			// given - Receive card
-			ReceivedCard receivedCard = receivedCardFixture.creator()
+			// given
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card card = cardFixture.creator()
+				.user(cardOwner)
+				.create();
+			receivedCardFixture.creator()
 				.user(mockUser)
-				.card(mockCard)
+				.card(card)
 				.create();
 
 			// when
@@ -1031,25 +1036,27 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
 
 			assertThat(cards).hasSize(1);
-			assertThat(cards.get(0).get("nickname")).isEqualTo(mockCard.getNickname());
+			assertThat(cards.get(0).get("nickname")).isEqualTo(card.getNickname());
 		}
 
 		@Test
 		void 특정_폴더의_받은_명함_목록_조회() {
-			// given - Create folder
+			// given
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card card = cardFixture.creator()
+				.user(cardOwner)
+				.create();
 			Folder folder = folderFixture.creator()
 				.user(mockUser)
-				.name("중요 명함")
+				.name("폴더")
 				.create();
-
-			// given - Receive card
 			ReceivedCard receivedCard = receivedCardFixture.creator()
 				.user(mockUser)
-				.card(mockCard)
+				.card(card)
 				.create();
-
-			// given - Add card to folder
-			ReceivedCardFolder relation = receivedCardFolderFixture.creator()
+			receivedCardFolderFixture.creator()
 				.folder(folder)
 				.receivedCard(receivedCard)
 				.create();
@@ -1071,7 +1078,7 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
 
 			assertThat(cards).hasSize(1);
-			assertThat(cards.get(0).get("nickname")).isEqualTo(mockCard.getNickname());
+			assertThat(cards.get(0).get("nickname")).isEqualTo(card.getNickname());
 		}
 	}
 
@@ -1080,19 +1087,30 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 		@Test
 		void 받은_명함_삭제_성공() {
-			// given - Receive card
+			// given
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card card = cardFixture.creator()
+				.user(cardOwner)
+				.create();
 			ReceivedCard receivedCard = receivedCardFixture.creator()
 				.user(mockUser)
-				.card(mockCard)
+				.card(card)
 				.create();
-
-			// given - Create delete request
+			Folder folder = folderFixture.creator()
+				.user(mockUser)
+				.create();
+			receivedCardFolderFixture.creator()
+				.receivedCard(receivedCard)
+				.folder(folder)
+				.create();
 			RemoveReceivedCardsRequest request = new RemoveReceivedCardsRequest(
-				List.of(receivedCard.getId())
+				List.of(card.getId())
 			);
 
 			// when
-			ExtractableResponse<Response> response = given()
+			given()
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.header("Authorization", authToken)
 				.body(request)
@@ -1103,24 +1121,17 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 				.extract();
 
 			// then
-			Map<String, Object> responseMap = response.as(Map.class);
-			assertThat(responseMap.get("status")).isEqualTo("OK");
-			assertThat(responseMap.get("message")).isEqualTo("명함 삭제 성공");
-
-			// Check that the card no longer appears in the received list
-			ExtractableResponse<Response> listResponse = given()
+			List<CardResponse> cards = given()
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.header("Authorization", authToken)
+				.queryParam("folderId", folder.getId())
 				.when()
 				.get("/api/card/receive")
 				.then()
 				.statusCode(HttpStatus.OK.value())
-				.extract();
-
-			Map<String, Object> listResponseMap = listResponse.as(Map.class);
-			Map<String, Object> dataMap = (Map<String, Object>)listResponseMap.get("data");
-			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
-
+				.extract()
+				.jsonPath()
+				.getList("data.cards", CardResponse.class);
 			assertThat(cards).isEmpty();
 		}
 
@@ -1131,8 +1142,8 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 				List.of(9999L)
 			);
 
-			// when
-			ExtractableResponse<Response> response = given()
+			// when, then
+			String errorMessage = given()
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.header("Authorization", authToken)
 				.body(request)
@@ -1140,11 +1151,10 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 				.delete("/api/card/receive")
 				.then()
 				.statusCode(HttpStatus.NOT_FOUND.value())
-				.extract();
-
-			// then
-			Map<String, Object> responseMap = response.as(Map.class);
-			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
+				.extract()
+				.jsonPath()
+				.getString("message");
+			assertThat(errorMessage).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
 		}
 	}
 
@@ -1153,15 +1163,21 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 		@Test
 		void 받은_명함_메모_업데이트_성공() {
-			// given - Receive card
-			ReceivedCard receivedCard = receivedCardFixture.creator()
+			// given
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card card = cardFixture.creator()
+				.user(cardOwner)
+				.create();
+			receivedCardFixture.creator()
 				.user(mockUser)
-				.card(mockCard)
+				.card(card)
 				.create();
 
 			// given - Update request
 			FixReceivedCardRequest request = new FixReceivedCardRequest(
-				mockCard.getId(),
+				card.getId(),
 				"중요한 비즈니스 파트너"
 			);
 

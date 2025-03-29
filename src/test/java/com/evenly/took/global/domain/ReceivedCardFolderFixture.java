@@ -29,7 +29,7 @@ public class ReceivedCardFolderFixture extends ReceivedCardFolderBase {
 	@Override
 	public ReceivedCardFolder create() {
 		if (folder == null) {
-			folder = folderFixture.create();
+			folder = folderFixture.create(); // TODO 예외 던지기
 		}
 		if (receivedCard == null) {
 			// 폴더와 수신된 카드는 동일한 사용자에게 속해야 함
