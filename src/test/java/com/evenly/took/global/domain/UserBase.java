@@ -1,5 +1,7 @@
 package com.evenly.took.global.domain;
 
+import java.util.UUID;
+
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.user.domain.User;
@@ -27,7 +29,11 @@ public abstract class UserBase {
 		this.id = DEFAULT_ID;
 		this.name = DEFAULT_NAME;
 		this.email = DEFAULT_EMAIL;
-		this.oauthIdentifier = DEFAULT_OAUTH_IDENTIFIER;
+		this.oauthIdentifier = OAuthIdentifier.builder()
+			.oauthId(UUID.randomUUID().toString())
+			.oauthType(OAuthType.GOOGLE)
+			.build();
+		;
 	}
 
 	public UserBase id(Long id) {

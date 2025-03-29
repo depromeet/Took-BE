@@ -25,7 +25,7 @@ public class FolderFixture extends FolderBase {
 	@Override
 	public Folder create() {
 		if (user == null) {
-			user = userFixture.create();
+			user = userFixture.creator().create();
 		}
 		Folder folder = Folder.builder()
 			.user(user)

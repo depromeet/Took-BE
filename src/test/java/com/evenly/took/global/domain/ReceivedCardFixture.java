@@ -29,7 +29,7 @@ public class ReceivedCardFixture extends ReceivedCardBase {
 	@Override
 	public ReceivedCard create() {
 		if (user == null) {
-			user = userFixture.create();
+			user = userFixture.creator().create();
 		}
 		if (card == null) {
 			// 카드를 받는 사용자와 카드 소유자는 달라야 함

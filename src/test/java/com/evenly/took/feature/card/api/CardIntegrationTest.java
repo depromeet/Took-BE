@@ -24,10 +24,21 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.evenly.took.feature.card.application.LinkExtractor;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
 import com.evenly.took.feature.card.domain.Card;
+import com.evenly.took.feature.card.domain.Folder;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
+import com.evenly.took.feature.card.domain.ReceivedCard;
+import com.evenly.took.feature.card.domain.ReceivedCardFolder;
+import com.evenly.took.feature.card.dto.request.AddFolderRequest;
+import com.evenly.took.feature.card.dto.request.FixFolderRequest;
+import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
+import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
+import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
+import com.evenly.took.feature.card.exception.FolderErrorCode;
 import com.evenly.took.global.aws.s3.S3Service;
 import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.integration.JwtMockIntegrationTest;
@@ -482,6 +493,716 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+		}
+	}
+
+	@Nested
+	class 폴더_생성 {
+
+		@Test
+		void 폴더_생성_성공() {
+			// given
+			AddFolderRequest request = new AddFolderRequest("업무 관련");
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.post("/api/card/folder")
+				.then()
+				.statusCode(HttpStatus.CREATED.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("CREATED");
+			assertThat(responseMap.get("message")).isEqualTo("폴더 생성 성공");
+		}
+
+		@Test
+		void 인증되지_않은_사용자가_폴더_생성_요청시_401_예외를_반환한다() {
+			// given
+			AddFolderRequest request = new AddFolderRequest("업무 관련");
+
+			// when & then
+			given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(request)
+				.when()
+				.post("/api/card/folder")
+				.then()
+				.statusCode(HttpStatus.UNAUTHORIZED.value());
+		}
+
+		@Test
+		void 폴더명이_비어있을_경우_400_예외를_반환한다() {
+			// given
+			AddFolderRequest request = new AddFolderRequest("");
+
+			// when & then
+			given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.post("/api/card/folder")
+				.then()
+				.statusCode(HttpStatus.BAD_REQUEST.value());
+		}
+	}
+
+	@Nested
+	class 폴더_목록_조회 {
+
+		@Test
+		void 폴더가_여러개_있을때_모두_조회() {
+			// given
+			Folder folder1 = folderFixture.creator()
+				.user(mockUser)
+				.name("업무 관련")
+				.create();
+
+			Folder folder2 = folderFixture.creator()
+				.user(mockUser)
+				.name("개인 네트워크")
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/folders")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> folders = (List<Map<String, Object>>)dataMap.get("folders");
+
+			assertThat(folders).hasSize(2);
+			assertThat(folders.get(0)).containsKeys("id", "name");
+
+			List<String> folderNames = folders.stream()
+				.map(folder -> (String)folder.get("name"))
+				.toList();
+
+			assertThat(folderNames).containsExactlyInAnyOrder("업무 관련", "개인 네트워크");
+		}
+
+		@Test
+		void 폴더가_없을때_빈_목록_반환() {
+			// given, when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/folders")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> folders = (List<Map<String, Object>>)dataMap.get("folders");
+
+			assertThat(folders).isEmpty();
+		}
+
+		@Test
+		void 인증되지_않은_사용자_폴더_목록_조회_요청시_401_예외를_반환한다() {
+			// when & then
+			given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.when()
+				.get("/api/card/folders")
+				.then()
+				.statusCode(HttpStatus.UNAUTHORIZED.value());
+		}
+	}
+
+	@Nested
+	class 폴더_이름_변경 {
+
+		@Test
+		void 폴더_이름_변경_성공() {
+			// given
+			Folder folder = folderFixture.creator()
+				.user(mockUser)
+				.name("원래 이름")
+				.create();
+
+			FixFolderRequest request = new FixFolderRequest(folder.getId(), "변경된 이름");
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/folder")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+			assertThat(responseMap.get("message")).isEqualTo("폴더 이름 변경 성공");
+
+			// Verify the name is changed via API response
+			ExtractableResponse<Response> folderListResponse = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/folders")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> listResponseMap = folderListResponse.as(Map.class);
+			Map<String, Object> listDataMap = (Map<String, Object>)listResponseMap.get("data");
+			List<Map<String, Object>> folders = (List<Map<String, Object>>)listDataMap.get("folders");
+
+			Map<String, Object> updatedFolder = folders.stream()
+				.filter(f -> ((Integer)f.get("id")) == folder.getId().intValue())
+				.findFirst()
+				.orElseThrow();
+
+			assertThat(updatedFolder.get("name")).isEqualTo("변경된 이름");
+		}
+
+		@Test
+		void 존재하지_않는_폴더_이름_변경시_404_예외를_반환한다() {
+			// given
+			FixFolderRequest request = new FixFolderRequest(9999L, "변경된 이름");
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/folder")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(FolderErrorCode.FOLDER_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		void 다른_사용자의_폴더_이름_변경시_403_예외를_반환한다() {
+			// given
+			Folder folder = folderFixture.creator()
+				.user(mockUser)
+				.name("다른 사용자의 폴더")
+				.create();
+
+			FixFolderRequest request = new FixFolderRequest(folder.getId(), "변경 시도");
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/folder")
+				.then()
+				.statusCode(HttpStatus.FORBIDDEN.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(FolderErrorCode.FOLDER_ACCESS_DENIED.getMessage());
+		}
+	}
+
+	@Nested
+	class 폴더_제거 {
+
+		@Test
+		void 폴더_제거_성공() {
+			// given
+			Folder folder = folderFixture.creator()
+				.user(mockUser)
+				.name("삭제할 폴더")
+				.create();
+
+			RemoveFolderRequest request = new RemoveFolderRequest(folder.getId());
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.delete("/api/card/folder")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+			assertThat(responseMap.get("message")).isEqualTo("폴더 제거 성공");
+
+			// Verify the folder is soft deleted in the database
+			ExtractableResponse<Response> folderListResponse = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/folders")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> listResponseMap = folderListResponse.as(Map.class);
+			Map<String, Object> listDataMap = (Map<String, Object>)listResponseMap.get("data");
+			List<Map<String, Object>> folders = (List<Map<String, Object>>)listDataMap.get("folders");
+
+			// Check that the deleted folder is not in the list
+			boolean folderExists = folders.stream()
+				.anyMatch(f -> ((Integer)f.get("id")) == folder.getId().intValue());
+
+			assertThat(folderExists).isFalse();
+		}
+
+		@Test
+		void 존재하지_않는_폴더_제거시_404_예외를_반환한다() {
+			// given
+			RemoveFolderRequest request = new RemoveFolderRequest(9999L);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.delete("/api/card/folder")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(FolderErrorCode.FOLDER_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		void 다른_사용자의_폴더_제거시_403_예외를_반환한다() {
+			// given
+			Folder folder = folderFixture.creator()
+				.user(mockUser)
+				.name("다른 사용자의 폴더")
+				.create();
+
+			RemoveFolderRequest request = new RemoveFolderRequest(folder.getId());
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.delete("/api/card/folder")
+				.then()
+				.statusCode(HttpStatus.FORBIDDEN.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(FolderErrorCode.FOLDER_ACCESS_DENIED.getMessage());
+		}
+	}
+
+	@Nested
+	class 명함_수신 {
+
+		@Test
+		void 명함_수신_성공() {
+			// given
+			ReceiveCardRequest request = new ReceiveCardRequest(mockCard.getId());
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)  // Another user receives the card
+				.body(request)
+				.when()
+				.post("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.CREATED.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("CREATED");
+			assertThat(responseMap.get("message")).isEqualTo("명함 수신 성공");
+		}
+
+		@Test
+		void 존재하지_않는_명함_수신시_404_예외를_반환한다() {
+			// given
+			ReceiveCardRequest request = new ReceiveCardRequest(9999L);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.post("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.CARD_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		void 자신의_명함_수신시_400_예외를_반환한다() {
+			// given
+			ReceiveCardRequest request = new ReceiveCardRequest(mockCard.getId());
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)  // Same user as card owner
+				.body(request)
+				.when()
+				.post("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.BAD_REQUEST.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.CANNOT_RECEIVE_OWN_CARD.getMessage());
+		}
+
+		@Test
+		void 이미_수신한_명함_다시_수신시_400_예외를_반환한다() {
+			// Create another test user for card receive tests
+			mockUser = userFixture.creator()
+				.email("another@example.com")
+				.create();
+
+			// Create a test card that belongs to the main mock user (for receiving)
+			Card testCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("테스트 명함")
+				.create();
+
+			// given - First receive the card
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(testCard)
+				.create();
+
+			ReceiveCardRequest request = new ReceiveCardRequest(mockCard.getId());
+
+			// when - Try to receive again
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.post("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.BAD_REQUEST.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.ALREADY_RECEIVED_CARD.getMessage());
+		}
+	}
+
+	@Nested
+	class 받은_명함_폴더_설정 {
+
+		@Test
+		void 받은_명함을_폴더에_저장_성공() {
+			// given - Create folder
+			Folder folder = folderFixture.creator()
+				.user(mockUser)
+				.name("중요 명함")
+				.create();
+
+			// given - Receive card
+			ReceivedCard receivedCard = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(mockCard)
+				.create();
+
+			// given - Set folder request
+			SetReceivedCardsFolderRequest request = new SetReceivedCardsFolderRequest(
+				folder.getId(),
+				List.of(mockCard.getId())
+			);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/folder")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+			assertThat(responseMap.get("message")).isEqualTo("명함 폴더 설정 성공");
+		}
+
+		@Test
+		void 존재하지_않는_폴더에_명함_추가시_404_예외를_반환한다() {
+			// given - Receive card
+			ReceivedCard receivedCard = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(mockCard)
+				.create();
+
+			// given - Set folder request with non-existent folder
+			SetReceivedCardsFolderRequest request = new SetReceivedCardsFolderRequest(
+				9999L,
+				List.of(mockCard.getId())
+			);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/folder")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(FolderErrorCode.FOLDER_NOT_FOUND.getMessage());
+		}
+	}
+
+	@Nested
+	class 받은_명함_목록_조회 {
+
+		@Test
+		void 받은_명함_목록_조회_성공() {
+			// given - Receive card
+			ReceivedCard receivedCard = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(mockCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).get("nickname")).isEqualTo(mockCard.getNickname());
+		}
+
+		@Test
+		void 특정_폴더의_받은_명함_목록_조회() {
+			// given - Create folder
+			Folder folder = folderFixture.creator()
+				.user(mockUser)
+				.name("중요 명함")
+				.create();
+
+			// given - Receive card
+			ReceivedCard receivedCard = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(mockCard)
+				.create();
+
+			// given - Add card to folder
+			ReceivedCardFolder relation = receivedCardFolderFixture.creator()
+				.folder(folder)
+				.receivedCard(receivedCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.queryParam("folderId", folder.getId())
+				.when()
+				.get("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).get("nickname")).isEqualTo(mockCard.getNickname());
+		}
+	}
+
+	@Nested
+	class 받은_명함_삭제 {
+
+		@Test
+		void 받은_명함_삭제_성공() {
+			// given - Receive card
+			ReceivedCard receivedCard = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(mockCard)
+				.create();
+
+			// given - Create delete request
+			RemoveReceivedCardsRequest request = new RemoveReceivedCardsRequest(
+				List.of(receivedCard.getId())
+			);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.delete("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+			assertThat(responseMap.get("message")).isEqualTo("명함 삭제 성공");
+
+			// Check that the card no longer appears in the received list
+			ExtractableResponse<Response> listResponse = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> listResponseMap = listResponse.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)listResponseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
+		}
+
+		@Test
+		void 존재하지_않는_받은_명함_삭제시_404_예외를_반환한다() {
+			// given
+			RemoveReceivedCardsRequest request = new RemoveReceivedCardsRequest(
+				List.of(9999L)
+			);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.delete("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
+		}
+	}
+
+	@Nested
+	class 받은_명함_업데이트 {
+
+		@Test
+		void 받은_명함_메모_업데이트_성공() {
+			// given - Receive card
+			ReceivedCard receivedCard = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(mockCard)
+				.create();
+
+			// given - Update request
+			FixReceivedCardRequest request = new FixReceivedCardRequest(
+				mockCard.getId(),
+				"중요한 비즈니스 파트너"
+			);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+			assertThat(responseMap.get("message")).isEqualTo("명함 업데이트 성공");
+		}
+
+		@Test
+		void 존재하지_않는_받은_명함_업데이트시_404_예외를_반환한다() {
+			// given
+			FixReceivedCardRequest request = new FixReceivedCardRequest(
+				9999L,
+				"존재하지 않는 명함 메모"
+			);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
 		}
 	}
 }

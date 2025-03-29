@@ -26,7 +26,7 @@ public class CardFixture extends CardBase {
 	@Override
 	public Card create() {
 		if (user == null) {
-			userFixture.create();
+			userFixture.creator().create();
 		}
 		if (career == null) {
 			career = careerFixture.serverDeveloper();
