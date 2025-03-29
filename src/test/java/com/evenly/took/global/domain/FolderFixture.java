@@ -2,7 +2,6 @@ package com.evenly.took.global.domain;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.evenly.took.feature.card.dao.FolderRepository;
 import com.evenly.took.feature.card.domain.Folder;
@@ -14,9 +13,6 @@ public class FolderFixture extends FolderBase {
 	@Autowired
 	FolderRepository folderRepository;
 
-	@Autowired
-	UserFixture userFixture;
-
 	public FolderBase creator() {
 		init();
 		return this;
@@ -25,21 +21,14 @@ public class FolderFixture extends FolderBase {
 	@Override
 	public Folder create() {
 		if (user == null) {
-			user = userFixture.create();
+			throw new IllegalStateException("user를 함께 입력해주세요.");
 		}
 		Folder folder = Folder.builder()
 			.user(user)
 			.name(name)
+			.deletedAt(deletedAt)
 			.build();
-
-		Folder savedFolder = folderRepository.save(folder);
-
-		if (deletedAt != null) {
-			ReflectionTestUtils.setField(savedFolder, "deletedAt", deletedAt);
-			return folderRepository.save(savedFolder);
-		}
-
-		return savedFolder;
+		return folderRepository.save(folder);
 	}
 
 	// 편의 메서드

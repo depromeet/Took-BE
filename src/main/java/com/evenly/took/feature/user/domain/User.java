@@ -46,10 +46,11 @@ public class User extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	public User(OAuthIdentifier oauthIdentifier, String name, String email) {
+	public User(OAuthIdentifier oauthIdentifier, String name, String email, LocalDateTime deletedAt) {
 		this.oauthIdentifier = oauthIdentifier;
 		this.name = name;
 		this.email = email;
+		this.deletedAt = deletedAt;
 	}
 
 	public static User toEntity(Long id) {
