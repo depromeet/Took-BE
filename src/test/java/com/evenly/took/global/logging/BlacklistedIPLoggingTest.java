@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,8 @@ import org.springframework.http.MediaType;
 import com.evenly.took.feature.user.dao.BlacklistedIPRepository;
 import com.evenly.took.global.integration.IntegrationTest;
 
-class RequestResponseLoggingTest extends IntegrationTest {
+@Disabled // 필요시에만 테스트(다른 테스트에 영향)
+class BlacklistedIPLoggingTest extends IntegrationTest {
 
 	@Autowired
 	private BlacklistedIPRepository blacklistedIPRepository;
@@ -98,7 +100,6 @@ class RequestResponseLoggingTest extends IntegrationTest {
 			blacklistedIPRepository.findByIpAddress(ip)
 				.ifPresent(blacklistedIP -> blacklistedIPRepository.delete(blacklistedIP));
 		} catch (Exception e) {
-			// 예외가 발생하더라도 테스트 진행에 영향을 주지 않도록 처리
 			System.err.println("블랙리스트에서 IP " + ip + " 삭제 중 오류 발생: " + e.getMessage());
 		}
 	}
