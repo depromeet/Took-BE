@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  took-crawl
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  TookCrawlQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: took-crawl-queue
+      VisibilityTimeout: 300
+
+  TookCrawlLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: took-crawl/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Description: Took Crawling Handler
+      FunctionName: took-crawl
+      Timeout: 300  # Lambda 실행 시간 (초)
+      MemorySize: 256  # 메모리 크기 (MB)
+      Environment:
+        Variables:
+          EXAMPLE: example
+      Architectures:
+        - x86_64
+      Policies:
+        - Statement:
+            - Sid: LambdaSQSPolicy
+              Effect: Allow
+              Action:
+                - sqs:ReceiveMessage
+                - sqs:GetQueueAttributes
+              Resource:
+                - !GetAtt TookCrawlQueue.Arn
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt TookCrawlQueue.Arn
+

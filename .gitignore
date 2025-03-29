@@ -74,3 +74,6 @@ src/main/resources/fcm
 
 # Apple Key
 src/main/resources/apple
+
+# SAM Deployment
+.aws-sam
