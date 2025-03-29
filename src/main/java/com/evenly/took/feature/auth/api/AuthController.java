@@ -19,12 +19,14 @@ import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.auth.meta.PublicApi;
 import com.evenly.took.global.auth.meta.SecuredApi;
+import com.evenly.took.global.logging.meta.PrivacySensitiveLogging;
 import com.evenly.took.global.response.SuccessResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @PublicApi
+@PrivacySensitiveLogging(logRequestBody = false, logResponseBody = false)
 @Slf4j
 @RestController
 @RequiredArgsConstructor
