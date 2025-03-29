@@ -1,10 +1,10 @@
-name: Development deploy workflow
+name: Production deploy workflow
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - 'deploy/83-production-deploy'
+      - 'main'
 
 jobs:
   build:
