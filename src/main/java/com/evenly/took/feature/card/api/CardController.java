@@ -38,6 +38,7 @@ import com.evenly.took.feature.card.dto.response.ReceivedCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.auth.meta.LoginUser;
+import com.evenly.took.global.auth.meta.PublicApi;
 import com.evenly.took.global.response.SuccessResponse;
 
 import jakarta.validation.ConstraintViolation;
@@ -68,6 +69,7 @@ public class CardController implements CardApi {
 		return SuccessResponse.of(response);
 	}
 
+	@PublicApi
 	@GetMapping("/api/card/register")
 	public SuccessResponse<CareersResponse> getCareers(@RequestParam Job job) {
 		CareersResponse response = cardService.findCareers(job);
@@ -130,6 +132,7 @@ public class CardController implements CardApi {
 		return SuccessResponse.ok("폴더 제거 성공");
 	}
 
+	@PublicApi
 	@GetMapping("/api/card/open")
 	public SuccessResponse<CardResponse> getCardOpen(
 		@ModelAttribute @Valid CardRequest request) {
