@@ -23,7 +23,10 @@ class CardMapperTest extends ServiceTest {
 	@Test
 	void 카드를_MyCardResponse로_변환시_기본필드_매핑_검증() {
 		// given
-		Card card = cardFixture.create();
+		User user = userFixture.create();
+		Card card = cardFixture.creator()
+			.user(user)
+			.create();
 
 		// when
 		CardResponse response = cardMapper.toCardResponse(card);
@@ -64,7 +67,9 @@ class CardMapperTest extends ServiceTest {
 	@Test
 	void 미리보기정보_PROJECT_변환검증() {
 		// given
+		User user = userFixture.create();
 		Card card = cardFixture.creator()
+			.user(user)
 			.previewInfo(PreviewInfoType.PROJECT)
 			.create();
 
@@ -83,7 +88,9 @@ class CardMapperTest extends ServiceTest {
 	@Test
 	void 미리보기정보_CONTENT_변환검증() {
 		// given
+		User user = userFixture.create();
 		Card card = cardFixture.creator()
+			.user(user)
 			.previewInfo(PreviewInfoType.CONTENT)
 			.create();
 
@@ -102,7 +109,9 @@ class CardMapperTest extends ServiceTest {
 	@Test
 	void 미리보기정보_HOBBY_변환검증() {
 		// given
+		User user = userFixture.create();
 		Card card = cardFixture.creator()
+			.user(user)
 			.previewInfo(PreviewInfoType.HOBBY)
 			.create();
 
@@ -117,7 +126,9 @@ class CardMapperTest extends ServiceTest {
 	@Test
 	void 미리보기정보_SNS_변환검증() {
 		// given
+		User user = userFixture.create();
 		Card card = cardFixture.creator()
+			.user(user)
 			.previewInfo(PreviewInfoType.SNS)
 			.create();
 
@@ -134,7 +145,9 @@ class CardMapperTest extends ServiceTest {
 	@Test
 	void 미리보기정보_NEWS_변환검증() {
 		// given
+		User user = userFixture.create();
 		Card card = cardFixture.creator()
+			.user(user)
 			.previewInfo(PreviewInfoType.NEWS)
 			.create();
 
@@ -149,7 +162,9 @@ class CardMapperTest extends ServiceTest {
 	@Test
 	void 미리보기정보_REGION_변환검증() {
 		// given
+		User user = userFixture.create();
 		Card card = cardFixture.creator()
+			.user(user)
 			.previewInfo(PreviewInfoType.REGION)
 			.create();
 
@@ -164,7 +179,9 @@ class CardMapperTest extends ServiceTest {
 	@Test
 	void 빈데이터_NULL데이터_처리_검증() {
 		// given
+		User user = userFixture.create();
 		Card card = cardFixture.creator()
+			.user(user)
 			.previewInfo(PreviewInfoType.PROJECT)
 			.projects(null)
 			.create();

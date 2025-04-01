@@ -2,7 +2,6 @@ package com.evenly.took.global.domain;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.evenly.took.feature.card.dao.ReceivedCardRepository;
 import com.evenly.took.feature.card.domain.Card;
@@ -15,12 +14,6 @@ public class ReceivedCardFixture extends ReceivedCardBase {
 	@Autowired
 	ReceivedCardRepository receivedCardRepository;
 
-	@Autowired
-	UserFixture userFixture;
-
-	@Autowired
-	CardFixture cardFixture;
-
 	public ReceivedCardBase creator() {
 		init();
 		return this;
@@ -29,28 +22,18 @@ public class ReceivedCardFixture extends ReceivedCardBase {
 	@Override
 	public ReceivedCard create() {
 		if (user == null) {
-			user = userFixture.create();
+			throw new IllegalStateException("user를 함께 입력해주세요.");
 		}
 		if (card == null) {
-			// 카드를 받는 사용자와 카드 소유자는 달라야 함
-			User cardOwner = userFixture.creator().id(user.getId() + 1).email("cardowner@example.com").create();
-			card = cardFixture.creator().user(cardOwner).create();
+			throw new IllegalStateException("card를 함께 입력해주세요.");
 		}
-
 		ReceivedCard receivedCard = ReceivedCard.builder()
 			.user(user)
 			.card(card)
 			.memo(memo)
+			.deletedAt(deletedAt)
 			.build();
-
-		ReceivedCard savedReceivedCard = receivedCardRepository.save(receivedCard);
-
-		if (deletedAt != null) {
-			ReflectionTestUtils.setField(savedReceivedCard, "deletedAt", deletedAt);
-			return receivedCardRepository.save(savedReceivedCard);
-		}
-
-		return savedReceivedCard;
+		return receivedCardRepository.save(receivedCard);
 	}
 
 	// 편의 메서드

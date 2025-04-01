@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class BehanceLinkCrawler implements LinkCrawler {
 
-	private static final int TIMEOUT_MILLISECONDS = 10000;
+	private static final int TIMEOUT_MILLISECONDS = 20000;
 	private static final String EMPTY_STRING = "";
 
 	private final WebDriverHandler webDriverHandler;

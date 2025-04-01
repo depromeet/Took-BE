@@ -16,6 +16,7 @@ public class UserFactory extends UserBase {
 			.name(name)
 			.email(email)
 			.oauthIdentifier(oauthIdentifier)
+			.deletedAt(deletedAt)
 			.build();
 		ReflectionTestUtils.setField(user, "id", id);
 		return user;

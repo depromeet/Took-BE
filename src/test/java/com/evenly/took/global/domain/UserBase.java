@@ -1,5 +1,8 @@
 package com.evenly.took.global.domain;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.user.domain.User;
@@ -9,15 +12,14 @@ public abstract class UserBase {
 	static Long DEFAULT_ID = 1L;
 	static String DEFAULT_NAME = "임손나";
 	static String DEFAULT_EMAIL = "took@google.com";
-	static OAuthIdentifier DEFAULT_OAUTH_IDENTIFIER = OAuthIdentifier.builder()
-		.oauthId("oauth-id")
-		.oauthType(OAuthType.GOOGLE)
-		.build();
+	static OAuthIdentifier DEFAULT_OAUTH_IDENTIFIER = null;
+	static LocalDateTime DEFAULT_DELETED_AT = null;
 
 	Long id;
 	String name;
 	String email;
 	OAuthIdentifier oauthIdentifier;
+	LocalDateTime deletedAt;
 
 	protected UserBase() {
 		init();
@@ -27,7 +29,11 @@ public abstract class UserBase {
 		this.id = DEFAULT_ID;
 		this.name = DEFAULT_NAME;
 		this.email = DEFAULT_EMAIL;
-		this.oauthIdentifier = DEFAULT_OAUTH_IDENTIFIER;
+		this.oauthIdentifier = OAuthIdentifier.builder()
+			.oauthId(UUID.randomUUID().toString())
+			.oauthType(OAuthType.GOOGLE)
+			.build();
+		this.deletedAt = DEFAULT_DELETED_AT;
 	}
 
 	public UserBase id(Long id) {
@@ -50,25 +56,9 @@ public abstract class UserBase {
 		return this;
 	}
 
-	public UserBase googleOAuth(String oauthId) {
-		return oauthIdentifier(OAuthIdentifier.builder()
-			.oauthId(oauthId)
-			.oauthType(OAuthType.GOOGLE)
-			.build());
-	}
-
-	public UserBase kakaoOAuth(String oauthId) {
-		return oauthIdentifier(OAuthIdentifier.builder()
-			.oauthId(oauthId)
-			.oauthType(OAuthType.KAKAO)
-			.build());
-	}
-
-	public UserBase appleOAuth(String oauthId) {
-		return oauthIdentifier(OAuthIdentifier.builder()
-			.oauthId(oauthId)
-			.oauthType(OAuthType.APPLE)
-			.build());
+	public UserBase deletedAt(LocalDateTime deletedAt) {
+		this.deletedAt = deletedAt;
+		return this;
 	}
 
 	public abstract User create();

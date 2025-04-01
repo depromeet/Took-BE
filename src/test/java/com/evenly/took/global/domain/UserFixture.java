@@ -23,6 +23,7 @@ public class UserFixture extends UserBase {
 			.name(name)
 			.email(email)
 			.oauthIdentifier(oauthIdentifier)
+			.deletedAt(deletedAt)
 			.build();
 		return userRepository.save(user);
 	}

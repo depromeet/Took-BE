@@ -24,4 +24,5 @@ public interface ReceivedCardFolderRepository extends JpaRepository<ReceivedCard
 		"OR rcf.receivedCard.id IN (SELECT rc.id FROM ReceivedCard rc WHERE rc.user.id = :userId)) " +
 		"AND rcf.deletedAt IS NULL")
 	int softDeleteAllByUserId(@Param("userId") Long userId, @Param("now") LocalDateTime now);
+
 }
