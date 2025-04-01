@@ -59,6 +59,9 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.25.27'
     testImplementation 'org.testcontainers:localstack:1.19.1'
 
+    // AWS SQS
+    implementation 'software.amazon.awssdk:sqs:2.20.102'
+
     // MapStruct
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'

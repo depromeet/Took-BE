@@ -23,8 +23,8 @@ Resources:
       Runtime: python3.9
       Description: Took Crawling Handler
       FunctionName: took-crawl
-      Timeout: 300  # Lambda 실행 시간 (초)
-      MemorySize: 256  # 메모리 크기 (MB)
+      Timeout: 300
+      MemorySize: 256
       Environment:
         Variables:
           EXAMPLE: example

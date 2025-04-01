@@ -83,6 +83,8 @@ aws:
   s3:
     bucket: ${BUCKET_NAME}
     env: ${BUCKET_ENV}
+  sqs:
+    crawl-queue: ${AWS_CRAWL_QUEUE}
 
 fcm:
   key-path: ${FCM_KEY_PATH} # TODO prod 환경 분리
