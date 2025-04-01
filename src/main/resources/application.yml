@@ -94,8 +94,6 @@ security:
 
 logging:
   config: classpath:logback-spring.xml
-  file:
-    name: ./logs/application.log
   logback:
     rollingpolicy:
       max-file-size: 100MB

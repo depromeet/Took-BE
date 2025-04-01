@@ -15,12 +15,12 @@
 
     <!-- 오류 로그 파일 -->
     <appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/error.log</file>
+        <file>${user.home}/app/logs/error.log</file>
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${user.home}/app/logs/error.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>60</maxHistory>
         </rollingPolicy>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -30,12 +30,12 @@
 
     <!-- 경고 로그 파일 -->
     <appender name="WARN_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/warn.log</file>
+        <file>${user.home}/app/logs/warn.log</file>
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/warn.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${user.home}/app/logs/warn.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>60</maxHistory>
         </rollingPolicy>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -45,12 +45,12 @@
 
     <!-- IP 차단 로그 파일 -->
     <appender name="BLOCKING_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/blocking.log</file>
+        <file>${user.home}/app/logs/blocking.log</file>
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/blocking.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${user.home}/app/logs/blocking.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
     </appender>
@@ -64,12 +64,12 @@
 
     <!-- 요청/응답 로그 (파일만 기록) -->
     <appender name="REQUEST_RESPONSE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/http-trace.log</file>
+        <file>${user.home}/app/logs/http-trace.log</file>
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/http-trace.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${user.home}/app/logs/http-trace.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
     </appender>
@@ -78,7 +78,7 @@
     <appender name="ASYNC_REQUEST_RESPONSE" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="REQUEST_RESPONSE_LOG"/>
         <queueSize>512</queueSize>
-        <discardingThreshold>0"/></discardingThreshold>
+        <discardingThreshold>0</discardingThreshold>
     </appender>
 
     <!-- IP 차단 로그 설정 -->
