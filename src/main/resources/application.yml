@@ -25,6 +25,11 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 swagger:
   version: 0.0.1
   server-url: ${SERVER_URL:http://localhost:8080}
