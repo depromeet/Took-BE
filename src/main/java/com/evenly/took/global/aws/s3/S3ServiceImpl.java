@@ -31,6 +31,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 @RequiredArgsConstructor
 public class S3ServiceImpl implements S3Service {
 
+	public static final String S3_URL_FORM = "https://%s.s3.%s.amazonaws.com/%s";
+
 	private final S3Presigner s3Presigner;
 	private final S3Client s3Client;
 
@@ -141,5 +143,11 @@ public class S3ServiceImpl implements S3Service {
 	private String getFileExtension(String fileName) {
 		int lastIndexOfDot = fileName.lastIndexOf(".");
 		return (lastIndexOfDot == -1) ? "" : fileName.substring(lastIndexOfDot + 1).toLowerCase();
+	}
+
+	public String getFullS3Url(String s3Key) {
+		String bucket = awsProperties.s3().bucket();
+		String region = s3Client.serviceClientConfiguration().region().toString();
+		return String.format(S3_URL_FORM, bucket, region, s3Key);
 	}
 }

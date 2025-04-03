@@ -10,4 +10,6 @@ public interface S3Service {
 	String uploadFile(MultipartFile file, String path);
 
 	void deleteFile(String s3Key);
+
+	String getFullS3Url(String s3Key);
 }

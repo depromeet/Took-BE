@@ -11,6 +11,7 @@ import com.evenly.took.feature.card.domain.vo.Project;
 import com.evenly.took.feature.card.domain.vo.SNS;
 import com.evenly.took.feature.common.model.BaseTimeEntity;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.aws.s3.S3UrlProvider;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -110,5 +111,21 @@ public class Card extends BaseTimeEntity {
 		this.sns = sns;
 		this.summary = summary;
 		this.user = user;
+	}
+
+	public String getImagePath() {
+		if (imagePath == null || imagePath.isEmpty()) {
+			return null;
+		}
+
+		try {
+			return S3UrlProvider.getFullS3Url(imagePath);
+		} catch (Exception e) {
+			return imagePath;
+		}
+	}
+
+	public String getOriginalImagePath() {
+		return imagePath;
 	}
 }
