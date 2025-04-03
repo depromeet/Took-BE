@@ -125,7 +125,8 @@ public class CardService {
 				baseResponse.content(),
 				baseResponse.project(),
 				folderResponses,
-				memo
+				memo,
+				baseResponse.imagePath()
 			);
 		}
 	}
