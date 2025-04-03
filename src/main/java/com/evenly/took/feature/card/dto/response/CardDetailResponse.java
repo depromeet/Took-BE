@@ -50,8 +50,10 @@ public record CardDetailResponse(
 	List<FolderResponse> folders,
 
 	@Schema(description = "한 줄 메모 (공유받은 명함 조회 시)", example = "디프만 2팀 팀장님입니다.")
-	String memo
+	String memo,
 
+	@Schema(description = "프로필 사진 경로", example = "/images/profile/user1.jpg")
+	String imagePath
 ) {
-	
+
 }
