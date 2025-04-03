@@ -13,6 +13,7 @@ import com.evenly.took.feature.common.model.BaseTimeEntity;
 import com.evenly.took.feature.user.domain.User;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -53,8 +54,8 @@ public class Card extends BaseTimeEntity {
 	@Column(name = "nickname", nullable = false)
 	private String nickname;
 
-	@Column(name = "image_path")
-	private String imagePath;
+	@Embedded
+	private CardImage image;
 
 	@Column(name = "interest_domain", nullable = false)
 	@JdbcTypeCode(SqlTypes.JSON)
@@ -93,12 +94,13 @@ public class Card extends BaseTimeEntity {
 	@Builder
 	public Card(Career career, List<Content> content, String hobby, String imagePath,
 		List<String> interestDomain, LocalDateTime deletedAt, String news, String nickname, String organization,
-		PreviewInfoType previewInfo, List<Project> project, String region, List<SNS> sns, String summary,
-		User user) {
+		PreviewInfoType previewInfo, List<Project> project, String region, List<SNS> sns, String summary, User user) {
 		this.career = career;
 		this.content = content;
 		this.hobby = hobby;
-		this.imagePath = imagePath;
+		this.image = CardImage.builder()
+			.imagePath(imagePath)
+			.build();
 		this.interestDomain = interestDomain;
 		this.deletedAt = deletedAt;
 		this.news = news;
@@ -110,5 +112,9 @@ public class Card extends BaseTimeEntity {
 		this.sns = sns;
 		this.summary = summary;
 		this.user = user;
+	}
+
+	public String getImagePath() {
+		return image != null ? image.getImagePath() : null;
 	}
 }

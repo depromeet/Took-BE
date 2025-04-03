@@ -37,7 +37,7 @@ public record CardResponse(
 	@Schema(description = "대표 정보에 따른 상세 내용")
 	PreviewInfoResponse previewInfo,
 
-	@Schema(description = "프로필 사진 경로", example = "/images/profile/user1.jpg")
+	@Schema(description = "프로필 사진 url", example = "https://s3/images/profile/user1.jpg")
 	String imagePath
 ) {
 }

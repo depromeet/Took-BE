@@ -88,6 +88,7 @@ aws:
   s3:
     bucket: ${BUCKET_NAME}
     env: ${BUCKET_ENV}
+    url-prefix: ${FILE_URL_PREFIX}
 
 fcm:
   key-path: ${FCM_KEY_PATH} # TODO prod 환경 분리

@@ -33,7 +33,6 @@ public class S3ServiceImpl implements S3Service {
 
 	private final S3Presigner s3Presigner;
 	private final S3Client s3Client;
-
 	private final AwsProperties awsProperties;
 
 	public String generatePresignedUploadUrl(String fileName, String path) {
