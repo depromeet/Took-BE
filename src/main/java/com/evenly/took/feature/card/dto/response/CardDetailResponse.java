@@ -52,7 +52,7 @@ public record CardDetailResponse(
 	@Schema(description = "한 줄 메모 (공유받은 명함 조회 시)", example = "디프만 2팀 팀장님입니다.")
 	String memo,
 
-	@Schema(description = "프로필 사진 경로", example = "/images/profile/user1.jpg")
+	@Schema(description = "프로필 사진 url", example = "https://s3/images/profile/user1.jpg")
 	String imagePath
 ) {
 
