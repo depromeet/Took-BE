@@ -132,6 +132,7 @@ public class CardController implements CardApi {
 		return SuccessResponse.of(response);
 	}
 
+	@PublicApi
 	@GetMapping("/api/card/open/detail")
 	public SuccessResponse<CardDetailResponse> getCardDetailOpen(
 		@ModelAttribute @Valid CardDetailRequest request) {
