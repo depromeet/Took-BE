@@ -115,6 +115,6 @@ public class Card extends BaseTimeEntity {
 	}
 
 	public String getImagePath() {
-		return image.getImagePath();
+		return image != null ? image.getImagePath() : null;
 	}
 }

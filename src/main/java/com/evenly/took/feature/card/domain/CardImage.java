@@ -19,6 +19,10 @@ public class CardImage {
 	}
 
 	public String getImagePath() {
-		return CardImageUrlFetcher.fetchFullUri(imagePath);
+		return CardImageUrlFetcher.getImageUrl(imagePath);
+	}
+
+	public String getRawImagePath() {
+		return imagePath;
 	}
 }
