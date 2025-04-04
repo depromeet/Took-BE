@@ -9,6 +9,7 @@ import org.mapstruct.Named;
 
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
+import com.evenly.took.feature.card.domain.ReceivedCard;
 import com.evenly.took.feature.card.domain.vo.Content;
 import com.evenly.took.feature.card.domain.vo.Project;
 import com.evenly.took.feature.card.domain.vo.SNS;
@@ -19,6 +20,7 @@ import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.PreviewInfoResponse;
 import com.evenly.took.feature.card.dto.response.ProjectResponse;
 import com.evenly.took.feature.card.dto.response.ReceivedCardListResponse;
+import com.evenly.took.feature.card.dto.response.ReceivedCardResponse;
 import com.evenly.took.feature.card.dto.response.SNSResponse;
 
 @Mapper(componentModel = "spring", imports = {Optional.class})
@@ -36,8 +38,27 @@ public interface CardMapper {
 		return new MyCardListResponse(toCardResponseList(cards));
 	}
 
-	default ReceivedCardListResponse toCardListResponse(List<Card> cards) {
-		return new ReceivedCardListResponse(toCardResponseList(cards));
+	default ReceivedCardListResponse toReceivedCardListResponse(List<ReceivedCard> receivedCards) {
+		List<ReceivedCardResponse> responses = receivedCards.stream()
+			.map(receivedCard -> {
+				Card card = receivedCard.getCard();
+				return new ReceivedCardResponse(
+					card.getId(),
+					receivedCard.getCreatedAt(),
+					card.getNickname(),
+					card.getOrganization(),
+					card.getCareer() != null ? card.getCareer().getJob() : null,
+					card.getCareer() != null ? card.getCareer().getDetailJobEn() : null,
+					card.getSummary(),
+					card.getInterestDomain(),
+					card.getPreviewInfo(),
+					toPreviewInfoResponse(card),
+					card.getImagePath()
+				);
+			})
+			.toList();
+
+		return new ReceivedCardListResponse(responses);
 	}
 
 	@Named("toPreviewInfoResponse")
