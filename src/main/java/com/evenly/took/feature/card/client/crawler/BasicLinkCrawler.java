@@ -26,10 +26,9 @@ public class BasicLinkCrawler implements LinkCrawler {
 	public CrawledDto crawl(String link) throws IOException {
 		Document target = scrap(link);
 		String title = fetchMeta(target, "title");
-		String url = fetchMeta(target, "url");
 		String image = fetchMeta(target, "image");
 		String description = fetchMeta(target, "description");
-		return new CrawledDto(title, url, image, description);
+		return new CrawledDto(title, link, image, description);
 	}
 
 	private Document scrap(String link) throws IOException {
