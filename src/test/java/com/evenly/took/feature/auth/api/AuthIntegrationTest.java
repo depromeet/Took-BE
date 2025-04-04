@@ -208,11 +208,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 				List.of("서비스가 마음에 들지 않아요"),
 				"사용성이 불편해요"
 			);
-			WithdrawRequest invalid = new WithdrawRequest(
-				tokens.refreshToken(),
-				List.of("서비스가 마음에 들지"),
-				"사용성이 불편해요"
-			);
+
 			given().log().all()
 				.contentType(ContentType.JSON)
 				.header("Authorization", "Bearer " + tokens.accessToken())
@@ -225,7 +221,6 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.get();
 
 			assertThat(withdrawUser.getWithdrawReasons()).isEqualTo(request.toWithdrawReasons());
-			assertThat(withdrawUser.getWithdrawReasons()).isEqualTo(invalid.toWithdrawReasons());
 		}
 
 		@Test
