@@ -13,7 +13,6 @@ public enum LinkSource {
 	BRUNCH("https://brunch.co.kr", ""),
 	BEHANCE("https://www.behance.net", ""),
 	VELOG_MAIN("https://velog.io", "/posts"),
-	MJVCD("https://mjvcd-nextjs-wordpress-pro.vercel.app", ""),
 	BASIC("basic", ""),
 	;
 
