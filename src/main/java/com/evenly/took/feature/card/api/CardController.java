@@ -65,7 +65,7 @@ public class CardController implements CardApi {
 	@DeleteMapping("/api/card/{cardId}")
 	public SuccessResponse<Void> deleteMyCards(@LoginUser User user, @PathVariable Long cardId) {
 		cardService.softDeleteMyCard(user.getId(), cardId);
-		return SuccessResponse.ok("명함 삭제 성공");
+		return SuccessResponse.deleted("내 명함 삭제 성공");
 	}
 
 	@GetMapping("/api/card/detail")

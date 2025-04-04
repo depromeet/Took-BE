@@ -57,6 +57,14 @@ public interface CardApi {
 	SuccessResponse<MyCardListResponse> getMyCards(User user);
 
 	@Operation(
+		summary = "내 명함 삭제",
+		description = "내가 소유한 명함을 삭제합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", description = "내 명함 삭제 성공")
+	})
+	SuccessResponse<Void> deleteMyCards(User user, Long cardId);
+
+	@Operation(
 		summary = "명함 상세 정보 조회",
 		description = "특정 명함의 모든 상세 정보를 조회합니다.")
 	@ApiResponses({

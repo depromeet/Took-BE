@@ -38,4 +38,8 @@ public class SuccessResponse<T> {
 	public static SuccessResponse<Void> ok(String message) {
 		return new SuccessResponse<>(HttpStatus.OK, message, LocalDateTime.now(), null);
 	}
+
+	public static SuccessResponse<Void> deleted(String message) {
+		return new SuccessResponse<>(HttpStatus.NO_CONTENT, message, LocalDateTime.now(), null);
+	}
 }
