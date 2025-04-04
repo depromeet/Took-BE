@@ -8,12 +8,15 @@ import static org.mockito.BDDMockito.doNothing;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.service.ServiceTest;
@@ -55,17 +58,21 @@ class AuthServiceTest extends ServiceTest {
 	}
 
 	@Test
-	void 회원탈퇴시_WithdrawService가_호출된다() {
+	void 회원탈퇴시_이유와_함께_WithdrawService가_호출된다() {
 		// given
 		Long userId = 1L;
-		String refreshToken = "test-refresh-token";
+		WithdrawRequest request = new WithdrawRequest(
+			"test-refresh-token",
+			Arrays.asList("서비스가 마음에 들지 않아요"),
+			"사용성이 불편해요"
+		);
 
-		doNothing().when(withdrawService).withdraw(anyLong(), anyString());
+		doNothing().when(withdrawService).withdraw(anyLong(), any(WithdrawRequest.class));
 
 		// when
-		authService.withdraw(userId, refreshToken);
+		authService.withdraw(userId, request);
 
 		// then
-		verify(withdrawService).withdraw(userId, refreshToken);
+		verify(withdrawService).withdraw(userId, request);
 	}
 }

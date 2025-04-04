@@ -24,6 +24,7 @@ public class UserFixture extends UserBase {
 			.email(email)
 			.oauthIdentifier(oauthIdentifier)
 			.deletedAt(deletedAt)
+			.withdrawReasons(withdrawReasons)
 			.build();
 		return userRepository.save(user);
 	}

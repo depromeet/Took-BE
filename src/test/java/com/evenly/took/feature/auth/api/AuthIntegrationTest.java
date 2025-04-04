@@ -5,6 +5,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -14,6 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
+import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
 import com.evenly.took.feature.user.dao.UserRepository;
 import com.evenly.took.feature.user.domain.User;
@@ -200,7 +203,12 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.getObject("data.token", TokenResponse.class);
 
 			// when, then
-			RefreshTokenRequest request = new RefreshTokenRequest(tokens.refreshToken());
+			WithdrawRequest request = new WithdrawRequest(
+				tokens.refreshToken(),
+				List.of("서비스가 마음에 들지 않아요"),
+				"사용성이 불편해요"
+			);
+
 			given().log().all()
 				.contentType(ContentType.JSON)
 				.header("Authorization", "Bearer " + tokens.accessToken())
@@ -208,6 +216,11 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.when().post("/api/auth/withdraw")
 				.then().log().all()
 				.statusCode(200);
+
+			User withdrawUser = userRepository.findById(user.getId())
+				.get();
+
+			assertThat(withdrawUser.getWithdrawReasons()).isEqualTo(request.toWithdrawReasons());
 		}
 
 		@Test
@@ -231,7 +244,11 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.getObject("data.token", TokenResponse.class);
 
 			// when
-			RefreshTokenRequest request = new RefreshTokenRequest(tokens.refreshToken());
+			WithdrawRequest request = new WithdrawRequest(
+				tokens.refreshToken(),
+				List.of("서비스가 마음에 들지 않아요"),
+				"사용성이 불편해요"
+			);
 			given().log().all()
 				.contentType(ContentType.JSON)
 				.header("Authorization", "Bearer " + tokens.accessToken())
@@ -243,11 +260,14 @@ public class AuthIntegrationTest extends IntegrationTest {
 			// then
 			User withdrawnUser = userRepository.findById(userId).orElseThrow();
 			assertThat(withdrawnUser.getDeletedAt()).isNotNull();
+			assertThat(withdrawnUser.getWithdrawReasons()).isNotNull();
+			assertThat(withdrawnUser.getWithdrawReasons().reasons()).isNotNull();
 
 			// 리프레시 토큰도 무효화 됐는지 확인
+			RefreshTokenRequest refreshRequest = new RefreshTokenRequest(tokens.refreshToken());
 			given().log().all()
 				.contentType(ContentType.JSON)
-				.body(request)
+				.body(refreshRequest)
 				.when().post("/api/auth/refresh")
 				.then().log().all()
 				.statusCode(401);

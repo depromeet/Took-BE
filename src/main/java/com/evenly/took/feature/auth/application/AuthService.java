@@ -8,6 +8,7 @@ import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.TokenDto;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
+import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
@@ -58,7 +59,7 @@ public class AuthService {
 		tokenProvider.invalidateRefreshToken(refreshToken);
 	}
 
-	public void withdraw(Long userId, String refreshToken) {
-		withdrawService.withdraw(userId, refreshToken);
+	public void withdraw(Long userId, WithdrawRequest request) {
+		withdrawService.withdraw(userId, request);
 	}
 }
