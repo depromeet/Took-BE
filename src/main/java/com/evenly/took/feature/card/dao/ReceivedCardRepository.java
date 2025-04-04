@@ -13,11 +13,11 @@ import com.evenly.took.feature.card.domain.ReceivedCard;
 
 public interface ReceivedCardRepository extends JpaRepository<ReceivedCard, Long> {
 
-	boolean existsByUserIdAndCardIdAndDeletedAtIsNull(Long userId, Long cardId);
+	boolean existsByUserIdAndCardIdAndDeletedAtIsNullOrderByIdDesc(Long userId, Long cardId);
 
-	List<ReceivedCard> findAllByUserIdAndDeletedAtIsNull(Long userId);
+	List<ReceivedCard> findAllByUserIdAndDeletedAtIsNullOrderByIdDesc(Long userId);
 
-	Optional<ReceivedCard> findByUserIdAndCardIdAndDeletedAtIsNull(Long userId, Long cardId);
+	Optional<ReceivedCard> findByUserIdAndCardIdAndDeletedAtIsNullOrderByIdDesc(Long userId, Long cardId);
 
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE ReceivedCard rc SET rc.deletedAt = :now WHERE rc.user.id = :userId AND rc.deletedAt IS NULL")
