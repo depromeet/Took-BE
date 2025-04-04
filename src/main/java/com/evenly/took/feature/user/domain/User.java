@@ -2,7 +2,11 @@ package com.evenly.took.feature.user.domain;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
+import com.evenly.took.feature.card.domain.vo.WithdrawReasons;
 import com.evenly.took.feature.common.model.BaseTimeEntity;
 
 import jakarta.persistence.Column;
@@ -45,12 +49,18 @@ public class User extends BaseTimeEntity {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
+	@Column(name = "withdraw_reasons")
+	@JdbcTypeCode(SqlTypes.JSON)
+	private WithdrawReasons withdrawReasons;
+
 	@Builder
-	public User(OAuthIdentifier oauthIdentifier, String name, String email, LocalDateTime deletedAt) {
+	public User(OAuthIdentifier oauthIdentifier, String name, String email, LocalDateTime deletedAt,
+		WithdrawReasons withdrawReasons) {
 		this.oauthIdentifier = oauthIdentifier;
 		this.name = name;
 		this.email = email;
 		this.deletedAt = deletedAt;
+		this.withdrawReasons = withdrawReasons;
 	}
 
 	public static User toEntity(Long id) {
@@ -59,8 +69,9 @@ public class User extends BaseTimeEntity {
 		return userEntity;
 	}
 
-	public void withdraw() {
+	public void withdraw(WithdrawReasons withdrawReasons) {
 		this.deletedAt = LocalDateTime.now();
 		this.oauthIdentifier = null;
+		this.withdrawReasons = withdrawReasons;
 	}
 }

@@ -12,6 +12,7 @@ import com.evenly.took.feature.auth.application.AuthService;
 import com.evenly.took.feature.auth.client.AuthContext;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
+import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
@@ -22,6 +23,7 @@ import com.evenly.took.global.auth.meta.SecuredApi;
 import com.evenly.took.global.logging.meta.PrivacySensitiveLogging;
 import com.evenly.took.global.response.SuccessResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,8 +75,8 @@ public class AuthController implements AuthApi {
 
 	@SecuredApi
 	@PostMapping("/api/auth/withdraw")
-	public SuccessResponse<Void> withdraw(@LoginUser User user, @RequestBody RefreshTokenRequest request) {
-		authService.withdraw(user.getId(), request.refreshToken());
+	public SuccessResponse<Void> withdraw(@LoginUser User user, @RequestBody @Valid WithdrawRequest request) {
+		authService.withdraw(user.getId(), request);
 		return SuccessResponse.ok("회원탈퇴 성공");
 	}
 }

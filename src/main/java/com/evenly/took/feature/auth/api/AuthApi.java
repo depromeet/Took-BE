@@ -2,6 +2,7 @@ package com.evenly.took.feature.auth.api;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
+import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
@@ -75,5 +76,5 @@ public interface AuthApi {
 		@ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 		@ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
-	SuccessResponse<Void> withdraw(User user, RefreshTokenRequest request);
+	SuccessResponse<Void> withdraw(User user, WithdrawRequest request);
 }
