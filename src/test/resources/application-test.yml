@@ -40,10 +40,6 @@ oauth:
     client-id: clientId
     redirect-uri: redirectUri
 
-aws:
-  s3:
-    url-prefix: https://test-bucket.s3.test-region.amazonaws.com/
-
 fcm:
   key-path: test
 
