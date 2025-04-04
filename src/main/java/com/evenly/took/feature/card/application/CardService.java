@@ -168,8 +168,7 @@ public class CardService {
 	@Transactional
 	public void createCard(User user, AddCardRequest request, String profileImageKey) {
 		Long currentCardCount = cardRepository.countByUserIdAndDeletedAtIsNull(user.getId());
-		System.out.println(profileImageKey);
-
+		
 		// if (currentCardCount >= 3) {
 		// 	throw new TookException(CardErrorCode.CARD_LIMIT_EXCEEDED);
 		// }
