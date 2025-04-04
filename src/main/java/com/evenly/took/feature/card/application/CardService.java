@@ -335,6 +335,13 @@ public class CardService {
 		receivedCardFolderRepository.softDeleteAllByUserId(userId, now);
 	}
 
+	@Transactional
+	public void softDeleteMyCard(Long userId, Long cardId) {
+		Card card = cardRepository.findById(cardId)
+			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
+		card.softDelete(userId);
+	}
+
 	private Folder verifyFolderAccess(User user, Long folderId) {
 		Folder folder = folderRepository.findById(folderId)
 			.orElseThrow(() -> new TookException(FolderErrorCode.FOLDER_NOT_FOUND));

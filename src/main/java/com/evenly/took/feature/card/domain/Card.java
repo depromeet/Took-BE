@@ -9,8 +9,10 @@ import org.hibernate.type.SqlTypes;
 import com.evenly.took.feature.card.domain.vo.Content;
 import com.evenly.took.feature.card.domain.vo.Project;
 import com.evenly.took.feature.card.domain.vo.SNS;
+import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.common.model.BaseTimeEntity;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.exception.TookException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -115,4 +117,14 @@ public class Card extends BaseTimeEntity {
 		this.imagePath = signedImageLink;
 	}
 
+	public void softDelete(Long userId) {
+		validateOwner(userId);
+		this.deletedAt = LocalDateTime.now();
+	}
+
+	private void validateOwner(Long userId) {
+		if (!userId.equals(this.user.getId())) {
+			throw new TookException(CardErrorCode.INVALID_CARD_OWNER);
+		}
+	}
 }
