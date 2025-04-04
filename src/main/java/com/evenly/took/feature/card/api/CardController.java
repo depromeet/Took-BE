@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,6 +60,12 @@ public class CardController implements CardApi {
 	public SuccessResponse<MyCardListResponse> getMyCards(@LoginUser User user) {
 		MyCardListResponse response = cardService.findUserCardList(user.getId());
 		return SuccessResponse.of(response);
+	}
+
+	@DeleteMapping("/api/card/{cardId}")
+	public SuccessResponse<Void> deleteMyCards(@LoginUser User user, @PathVariable Long cardId) {
+		cardService.softDeleteMyCard(user.getId(), cardId);
+		return SuccessResponse.ok("명함 삭제 성공");
 	}
 
 	@GetMapping("/api/card/detail")

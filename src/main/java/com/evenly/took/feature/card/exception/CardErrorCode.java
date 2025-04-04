@@ -20,6 +20,7 @@ public enum CardErrorCode implements ErrorCode {
 	RECEIVED_CARD_ACCESS_DENIED(HttpStatus.FORBIDDEN, "해당 수신 명함에 대한 권한이 없습니다."),
 	RECEIVED_CARD_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 수신 명함입니다."),
 	INVALID_CRAWL_URL(HttpStatus.BAD_REQUEST, "유효하지 않은 크롤링 링크입니다."),
+	INVALID_CARD_OWNER(HttpStatus.BAD_REQUEST, "자신이 소유한 카드만 삭제할 수 있습니다."),
 	;
 
 	private final HttpStatus status;
