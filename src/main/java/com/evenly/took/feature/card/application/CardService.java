@@ -81,6 +81,9 @@ public class CardService {
 	@Transactional(readOnly = true)
 	public MyCardListResponse findUserCardList(Long userId) {
 		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+
+		cards.forEach(this::updatePresignedImagePath);
+
 		return cardMapper.toMyCardListResponse(cards);
 	}
 
@@ -89,13 +92,14 @@ public class CardService {
 		Optional<Card> ownCard = cardRepository.findByUserIdAndIdAndDeletedAtIsNull(userId, request.cardId());
 
 		if (ownCard.isPresent()) {
-			return cardMapper.toCardDetailResponse(ownCard.get());
+			return cardMapper.toCardDetailResponse(updatePresignedImagePath(ownCard.get()));
 		} else {
-			ReceivedCard receivedCard = receivedCardRepository.findByUserIdAndCardIdAndDeletedAtIsNull(userId,
+			ReceivedCard receivedCard = receivedCardRepository.findByUserIdAndCardIdAndDeletedAtIsNullOrderByIdDesc(
+					userId,
 					request.cardId())
 				.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
 
-			Card card = receivedCard.getCard();
+			Card card = updatePresignedImagePath(receivedCard.getCard());
 
 			List<ReceivedCardFolder> folderRelations =
 				receivedCardFolderRepository.findAllByReceivedCardIdAndDeletedAtIsNull(receivedCard.getId());
@@ -135,14 +139,15 @@ public class CardService {
 	public CardResponse findCardOpen(CardRequest request) {
 		Card card = cardRepository.findByIdAndDeletedAtIsNull(request.cardId())
 			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
-		return cardMapper.toCardResponse(card);
+
+		return cardMapper.toCardResponse(updatePresignedImagePath(card));
 	}
 
 	@Transactional(readOnly = true)
 	public CardDetailResponse findCardDetailOpen(CardDetailRequest request) {
 		Card card = cardRepository.findByIdAndDeletedAtIsNull(request.cardId())
 			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
-		return cardMapper.toCardDetailResponse(card);
+		return cardMapper.toCardDetailResponse(updatePresignedImagePath(card));
 	}
 
 	@Transactional(readOnly = true)
@@ -163,7 +168,7 @@ public class CardService {
 	@Transactional
 	public void createCard(User user, AddCardRequest request, String profileImageKey) {
 		Long currentCardCount = cardRepository.countByUserIdAndDeletedAtIsNull(user.getId());
-
+		
 		// if (currentCardCount >= 3) {
 		// 	throw new TookException(CardErrorCode.CARD_LIMIT_EXCEEDED);
 		// }
@@ -236,7 +241,7 @@ public class CardService {
 			throw new TookException(CardErrorCode.CANNOT_RECEIVE_OWN_CARD);
 		}
 
-		boolean alreadyReceived = receivedCardRepository.existsByUserIdAndCardIdAndDeletedAtIsNull(
+		boolean alreadyReceived = receivedCardRepository.existsByUserIdAndCardIdAndDeletedAtIsNullOrderByIdDesc(
 			user.getId(), request.cardId());
 
 		if (alreadyReceived) {
@@ -282,11 +287,13 @@ public class CardService {
 				.map(ReceivedCard::getCard)
 				.collect(Collectors.toList());
 		} else {
-			cards = receivedCardRepository.findAllByUserIdAndDeletedAtIsNull(user.getId())
+			cards = receivedCardRepository.findAllByUserIdAndDeletedAtIsNullOrderByIdDesc(user.getId())
 				.stream()
 				.map(ReceivedCard::getCard)
 				.collect(Collectors.toList());
 		}
+
+		cards.forEach(this::updatePresignedImagePath);
 
 		return cardMapper.toCardListResponse(cards);
 	}
@@ -348,7 +355,7 @@ public class CardService {
 	}
 
 	private ReceivedCard findReceivedCardByUserAndCardId(Long userId, Long cardId) {
-		return receivedCardRepository.findByUserIdAndCardIdAndDeletedAtIsNull(userId, cardId)
+		return receivedCardRepository.findByUserIdAndCardIdAndDeletedAtIsNullOrderByIdDesc(userId, cardId)
 			.orElseThrow(() -> new TookException(CardErrorCode.RECEIVED_CARD_NOT_FOUND));
 	}
 
@@ -387,6 +394,12 @@ public class CardService {
 		for (ReceivedCardFolder relation : relations) {
 			relation.softDelete();
 		}
+	}
 
+	private Card updatePresignedImagePath(Card card) {
+		if (card.getImagePath() != null && !card.getImagePath().isEmpty()) {
+			card.setImageLink(s3Service.generatePresignedViewUrl(card.getImagePath()));
+		}
+		return card;
 	}
 }
