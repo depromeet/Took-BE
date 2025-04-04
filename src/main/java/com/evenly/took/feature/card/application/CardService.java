@@ -168,7 +168,7 @@ public class CardService {
 	@Transactional
 	public void createCard(User user, AddCardRequest request, String profileImageKey) {
 		Long currentCardCount = cardRepository.countByUserIdAndDeletedAtIsNull(user.getId());
-		
+
 		// if (currentCardCount >= 3) {
 		// 	throw new TookException(CardErrorCode.CARD_LIMIT_EXCEEDED);
 		// }
@@ -269,7 +269,7 @@ public class CardService {
 
 	@Transactional(readOnly = true)
 	public ReceivedCardListResponse findReceivedCards(User user, ReceivedCardsRequest request) {
-		List<Card> cards;
+		List<ReceivedCard> receivedCards;
 
 		if (request != null && request.folderId() != null) {
 			Folder folder = verifyFolderAccess(user, request.folderId());
@@ -281,21 +281,17 @@ public class CardService {
 				return new ReceivedCardListResponse(new ArrayList<>());
 			}
 
-			cards = receivedCardFolders.stream()
+			receivedCards = receivedCardFolders.stream()
 				.map(ReceivedCardFolder::getReceivedCard)
 				.filter(rc -> rc.getDeletedAt() == null)
-				.map(ReceivedCard::getCard)
 				.collect(Collectors.toList());
 		} else {
-			cards = receivedCardRepository.findAllByUserIdAndDeletedAtIsNullOrderByIdDesc(user.getId())
-				.stream()
-				.map(ReceivedCard::getCard)
-				.collect(Collectors.toList());
+			receivedCards = receivedCardRepository.findAllByUserIdAndDeletedAtIsNullOrderByIdDesc(user.getId());
 		}
 
-		cards.forEach(this::updatePresignedImagePath);
+		receivedCards.forEach(rc -> updatePresignedImagePath(rc.getCard()));
 
-		return cardMapper.toCardListResponse(cards);
+		return cardMapper.toReceivedCardListResponse(receivedCards);
 	}
 
 	@Transactional
