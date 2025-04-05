@@ -3,7 +3,6 @@ package com.evenly.took.feature.card.client.crawler;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -63,7 +62,12 @@ public class BehanceLinkCrawler implements LinkCrawler {
 		String selector = "meta[property='og:%s']".formatted(tag);
 		try {
 			return driver.findElement(By.cssSelector(selector)).getAttribute("content");
-		} catch (NoSuchElementException ex) {
+		} catch (Exception ex) {
+			if (tag.equals("title")) {
+				return "저의 대표프로젝트를 소개할게요";
+			} else if (tag.equals("description")) {
+				return "썸네일을 눌러서 상세하게 살펴보세요";
+			}
 			return EMPTY_STRING;
 		}
 	}

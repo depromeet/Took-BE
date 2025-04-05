@@ -38,8 +38,8 @@ public class VelogMainLinkCrawler implements LinkCrawler {
 	}
 
 	private String extractTitle(Document document) {
-		Element head = document.head();
-		return head.getElementsByTag("title").text();
+		String title = document.head().getElementsByTag("title").text();
+		return title.isEmpty() ? "저의 대표프로젝트를 소개할게요" : title;
 	}
 
 	private String extractImage(Document document) {
@@ -55,7 +55,7 @@ public class VelogMainLinkCrawler implements LinkCrawler {
 		Element description = document.selectFirst(
 			"body > div > div:nth-child(2) > div:nth-child(2) > main > div > div:nth-child(1) > div:nth-child(1) > div > div > div:nth-child(2)");
 		if (description == null) {
-			return EMPTY_STRING;
+			return "썸네일을 눌러서 상세하게 살펴보세요";
 		}
 		return description.text();
 	}
