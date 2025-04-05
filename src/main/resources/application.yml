@@ -88,6 +88,7 @@ aws:
   s3:
     bucket: ${BUCKET_NAME}
     env: ${BUCKET_ENV}
+    base-image: ${BASE_KEY}
 
 fcm:
   key-path: ${FCM_KEY_PATH} # TODO prod 환경 분리
