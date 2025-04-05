@@ -85,7 +85,7 @@ public class S3ServiceImpl implements S3Service {
 		String fileName = createFileName(file.getOriginalFilename());
 		String key = awsProperties.s3().env() + path + fileName;
 
-		if (fileName.contains("default")) {
+		if (fileName.contains("default") || file.isEmpty()) {
 			key = "base_image.png";
 		}
 
