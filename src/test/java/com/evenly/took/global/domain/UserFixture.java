@@ -1,8 +1,12 @@
 package com.evenly.took.global.domain;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.evenly.took.feature.auth.domain.OAuthIdentifier;
+import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.user.dao.UserRepository;
 import com.evenly.took.feature.user.domain.User;
 
@@ -19,6 +23,10 @@ public class UserFixture extends UserBase {
 
 	@Override
 	public User create() {
+		this.oauthIdentifier = OAuthIdentifier.builder()
+			.oauthId(UUID.randomUUID().toString())
+			.oauthType(OAuthType.GOOGLE)
+			.build();
 		User user = User.builder()
 			.name(name)
 			.email(email)

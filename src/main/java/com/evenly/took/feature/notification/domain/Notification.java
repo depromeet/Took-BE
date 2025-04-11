@@ -1,9 +1,15 @@
 package com.evenly.took.feature.notification.domain;
 
+import java.time.LocalDateTime;
+
+import com.evenly.took.feature.card.domain.ReceivedCard;
 import com.evenly.took.feature.common.model.BaseTimeEntity;
+import com.evenly.took.feature.user.domain.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,11 +33,29 @@ public class Notification extends BaseTimeEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_device")
-	private UserDevice userDevice;
+	@JoinColumn(name = "user_id")
+	private User user; // TODO receivedCard.user와 중복 고려
 
-	@Column(name = "content", nullable = false)
-	private String content;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "received_card_id")
+	private ReceivedCard receivedCard;
 
-	// TODO 기획 확정 후 필드 추가 예정
+	@Column(name = "type", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private NotificationType type;
+
+	@Column(name = "will_send_at", nullable = false)
+	private LocalDateTime willSendAt;
+
+	@Column(name = "send_at")
+	private LocalDateTime sendAt;
+
+	@Builder
+	public Notification(User user, ReceivedCard receivedCard, NotificationType type, LocalDateTime willSendAt) {
+		this.user = user;
+		this.receivedCard = receivedCard;
+		this.type = type;
+		this.willSendAt = willSendAt;
+		this.sendAt = null;
+	}
 }
