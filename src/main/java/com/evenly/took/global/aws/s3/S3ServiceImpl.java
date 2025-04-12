@@ -86,7 +86,7 @@ public class S3ServiceImpl implements S3Service {
 		String key = awsProperties.s3().env() + path + fileName;
 
 		if (fileName.contains("default") || file.isEmpty()) {
-			key = awsProperties.s3().baseImage();
+			key = null;
 		}
 
 		String bucket = awsProperties.s3().bucket();
