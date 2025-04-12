@@ -39,6 +39,7 @@ import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.auth.meta.PublicApi;
+import com.evenly.took.global.monitoring.slack.SlackErrorAlert;
 import com.evenly.took.global.response.SuccessResponse;
 
 import jakarta.validation.ConstraintViolation;
@@ -50,6 +51,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@SlackErrorAlert
 @RestController
 @RequiredArgsConstructor
 public class CardController implements CardApi {
