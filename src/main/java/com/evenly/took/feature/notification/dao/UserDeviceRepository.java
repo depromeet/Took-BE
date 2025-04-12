@@ -10,4 +10,6 @@ import com.evenly.took.feature.user.domain.User;
 public interface UserDeviceRepository extends JpaRepository<UserDevice, Long> {
 
 	List<UserDevice> findByUser(User user);
+
+	boolean existsByUserAndFcmToken(User user, String fcmToken);
 }

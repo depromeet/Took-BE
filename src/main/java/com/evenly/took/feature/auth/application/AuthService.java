@@ -1,19 +1,23 @@
 package com.evenly.took.feature.auth.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.evenly.took.feature.auth.client.AuthCodeRequestUrlProviderComposite;
 import com.evenly.took.feature.auth.client.AuthContext;
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.dto.TokenDto;
+import com.evenly.took.feature.auth.dto.request.LoginRequest;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.auth.dto.response.OAuthUrlResponse;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
+import com.evenly.took.feature.user.dao.UserDeviceRepository;
 import com.evenly.took.feature.user.dao.UserRepository;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.feature.user.domain.UserDevice;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +28,7 @@ public class AuthService {
 	private final AuthCodeRequestUrlProviderComposite authCodeComposite;
 	private final UserClientComposite userClientComposite;
 	private final UserRepository userRepository;
+	private final UserDeviceRepository userDeviceRepository;
 	private final TokenProvider tokenProvider;
 	private final WithdrawService withdrawService;
 
@@ -32,21 +37,40 @@ public class AuthService {
 		return new OAuthUrlResponse(url);
 	}
 
-	public AuthResponse loginAndGenerateToken(OAuthType oauthType, String authCode) {
+	@Transactional
+	public AuthResponse loginAndGenerateToken(OAuthType oauthType, String authCode, LoginRequest request) {
 		User user = userClientComposite.fetch(oauthType, authCode);
 		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
 			.orElseGet(() -> userRepository.save(user));
 		TokenDto tokens = tokenProvider.provideTokens(savedUser);
-		return new AuthResponse(tokens, savedUser);
+		if (request == null) {
+			return new AuthResponse(tokens, savedUser, false);
+		}
+		String fcmToken = request.fcmToken();
+		boolean isFirstLogin = !userDeviceRepository.existsByUserAndFcmToken(savedUser, fcmToken);
+		if (isFirstLogin) {
+			UserDevice userDevice = new UserDevice(savedUser, fcmToken);
+			userDeviceRepository.save(userDevice);
+		}
+		return new AuthResponse(tokens, savedUser, isFirstLogin);
 	}
 
-	public AuthResponse loginAndGenerateToken(OAuthType oauthType, AuthContext context) {
+	@Transactional
+	public AuthResponse loginAndGenerateToken(OAuthType oauthType, AuthContext context, LoginRequest request) {
 		User user = userClientComposite.fetch(oauthType, context);
 		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
 			.orElseGet(() -> userRepository.save(user));
-		// TODO UserDevice (token, user) 필드로 조회한 게 없으면 추가하거나 주인 변경 (멀티디바이스 & 한 기기 당 여러 사용자 상황 고려)
 		TokenDto tokens = tokenProvider.provideTokens(savedUser);
-		return new AuthResponse(tokens, savedUser);
+		if (request == null) {
+			return new AuthResponse(tokens, savedUser, false);
+		}
+		String fcmToken = request.fcmToken();
+		boolean isFirstLogin = !userDeviceRepository.existsByUserAndFcmToken(savedUser, fcmToken);
+		if (isFirstLogin) {
+			UserDevice userDevice = new UserDevice(savedUser, fcmToken);
+			userDeviceRepository.save(userDevice);
+		}
+		return new AuthResponse(tokens, savedUser, isFirstLogin);
 	}
 
 	public TokenResponse refreshToken(RefreshTokenRequest request) {

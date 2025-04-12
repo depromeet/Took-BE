@@ -1,6 +1,7 @@
 package com.evenly.took.feature.auth.api;
 
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.auth.dto.request.LoginRequest;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
@@ -46,7 +47,8 @@ public interface AuthApi {
 		@Parameter(description = "소셜 서버로부터 전달받은 인가 코드", required = true)
 		String code,
 		@Parameter(description = "애플 최초 가입 시, 서버로부터 전달받는 사용자 이름", required = false)
-		String name
+		String name,
+		LoginRequest request
 	);
 
 	@SecurityRequirements
