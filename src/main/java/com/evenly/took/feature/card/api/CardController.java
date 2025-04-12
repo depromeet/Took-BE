@@ -191,4 +191,13 @@ public class CardController implements CardApi {
 		cardService.updateReceivedCard(user, request);
 		return SuccessResponse.ok("명함 업데이트 성공");
 	}
+
+	@PostMapping("/api/card/{id}/primary")
+	public SuccessResponse<Void> setPrimaryCard(
+		@LoginUser User user,
+		@PathVariable("id") Long cardId
+	) {
+		cardService.setPrimaryCard(user.getId(), cardId);
+		return SuccessResponse.ok("대표 명함 설정 성공");
+	}
 }

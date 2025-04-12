@@ -1,10 +1,11 @@
 package com.evenly.took.feature.card.api;
 
-import static io.restassured.RestAssured.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.evenly.took.feature.card.application.LinkExtractor;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
+import com.evenly.took.feature.card.dao.CardRepository;
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Folder;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
@@ -56,6 +58,9 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 	@Autowired
 	S3Service s3Service;
+
+	@Autowired
+	CardRepository cardRepository;
 
 	@Nested
 	class 내_명함_목록_조회 {
@@ -1222,6 +1227,177 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			// then
 			Map<String, Object> responseMap = response.as(Map.class);
 			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
+		}
+	}
+
+	@Nested
+	class 대표_명함_시나리오 {
+
+		@Test
+		void 최초_명함은_자동으로_대표로_지정된다() throws IOException {
+			// given
+			MockMultipartFile profileImage = new MockMultipartFile(
+				"profileImage",
+				"first.jpg",
+				"image/jpeg",
+				"fake-image".getBytes()
+			);
+
+			// when
+			given()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType("multipart/form-data")
+				.multiPart("profileImage", profileImage.getOriginalFilename(), profileImage.getBytes(),
+					profileImage.getContentType())
+				.multiPart("nickname", "윤장원")
+				.multiPart("detailJobId", "1")
+				.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
+				.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
+				.multiPart("organization", "ABC 회사")
+				.multiPart("sns", "[{\"type\":\"LINKEDIN\",\"link\":\"https://linkedin.com/in/username\"}]")
+				.multiPart("region", "서울 강남구")
+				.multiPart("hobby", "등산, 독서")
+				.multiPart("news", "최근 블로그 포스팅 시작했습니다")
+				.multiPart("content",
+					"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
+				.multiPart("project",
+					"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
+				.multiPart("previewInfoType", "SNS")
+				.when().post("/api/card")
+				.then().statusCode(201);
+
+			// then
+			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(mockUser.getId());
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).isPrimary()).isTrue();
+		}
+
+		@Test
+		void 기존_명함이_있는_상태에서_생성된_명함은_대표가_아니다() throws IOException {
+			// given
+			cardFixture.creator().user(mockUser).isPrimary(true).create();
+
+			MockMultipartFile profileImage = new MockMultipartFile(
+				"profileImage",
+				"second.jpg",
+				"image/jpeg",
+				"fake-image".getBytes()
+			);
+
+			// when
+			given()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType("multipart/form-data")
+				.multiPart("previewInfoType", "SNS")
+				.multiPart("profileImage", profileImage.getOriginalFilename(), profileImage.getBytes(),
+					profileImage.getContentType())
+				.multiPart("nickname", "윤장원2")
+				.multiPart("detailJobId", "1")
+				.multiPart("interestDomain", "[\"웹\"]")
+				.multiPart("summary", "두 번째 명함")
+				.when().post("/api/card")
+				.then().statusCode(201);
+
+			// then
+			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(mockUser.getId());
+			assertThat(cards).hasSize(2);
+			long primaryCount = cards.stream().filter(Card::isPrimary).count();
+			assertThat(primaryCount).isEqualTo(1);
+			assertThat(
+				cards.stream().anyMatch(card -> !card.isPrimary())).isTrue();
+		}
+
+		@Test
+		void 대표_명함을_수동으로_설정하면_기존_대표가_해제된다() {
+			// given
+			Card card1 = cardFixture.creator().user(mockUser).nickname("기존대표").isPrimary(true).create();
+			Card card2 = cardFixture.creator().user(mockUser).nickname("신규후보").create();
+
+			// when
+			given()
+				.header("Authorization", authToken)
+				.contentType(ContentType.JSON)
+				.when()
+				.post("/api/card/{cardId}/primary", card2.getId())
+				.then()
+				.statusCode(HttpStatus.OK.value());
+
+			// then
+			Card updatedCard1 = cardRepository.findById(card1.getId()).orElseThrow();
+			Card updatedCard2 = cardRepository.findById(card2.getId()).orElseThrow();
+			assertThat(updatedCard1.isPrimary()).isFalse();
+			assertThat(updatedCard2.isPrimary()).isTrue();
+		}
+
+		@Test
+		void 대표_명함_삭제시_남은_한_명이_대표로_승격된다() {
+			// given
+			Card card1 = cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
+			Card card2 = cardFixture.creator().user(mockUser).nickname("후보").create();
+
+			// when
+			given()
+				.header("Authorization", authToken)
+				.contentType(ContentType.JSON)
+				.when()
+				.delete("/api/card/{cardId}", card1.getId())
+				.then()
+				.statusCode(HttpStatus.NO_CONTENT.value());
+
+			// then
+			Card updatedCard2 = cardRepository.findById(card2.getId()).orElseThrow();
+			Card deletedCard1 = cardRepository.findById(card1.getId()).orElseThrow();
+			assertThat(deletedCard1.getDeletedAt()).isNotNull();
+			assertThat(updatedCard2.isPrimary()).isTrue();
+		}
+
+		@Test
+		void 대표_명함_삭제시_여러_명함_중_임의_하나가_대표로_선정된다() {
+			// given
+			Card card1 = cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
+			Card card2 = cardFixture.creator().user(mockUser).nickname("후보1").create();
+			Card card3 = cardFixture.creator().user(mockUser).nickname("후보2").create();
+
+			// when
+			given()
+				.header("Authorization", authToken)
+				.contentType(ContentType.JSON)
+				.when()
+				.delete("/api/card/{cardId}", card1.getId())
+				.then()
+				.statusCode(HttpStatus.NO_CONTENT.value());
+
+			// then
+			Card updatedCard2 = cardRepository.findById(card2.getId()).orElseThrow();
+			Card updatedCard3 = cardRepository.findById(card3.getId()).orElseThrow();
+
+			long primaryCount = 0;
+			if (updatedCard2.isPrimary())
+				primaryCount++;
+			if (updatedCard3.isPrimary())
+				primaryCount++;
+
+			assertThat(primaryCount).isEqualTo(1);
+		}
+
+		@Test
+		void 모든_명함을_삭제하면_대표_명함은_존재하지_않는다() {
+			// given
+			Card card1 = cardFixture.creator().user(mockUser).create();
+			Card card2 = cardFixture.creator().user(mockUser).create();
+
+			// when
+			given().header("Authorization", authToken)
+				.when().delete("/api/card/{cardId}", card1.getId())
+				.then().statusCode(HttpStatus.NO_CONTENT.value());
+
+			given().header("Authorization", authToken)
+				.when().delete("/api/card/{cardId}", card2.getId())
+				.then().statusCode(HttpStatus.NO_CONTENT.value());
+
+			// then
+			List<Card> remaining = cardRepository.findAllByUserIdAndDeletedAtIsNull(mockUser.getId());
+			assertThat(remaining).isEmpty();
 		}
 	}
 }
