@@ -1,6 +1,10 @@
-package com.evenly.took.feature.notification.service;
+package com.evenly.took.feature.notification.application;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +20,7 @@ class NotificationServiceTest extends ServiceTest {
 	NotificationService notificationService;
 
 	@Test
-	void 알림을_예약한다() {
+	void 알림을_전송한다() {
 		// given
 		User me = userFixture.create();
 		User cardOwner = userFixture.create();
@@ -29,7 +33,8 @@ class NotificationServiceTest extends ServiceTest {
 			.create();
 
 		// when
-		notificationService.reserveNotification(receivedCard);
+		LocalDateTime sendAt = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 0));
+		notificationService.sendNotification(sendAt);
 
 		// then
 		assertThat(notificationFixture.count()).isEqualTo(1);

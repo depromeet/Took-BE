@@ -17,29 +17,19 @@ public class CardInterest {
 			entity.getInterestDomain());
 	}
 
-	public int countInterest(CardInterest other) {
-		int count = 0;
-		if (hasSameInterestDomain(other)) {
-			count++;
-		}
-		if (hasSameDetailJob(other)) {
-			count++;
-		}
-		if (hasSameOrganization(other)) {
-			count++;
-		}
-		return count;
+	public boolean isInteresting(CardInterest other) {
+		return hasSameInterestDomain(other) || hasSameDetailJob(other) || hasSameOrganization(other);
 	}
 
-	public boolean hasSameInterestDomain(CardInterest other) {
+	private boolean hasSameInterestDomain(CardInterest other) {
 		return interestDomain.stream().anyMatch(other.interestDomain::contains);
 	}
 
-	public boolean hasSameDetailJob(CardInterest other) {
+	private boolean hasSameDetailJob(CardInterest other) {
 		return detailJob.equals(other.detailJob);
 	}
 
-	public boolean hasSameOrganization(CardInterest other) {
+	private boolean hasSameOrganization(CardInterest other) {
 		return organization.equals(other.organization);
 	}
 }

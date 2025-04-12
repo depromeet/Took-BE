@@ -13,7 +13,7 @@ import com.evenly.took.feature.notification.exception.AsyncErrorHandler;
 
 @EnableAsync
 @Configuration
-public class NotificationAsyncConfig implements AsyncConfigurer {
+public class AsyncConfig implements AsyncConfigurer {
 
 	@Override
 	public Executor getAsyncExecutor() { // TODO 데이터 조정

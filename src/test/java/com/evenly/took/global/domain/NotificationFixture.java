@@ -22,14 +22,9 @@ public class NotificationFixture extends NotificationBase {
 		if (user == null) {
 			throw new IllegalStateException("user를 함께 입력해주세요.");
 		}
-		if (receivedCard == null) {
-			throw new IllegalStateException("receivedCard를 함께 입력해주세요.");
-		}
 		Notification notification = Notification.builder()
 			.user(user)
-			.receivedCard(receivedCard)
 			.type(type)
-			.willSendAt(willSendAt)
 			.build();
 		return notificationRepository.save(notification);
 	}

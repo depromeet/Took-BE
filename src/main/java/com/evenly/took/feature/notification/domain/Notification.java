@@ -2,7 +2,6 @@ package com.evenly.took.feature.notification.domain;
 
 import java.time.LocalDateTime;
 
-import com.evenly.took.feature.card.domain.ReceivedCard;
 import com.evenly.took.feature.common.model.BaseTimeEntity;
 import com.evenly.took.feature.user.domain.User;
 
@@ -34,28 +33,19 @@ public class Notification extends BaseTimeEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
-	private User user; // TODO receivedCard.user와 중복 고려
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "received_card_id")
-	private ReceivedCard receivedCard;
+	private User user;
 
 	@Column(name = "type", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private NotificationType type;
 
-	@Column(name = "will_send_at", nullable = false)
-	private LocalDateTime willSendAt;
-
 	@Column(name = "send_at")
 	private LocalDateTime sendAt;
 
 	@Builder
-	public Notification(User user, ReceivedCard receivedCard, NotificationType type, LocalDateTime willSendAt) {
+	public Notification(User user, NotificationType type, LocalDateTime sendAt) {
 		this.user = user;
-		this.receivedCard = receivedCard;
 		this.type = type;
-		this.willSendAt = willSendAt;
-		this.sendAt = null;
+		this.sendAt = sendAt;
 	}
 }
