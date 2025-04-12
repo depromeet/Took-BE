@@ -92,7 +92,7 @@ public class Card extends BaseTimeEntity {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
-	@Column(name = "isPrimary")
+	@Column(name = "is_primary")
 	private boolean isPrimary;
 
 	@Builder

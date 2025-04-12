@@ -80,7 +80,7 @@ public class CardService {
 
 	@Transactional(readOnly = true)
 	public MyCardListResponse findUserCardList(Long userId) {
-		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNullOrderByIsPrimaryDesc(userId);
 
 		cards.forEach(this::updatePresignedImagePath);
 
