@@ -1,11 +1,11 @@
-package com.evenly.took.feature.notification.dao;
+package com.evenly.took.feature.user.dao;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.evenly.took.feature.notification.domain.UserDevice;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.feature.user.domain.UserDevice;
 
 public interface UserDeviceRepository extends JpaRepository<UserDevice, Long> {
 

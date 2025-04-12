@@ -5,15 +5,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.evenly.took.feature.notification.dao.UserDeviceRepository;
 import com.evenly.took.feature.notification.domain.FcmData;
 import com.evenly.took.feature.notification.domain.FcmMessageCreator;
 import com.evenly.took.feature.notification.domain.FcmMessageSender;
 import com.evenly.took.feature.notification.domain.FcmNotification;
 import com.evenly.took.feature.notification.domain.FcmToken;
 import com.evenly.took.feature.notification.domain.NotificationType;
-import com.evenly.took.feature.notification.domain.UserDevice;
+import com.evenly.took.feature.user.dao.UserDeviceRepository;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.feature.user.domain.UserDevice;
 import com.google.firebase.messaging.Message;
 
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,7 @@
 package com.evenly.took.feature.notification.domain;
 
+import com.evenly.took.feature.user.domain.UserDevice;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

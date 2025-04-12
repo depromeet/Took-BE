@@ -1,13 +1,13 @@
-package com.evenly.took.feature.notification.domain;
+package com.evenly.took.feature.user.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.evenly.took.feature.common.model.BaseTimeEntity;
-import com.evenly.took.feature.user.domain.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,6 +55,7 @@ public class UserDevice extends BaseTimeEntity {
 		this.user = user;
 		this.fcmToken = fcmToken;
 		this.allowPushNotification = false;
+		this.allowPushContent = new ArrayList<>();
 		this.deletedAt = null;
 	}
 }
