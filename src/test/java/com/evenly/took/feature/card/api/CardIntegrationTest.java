@@ -39,6 +39,7 @@ import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
 import com.evenly.took.feature.card.dto.response.CardResponse;
+import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.card.exception.FolderErrorCode;
@@ -1407,53 +1408,55 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 대표_명함이_항상_가장_먼저_조회된다_중간() {
 			// given
-			Card card1 = cardFixture.creator().user(mockUser).nickname("후보1").isPrimary(false).create();
-			Card card2 = cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
-			Card card3 = cardFixture.creator().user(mockUser).nickname("후보2").isPrimary(false).create();
+			cardFixture.creator().user(mockUser).nickname("후보1").isPrimary(false).create();
+			cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
+			cardFixture.creator().user(mockUser).nickname("후보2").isPrimary(false).create();
 
 			// when
-			ExtractableResponse<Response> response = given()
+			MyCardListResponse response = given()
 				.contentType(ContentType.JSON)
 				.header("Authorization", authToken)
 				.when()
 				.get("/api/card/my")
 				.then()
 				.statusCode(HttpStatus.OK.value())
-				.extract();
+				.extract()
+				.jsonPath()
+				.getObject("data", MyCardListResponse.class);
 
 			// then
-			Map<String, Object> responseMap = response.as(Map.class);
-			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
-			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
-
-			assertThat(cards).hasSize(3);
-			assertThat(cards.get(0).get("nickname")).isEqualTo("대표");
+			assertThat(response.cards()).hasSize(3);
+			assertThat(response.cards().get(0).nickname()).isEqualTo("대표");
+			assertThat(response.cards().get(0).isPrimary()).isEqualTo(true);
+			assertThat(response.cards().get(1).isPrimary()).isEqualTo(false);
+			assertThat(response.cards().get(2).isPrimary()).isEqualTo(false);
 		}
 
 		@Test
 		void 대표_명함이_항상_가장_먼저_조회된다_끝() {
 			// given
-			Card card1 = cardFixture.creator().user(mockUser).nickname("후보1").isPrimary(false).create();
-			Card card2 = cardFixture.creator().user(mockUser).nickname("후보2").isPrimary(false).create();
-			Card card3 = cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
+			cardFixture.creator().user(mockUser).nickname("후보1").isPrimary(false).create();
+			cardFixture.creator().user(mockUser).nickname("후보2").isPrimary(false).create();
+			cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
 
 			// when
-			ExtractableResponse<Response> response = given()
+			MyCardListResponse response = given()
 				.contentType(ContentType.JSON)
 				.header("Authorization", authToken)
 				.when()
 				.get("/api/card/my")
 				.then()
 				.statusCode(HttpStatus.OK.value())
-				.extract();
+				.extract()
+				.jsonPath()
+				.getObject("data", MyCardListResponse.class);
 
 			// then
-			Map<String, Object> responseMap = response.as(Map.class);
-			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
-			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
-
-			assertThat(cards).hasSize(3);
-			assertThat(cards.get(0).get("nickname")).isEqualTo("대표");
+			assertThat(response.cards()).hasSize(3);
+			assertThat(response.cards().get(0).nickname()).isEqualTo("대표");
+			assertThat(response.cards().get(0).isPrimary()).isEqualTo(true);
+			assertThat(response.cards().get(1).isPrimary()).isEqualTo(false);
+			assertThat(response.cards().get(2).isPrimary()).isEqualTo(false);
 		}
 	}
 }
