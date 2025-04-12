@@ -89,7 +89,8 @@ public class S3TestConfig {
 	public AwsS3Properties testAwsS3Properties() {
 		return new AwsS3Properties(
 			TEST_BUCKET,
-			TEST_ENV
+			TEST_ENV,
+			""
 		);
 	}
 
