@@ -38,6 +38,9 @@ public record CardResponse(
 	PreviewInfoResponse previewInfo,
 
 	@Schema(description = "프로필 사진 url", example = "https://s3/images/profile/user1.jpg")
-	String imagePath
+	String imagePath,
+
+	@Schema(description = "대표 명함인지 확인", example = "true")
+	boolean isPrimary
 ) {
 }

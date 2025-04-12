@@ -191,11 +191,12 @@ public class CardService {
 			.isPrimary(isCreatingFirstCard(currentCardCount))
 			.build();
 
+		System.out.println(newCard.isPrimary());
 		cardRepository.save(newCard);
 	}
 
 	private boolean isCreatingFirstCard(Long currentCardCount) {
-		return cardRepository.countByUserIdAndDeletedAtIsNull(currentCardCount) == 0;
+		return currentCardCount == 0;
 	}
 
 	@Transactional
