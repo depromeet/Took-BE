@@ -9,3 +9,7 @@ spring:
         show_sql: false
         use_sql_comments: false
         default_schema: production
+
+webhook:
+  slack:
+    url: ${SLACK_WEBHOOK_URL}
