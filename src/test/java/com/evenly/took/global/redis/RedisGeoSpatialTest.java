@@ -28,8 +28,6 @@ class RedisGeoSpatialTest {
 	@Autowired
 	private RedisGeoSpatialService redisGeoSpatialService;
 
-	private final String TEST_SESSION_ID = "test-precision-session";
-
 	// 37.5065, 127.0548 - 한 건물 좌표
 	private final double BASE_LONGITUDE = 127.0548;
 	private final double BASE_LATITUDE = 37.5065;
@@ -60,11 +58,11 @@ class RedisGeoSpatialTest {
 
 	private void cleanUpTestData() {
 		// 테스트 데이터 삭제
-		redisGeoSpatialService.removeUserLocation(CENTER_USER, TEST_SESSION_ID);
-		redisGeoSpatialService.removeUserLocation(USER_10M_AWAY, TEST_SESSION_ID);
-		redisGeoSpatialService.removeUserLocation(USER_1M_AWAY, TEST_SESSION_ID);
-		redisGeoSpatialService.removeUserLocation(USER_10CM_AWAY, TEST_SESSION_ID);
-		redisGeoSpatialService.removeUserLocation(USER_EXACT_SAME, TEST_SESSION_ID);
+		redisGeoSpatialService.removeUserLocation(CENTER_USER);
+		redisGeoSpatialService.removeUserLocation(USER_10M_AWAY);
+		redisGeoSpatialService.removeUserLocation(USER_1M_AWAY);
+		redisGeoSpatialService.removeUserLocation(USER_10CM_AWAY);
+		redisGeoSpatialService.removeUserLocation(USER_EXACT_SAME);
 	}
 
 	@Nested
@@ -75,12 +73,12 @@ class RedisGeoSpatialTest {
 		void 기준_위치_사용자_등록() {
 			// when
 			boolean result = redisGeoSpatialService.registerUserLocation(
-				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE, TEST_SESSION_ID);
+				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE);
 
 			// then
 			assertThat(result).isTrue();
 
-			Point position = redisGeoSpatialService.getUserPosition(CENTER_USER, TEST_SESSION_ID);
+			Point position = redisGeoSpatialService.getUserPosition(CENTER_USER);
 			assertThat(position).isNotNull();
 			assertThat(position.getX()).isCloseTo(BASE_LONGITUDE, within(0.0001));
 			assertThat(position.getY()).isCloseTo(BASE_LATITUDE, within(0.0001));
@@ -90,25 +88,25 @@ class RedisGeoSpatialTest {
 		void 여러_위치의_사용자_등록() {
 			// when
 			boolean centerResult = redisGeoSpatialService.registerUserLocation(
-				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE, TEST_SESSION_ID);
+				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE);
 
 			// 10m 떨어진 위치 (북동쪽)
 			double lon10m = BASE_LONGITUDE + (10 * METER_TO_LONGITUDE_DEGREE);
 			double lat10m = BASE_LATITUDE + (10 * METER_TO_LATITUDE_DEGREE);
 			boolean result10m = redisGeoSpatialService.registerUserLocation(
-				USER_10M_AWAY, lon10m, lat10m, TEST_SESSION_ID);
+				USER_10M_AWAY, lon10m, lat10m);
 
 			// 1m 떨어진 위치 (동쪽)
 			double lon1m = BASE_LONGITUDE + (1 * METER_TO_LONGITUDE_DEGREE);
 			double lat1m = BASE_LATITUDE;
 			boolean result1m = redisGeoSpatialService.registerUserLocation(
-				USER_1M_AWAY, lon1m, lat1m, TEST_SESSION_ID);
+				USER_1M_AWAY, lon1m, lat1m);
 
 			// 10cm 떨어진 위치 (남쪽)
 			double lon10cm = BASE_LONGITUDE;
 			double lat10cm = BASE_LATITUDE - (0.1 * METER_TO_LATITUDE_DEGREE);
 			boolean result10cm = redisGeoSpatialService.registerUserLocation(
-				USER_10CM_AWAY, lon10cm, lat10cm, TEST_SESSION_ID);
+				USER_10CM_AWAY, lon10cm, lat10cm);
 
 			// then
 			assertThat(centerResult).isTrue();
@@ -121,25 +119,24 @@ class RedisGeoSpatialTest {
 		void 정확히_같은_위치에_여러_사용자_등록() {
 			// when
 			boolean centerResult = redisGeoSpatialService.registerUserLocation(
-				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE, TEST_SESSION_ID);
+				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE);
 
 			boolean sameResult = redisGeoSpatialService.registerUserLocation(
-				USER_EXACT_SAME, BASE_LONGITUDE, BASE_LATITUDE, TEST_SESSION_ID);
+				USER_EXACT_SAME, BASE_LONGITUDE, BASE_LATITUDE);
 
 			// then
 			assertThat(centerResult).isTrue();
 			assertThat(sameResult).isTrue();
 
 			// 두 사용자의 위치가 정확히 같은지 확인
-			Point position1 = redisGeoSpatialService.getUserPosition(CENTER_USER, TEST_SESSION_ID);
-			Point position2 = redisGeoSpatialService.getUserPosition(USER_EXACT_SAME, TEST_SESSION_ID);
+			Point position1 = redisGeoSpatialService.getUserPosition(CENTER_USER);
+			Point position2 = redisGeoSpatialService.getUserPosition(USER_EXACT_SAME);
 
 			assertThat(position1.getX()).isCloseTo(position2.getX(), within(0.0001));
 			assertThat(position1.getY()).isCloseTo(position2.getY(), within(0.0001));
 
 			// 두 사용자 간 거리 확인 (0에 매우 가까워야 함)
-			double distance = redisGeoSpatialService.calculateDistance(CENTER_USER, USER_EXACT_SAME,
-				TEST_SESSION_ID);
+			double distance = redisGeoSpatialService.calculateDistance(CENTER_USER, USER_EXACT_SAME);
 			assertThat(distance).isLessThan(0.1);  // 10cm 미만(오차범위 감안)
 		}
 	}
@@ -151,34 +148,34 @@ class RedisGeoSpatialTest {
 		void setUpLocationData() {
 			// 기준 위치 사용자
 			redisGeoSpatialService.registerUserLocation(
-				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE, TEST_SESSION_ID);
+				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE);
 
 			// 10m 떨어진 위치 (북동쪽)
 			double lon10m = BASE_LONGITUDE + (10 * METER_TO_LONGITUDE_DEGREE);
 			double lat10m = BASE_LATITUDE + (10 * METER_TO_LATITUDE_DEGREE);
 			redisGeoSpatialService.registerUserLocation(
-				USER_10M_AWAY, lon10m, lat10m, TEST_SESSION_ID);
+				USER_10M_AWAY, lon10m, lat10m);
 
 			// 1m 떨어진 위치 (동쪽)
 			double lon1m = BASE_LONGITUDE + (1 * METER_TO_LONGITUDE_DEGREE);
 			double lat1m = BASE_LATITUDE;
 			redisGeoSpatialService.registerUserLocation(
-				USER_1M_AWAY, lon1m, lat1m, TEST_SESSION_ID);
+				USER_1M_AWAY, lon1m, lat1m);
 
 			// 10cm 떨어진 위치 (남쪽)
 			double lon10cm = BASE_LONGITUDE;
 			double lat10cm = BASE_LATITUDE - (0.1 * METER_TO_LATITUDE_DEGREE);
 			redisGeoSpatialService.registerUserLocation(
-				USER_10CM_AWAY, lon10cm, lat10cm, TEST_SESSION_ID);
+				USER_10CM_AWAY, lon10cm, lat10cm);
 		}
 
 		@Test
 		void 사용자_위치_정확히_조회() {
 			// when
-			Point centerPosition = redisGeoSpatialService.getUserPosition(CENTER_USER, TEST_SESSION_ID);
-			Point position10m = redisGeoSpatialService.getUserPosition(USER_10M_AWAY, TEST_SESSION_ID);
-			Point position1m = redisGeoSpatialService.getUserPosition(USER_1M_AWAY, TEST_SESSION_ID);
-			Point position10cm = redisGeoSpatialService.getUserPosition(USER_10CM_AWAY, TEST_SESSION_ID);
+			Point centerPosition = redisGeoSpatialService.getUserPosition(CENTER_USER);
+			Point position10m = redisGeoSpatialService.getUserPosition(USER_10M_AWAY);
+			Point position1m = redisGeoSpatialService.getUserPosition(USER_1M_AWAY);
+			Point position10cm = redisGeoSpatialService.getUserPosition(USER_10CM_AWAY);
 
 			// then
 			assertThat(centerPosition).isNotNull();
@@ -205,12 +202,9 @@ class RedisGeoSpatialTest {
 		@Test
 		void 두_사용자_간_거리_계산() {
 			// when
-			double distanceTo10m = redisGeoSpatialService.calculateDistance(CENTER_USER, USER_10M_AWAY,
-				TEST_SESSION_ID);
-			double distanceTo1m = redisGeoSpatialService.calculateDistance(CENTER_USER, USER_1M_AWAY,
-				TEST_SESSION_ID);
-			double distanceTo10cm = redisGeoSpatialService.calculateDistance(CENTER_USER, USER_10CM_AWAY,
-				TEST_SESSION_ID);
+			double distanceTo10m = redisGeoSpatialService.calculateDistance(CENTER_USER, USER_10M_AWAY);
+			double distanceTo1m = redisGeoSpatialService.calculateDistance(CENTER_USER, USER_1M_AWAY);
+			double distanceTo10cm = redisGeoSpatialService.calculateDistance(CENTER_USER, USER_10CM_AWAY);
 
 			// then
 			assertThat(distanceTo10m).isBetween(8.0, 16.0);  // 약 10m 허용 오차 포함
@@ -226,32 +220,32 @@ class RedisGeoSpatialTest {
 		void setUpLocationData() {
 			// 기준 위치 사용자
 			redisGeoSpatialService.registerUserLocation(
-				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE, TEST_SESSION_ID);
+				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE);
 
 			// 10m 떨어진 위치 (북동쪽)
 			double lon10m = BASE_LONGITUDE + (10 * METER_TO_LONGITUDE_DEGREE);
 			double lat10m = BASE_LATITUDE + (10 * METER_TO_LATITUDE_DEGREE);
 			redisGeoSpatialService.registerUserLocation(
-				USER_10M_AWAY, lon10m, lat10m, TEST_SESSION_ID);
+				USER_10M_AWAY, lon10m, lat10m);
 
 			// 1m 떨어진 위치 (동쪽)
 			double lon1m = BASE_LONGITUDE + (1 * METER_TO_LONGITUDE_DEGREE);
 			double lat1m = BASE_LATITUDE;
 			redisGeoSpatialService.registerUserLocation(
-				USER_1M_AWAY, lon1m, lat1m, TEST_SESSION_ID);
+				USER_1M_AWAY, lon1m, lat1m);
 
 			// 10cm 떨어진 위치 (남쪽)
 			double lon10cm = BASE_LONGITUDE;
 			double lat10cm = BASE_LATITUDE - (0.1 * METER_TO_LATITUDE_DEGREE);
 			redisGeoSpatialService.registerUserLocation(
-				USER_10CM_AWAY, lon10cm, lat10cm, TEST_SESSION_ID);
+				USER_10CM_AWAY, lon10cm, lat10cm);
 		}
 
 		@Test
 		void 반경_15m_내_사용자_검색() {
 			// when
 			List<NearbyUserDto> nearbyUsers = redisGeoSpatialService.findNearbyUsers(
-				BASE_LONGITUDE, BASE_LATITUDE, 15.0, TEST_SESSION_ID);
+				BASE_LONGITUDE, BASE_LATITUDE, 15.0);
 
 			// then
 			assertThat(nearbyUsers).hasSize(4); // 모든 사용자가 15m 내에 있음
@@ -273,7 +267,7 @@ class RedisGeoSpatialTest {
 		void 반경_5m_내_사용자_검색() {
 			// when
 			List<NearbyUserDto> nearbyUsers = redisGeoSpatialService.findNearbyUsers(
-				BASE_LONGITUDE, BASE_LATITUDE, 5.0, TEST_SESSION_ID);
+				BASE_LONGITUDE, BASE_LATITUDE, 5.0);
 
 			// then
 			assertThat(nearbyUsers).hasSize(3);
@@ -286,7 +280,7 @@ class RedisGeoSpatialTest {
 		void 반경_50cm_내_사용자_검색() {
 			// when
 			List<NearbyUserDto> nearbyUsers = redisGeoSpatialService.findNearbyUsers(
-				BASE_LONGITUDE, BASE_LATITUDE, 0.5, TEST_SESSION_ID);
+				BASE_LONGITUDE, BASE_LATITUDE, 0.5);
 
 			// then
 			assertThat(nearbyUsers).hasSize(2); // 1m, 10m 떨어진 사용자는 제외
@@ -306,7 +300,7 @@ class RedisGeoSpatialTest {
 		void 반경_15cm_내_사용자_검색_오차범위의_한계_확인() {
 			// when
 			List<NearbyUserDto> nearbyUsers = redisGeoSpatialService.findNearbyUsers(
-				BASE_LONGITUDE, BASE_LATITUDE, 0.15, TEST_SESSION_ID);
+				BASE_LONGITUDE, BASE_LATITUDE, 0.15);
 
 			// then
 			assertThat(nearbyUsers).hasSize(1);
@@ -321,23 +315,23 @@ class RedisGeoSpatialTest {
 		@BeforeEach
 		void setUpPrecisionTestData() {
 			redisGeoSpatialService.registerUserLocation(
-				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE, TEST_SESSION_ID);
+				CENTER_USER, BASE_LONGITUDE, BASE_LATITUDE);
 
 			for (int distance = 1; distance <= 10; distance++) {
 				String userId = "user_" + distance + "m";
 				double longitude = BASE_LONGITUDE + (distance * METER_TO_LONGITUDE_DEGREE);
 				double latitude = BASE_LATITUDE;
-				redisGeoSpatialService.registerUserLocation(userId, longitude, latitude, TEST_SESSION_ID);
+				redisGeoSpatialService.registerUserLocation(userId, longitude, latitude);
 			}
 		}
 
 		@AfterEach
 		void cleanUpPrecisionTestData() {
-			redisGeoSpatialService.removeUserLocation(CENTER_USER, TEST_SESSION_ID);
+			redisGeoSpatialService.removeUserLocation(CENTER_USER);
 
 			for (int distance = 1; distance <= 10; distance++) {
 				String userId = "user_" + distance + "m";
-				redisGeoSpatialService.removeUserLocation(userId, TEST_SESSION_ID);
+				redisGeoSpatialService.removeUserLocation(userId);
 			}
 		}
 
@@ -347,7 +341,7 @@ class RedisGeoSpatialTest {
 				// given
 				String userId = "user_" + expectedDistance + "m";
 				double actualDistance = redisGeoSpatialService.calculateDistance(
-					CENTER_USER, userId, TEST_SESSION_ID);
+					CENTER_USER, userId);
 
 				// when
 				double lowerBound = expectedDistance * 0.7;
@@ -369,7 +363,7 @@ class RedisGeoSpatialTest {
 		void 반경_3m_검색_테스트() {
 			// when
 			List<NearbyUserDto> nearbyUsers = redisGeoSpatialService.findNearbyUsers(
-				BASE_LONGITUDE, BASE_LATITUDE, 3.0, TEST_SESSION_ID);
+				BASE_LONGITUDE, BASE_LATITUDE, 3.0);
 
 			// then
 			// 3m 이내 사용자들만 조회되어야 함 (center + 1m, 2m, 3m = 총 4명)
@@ -394,7 +388,7 @@ class RedisGeoSpatialTest {
 		void 반경_7m_검색_테스트() {
 			// when
 			List<NearbyUserDto> nearbyUsers = redisGeoSpatialService.findNearbyUsers(
-				BASE_LONGITUDE, BASE_LATITUDE, 7.0, TEST_SESSION_ID);
+				BASE_LONGITUDE, BASE_LATITUDE, 7.0);
 
 			// then
 			assertThat(nearbyUsers).hasSize(7);
@@ -422,7 +416,7 @@ class RedisGeoSpatialTest {
 		void 소수점_반경_검색_정확도_테스트() {
 			// 2.5m 반경 검색 - 이론상 center + 1m, 2m이 조회되고 3m는 경계에 있을 수 있음
 			List<NearbyUserDto> users2_5m = redisGeoSpatialService.findNearbyUsers(
-				BASE_LONGITUDE, BASE_LATITUDE, 2.5, TEST_SESSION_ID);
+				BASE_LONGITUDE, BASE_LATITUDE, 2.5);
 
 			// 최소 3명(center, 1m, 2m)은 포함되어야 함
 			assertThat(users2_5m).hasSizeGreaterThanOrEqualTo(3);
@@ -435,7 +429,7 @@ class RedisGeoSpatialTest {
 
 			// 5.5m 반경 검색 - 이론상 center + 1m ~ 5m이 조회되고 6m는 경계에 있을 수 있음
 			List<NearbyUserDto> users5_5m = redisGeoSpatialService.findNearbyUsers(
-				BASE_LONGITUDE, BASE_LATITUDE, 5.5, TEST_SESSION_ID);
+				BASE_LONGITUDE, BASE_LATITUDE, 5.5);
 
 			// 최소 6명(center, 1m ~ 5m)은 포함되어야 함
 			assertThat(users5_5m).hasSizeGreaterThanOrEqualTo(6);
