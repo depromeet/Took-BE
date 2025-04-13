@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record AllowNotificationResponse(
 
 	@Schema(description = "전체 알림 허용 여부")
-	boolean isAllowPushNotification,
+	boolean isAllowPush,
 
 	@Schema(description = "알림 허용 목록 (허용한 알림 목록만 반환)", example = "[\"흥미로운 명함 알림\", \"한 줄 메모 알림\", \"서비스 업데이트 알림\"]")
 	List<String> allowPushContent

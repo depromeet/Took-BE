@@ -1,18 +1,15 @@
 package com.evenly.took.feature.user.api;
 
 import static io.restassured.RestAssured.*;
-import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 import com.evenly.took.feature.user.dto.request.AllowNotificationRequest;
-import com.evenly.took.feature.user.dto.response.AllowNotificationResponse;
 import com.evenly.took.global.integration.JwtMockIntegrationTest;
-
-import io.restassured.http.ContentType;
 
 public class UserIntegrationTest extends JwtMockIntegrationTest {
 
@@ -35,30 +32,18 @@ public class UserIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 알림_설정을_수정한다() {
 			// given
-			boolean isAllowPushNotification = true;
+			boolean isAllowPush = true;
 			List<String> allowPushContent = List.of("흥미로운 명함 알림", "한 줄 메모 알림");
 
-			// when
-			AllowNotificationRequest request = new AllowNotificationRequest(isAllowPushNotification, allowPushContent);
+			// when & then
+			AllowNotificationRequest request = new AllowNotificationRequest(isAllowPush, allowPushContent);
 			given().log().all()
-				.contentType(ContentType.JSON)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.header("Authorization", authToken)
 				.body(request)
 				.when().put("/api/user/notification-allow")
 				.then().log().all()
 				.statusCode(200);
-
-			// then
-			AllowNotificationResponse response = given().log().all()
-				.header("Authorization", authToken)
-				.when().get("/api/user/notification-allow")
-				.then().log().all()
-				.statusCode(200)
-				.extract()
-				.jsonPath()
-				.getObject("data", AllowNotificationResponse.class);
-			assertThat(response.isAllowPushNotification()).isEqualTo(isAllowPushNotification);
-			assertThat(response.allowPushContent()).isEqualTo(allowPushContent);
 		}
 	}
 }

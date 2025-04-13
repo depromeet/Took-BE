@@ -30,6 +30,7 @@ public class UserService {
 		userRepository.save(user);
 	}
 
+	@Transactional(readOnly = true)
 	public AllowNotificationResponse getAllowNotification(User user) {
 		return new AllowNotificationResponse(user.getAllowPush());
 	}

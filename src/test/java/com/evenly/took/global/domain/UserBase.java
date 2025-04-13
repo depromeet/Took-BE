@@ -17,7 +17,7 @@ public abstract class UserBase {
 	static LocalDateTime DEFAULT_DELETED_AT = null;
 	static WithdrawReasons DEFAULT_WITHDRAW_REASONS = null;
 	static AllowPush DEFAULT_ALLOW_PUSH = AllowPush.builder()
-		.allowPushNotification(true)
+		.allowPushNotification(false)
 		.allowPushContent(new ArrayList<>())
 		.build();
 
