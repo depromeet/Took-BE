@@ -8,6 +8,7 @@ import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CardRequest;
+import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
@@ -243,5 +244,40 @@ public interface CardApi {
 	SuccessResponse<Void> fixReceivedCard(
 		User user,
 		FixReceivedCardRequest request
+	);
+
+	@Operation(
+		summary = "명함 수정",
+		description = "내 명함을 수정합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "내 명함 수정 성공"),
+		@ApiResponse(responseCode = "404", description = "내 명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "권한이 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> fixCard(
+		User user,
+		FixCardRequest request,
+		@Parameter(hidden = true)
+		MultipartFile profileImage
+	);
+
+	@Operation(
+		summary = "대표 명함 설정",
+		description = "사용자가 소유한 명함 중 하나를 대표 명함으로 설정합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "대표 명함 설정 성공"),
+		@ApiResponse(responseCode = "404", description = "명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "명함 소유자가 아님",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> setPrimaryCard(
+		@Parameter(description = "로그인 사용자", hidden = true)
+		User user,
+
+		@Parameter(description = "대표로 지정할 명함 ID", required = true)
+		Long cardId
 	);
 }

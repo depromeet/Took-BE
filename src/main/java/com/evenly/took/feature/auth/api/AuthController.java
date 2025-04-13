@@ -22,6 +22,7 @@ import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.auth.meta.PublicApi;
 import com.evenly.took.global.auth.meta.SecuredApi;
 import com.evenly.took.global.logging.meta.PrivacySensitiveLogging;
+import com.evenly.took.global.monitoring.slack.SlackErrorAlert;
 import com.evenly.took.global.response.SuccessResponse;
 
 import jakarta.validation.Valid;
@@ -31,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @PublicApi
 @PrivacySensitiveLogging(logRequestBody = false, logResponseBody = false)
 @Slf4j
+@SlackErrorAlert
 @RestController
 @RequiredArgsConstructor
 public class AuthController implements AuthApi {

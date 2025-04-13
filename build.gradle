@@ -69,6 +69,9 @@ dependencies {
 
     // firebase
     implementation 'com.google.firebase:firebase-admin:9.4.3'
+
+    // Slack
+    implementation 'com.slack.api:slack-api-client:1.30.0'
 }
 
 tasks.named('test') {

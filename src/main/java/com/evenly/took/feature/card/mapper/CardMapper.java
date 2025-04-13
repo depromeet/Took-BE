@@ -30,6 +30,7 @@ public interface CardMapper {
 	@Mapping(source = "career.job", target = "job")
 	@Mapping(source = "career.detailJobEn", target = "detailJob")
 	@Mapping(source = "previewInfo", target = "previewInfoType")
+	@Mapping(source = "isPrimary", target = "isPrimary")
 	CardResponse toCardResponse(Card card);
 
 	List<CardResponse> toCardResponseList(List<Card> cards);

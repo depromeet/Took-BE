@@ -3,6 +3,7 @@ package com.evenly.took.feature.card.application;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CardRequest;
+import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
@@ -80,7 +82,7 @@ public class CardService {
 
 	@Transactional(readOnly = true)
 	public MyCardListResponse findUserCardList(Long userId) {
-		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNullOrderByIsPrimaryDesc(userId);
 
 		cards.forEach(this::updatePresignedImagePath);
 
@@ -99,8 +101,6 @@ public class CardService {
 					request.cardId())
 				.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
 
-			Card card = updatePresignedImagePath(receivedCard.getCard());
-
 			List<ReceivedCardFolder> folderRelations =
 				receivedCardFolderRepository.findAllByReceivedCardIdAndDeletedAtIsNull(receivedCard.getId());
 
@@ -113,7 +113,8 @@ public class CardService {
 
 			String memo = receivedCard.getMemo();
 
-			CardDetailResponse baseResponse = cardMapper.toCardDetailResponse(card);
+			CardDetailResponse baseResponse = cardMapper.toCardDetailResponse(
+				updatePresignedImagePath(receivedCard.getCard()));
 
 			return new CardDetailResponse(
 				baseResponse.nickname(),
@@ -188,9 +189,15 @@ public class CardService {
 			.content(contentMapper.toEntity(request.content()))
 			.project(projectMapper.toEntity(request.project()))
 			.previewInfo(request.previewInfoType())
+			.isPrimary(isCreatingFirstCard(currentCardCount))
 			.build();
 
+		System.out.println(newCard.getIsPrimary());
 		cardRepository.save(newCard);
+	}
+
+	private boolean isCreatingFirstCard(Long currentCardCount) {
+		return currentCardCount == 0;
 	}
 
 	@Transactional
@@ -316,6 +323,53 @@ public class CardService {
 	}
 
 	@Transactional
+	public void updateCard(User user, FixCardRequest request, MultipartFile profileImage) {
+		Card card = findCardOrThrow(request.cardId());
+
+		if (!Objects.equals(card.getUser().getId(), user.getId())) {
+			throw new TookException(CardErrorCode.INVALID_CARD_OWNER);
+		}
+
+		handleImageUpdate(card, request.profileImage(), request.isImageRemoved());
+
+		card.setNickname(request.nickname());
+		card.setSummary(request.summary());
+		card.setCareer(Career.toEntity(request.detailJobId()));
+		card.setOrganization(request.organization());
+		card.setInterestDomain(request.interestDomain());
+		card.setRegion(request.region());
+		card.setHobby(request.hobby());
+		card.setNews(request.news());
+		card.setPreviewInfo(request.previewInfoType());
+		card.setSns(snsMapper.toEntity(request.sns()));
+		card.setContent(contentMapper.toEntity(request.content()));
+		card.setProject(projectMapper.toEntity(request.project()));
+	}
+
+	private void handleImageUpdate(Card card, MultipartFile newProfileImage, Boolean isImageRemoved) {
+		String oldImageKey = card.getImagePath();
+
+		String newImageKey = uploadProfileImage(newProfileImage);
+		// Case 1: 새 이미지 업로드된 경우
+		if (newProfileImage != null && !newProfileImage.isEmpty()) {
+			if (oldImageKey != null && !oldImageKey.isEmpty()) {
+				s3Service.deleteFile(oldImageKey);
+			}
+			card.setImageLink(newImageKey);
+		}
+		// Case 2: 새 이미지 없고, 기존 이미지 유지 신호도 없는 경우 (기존 이미지 삭제)
+		else if (isImageRemoved) {
+			// 기존 이미지 S3에서 삭제 (있었다면)
+			if (oldImageKey != null && !oldImageKey.isEmpty()) {
+				s3Service.deleteFile(oldImageKey);
+			}
+			card.setImageLink(newImageKey); // 기본 이미지 Key
+		}
+		// Case 3: 새 이미지 없고, 기존 이미지 유지 신호(originImageKey)가 있는 경우
+		// -> 아무 작업도 하지 않음 (card.imagePath는 변경되지 않음)
+	}
+
+	@Transactional
 	public void softDeleteAllCards(Long userId, LocalDateTime now) {
 		cardRepository.softDeleteAllByUserId(userId, now);
 	}
@@ -337,9 +391,45 @@ public class CardService {
 
 	@Transactional
 	public void softDeleteMyCard(Long userId, Long cardId) {
-		Card card = cardRepository.findById(cardId)
-			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
+		Card card = findCardOrThrow(cardId);
 		card.softDelete(userId);
+
+		if (card.getIsPrimary()) {
+			card.changePrimaryCard(false);
+			assignNewPrimaryIfNecessary(userId);
+		}
+	}
+
+	private void assignNewPrimaryIfNecessary(Long userId) {
+		List<Card> remainingCards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+
+		if (!remainingCards.isEmpty()) {
+			remainingCards.get(0).changePrimaryCard(true);
+		}
+	}
+
+	@Transactional
+	public void setPrimaryCard(Long userId, Long cardId) {
+		Card targetCard = findOwnedCardOrThrow(userId, cardId);
+		clearExistingPrimaryCard(userId);
+		targetCard.changePrimaryCard(true);
+	}
+
+	private Card findOwnedCardOrThrow(Long userId, Long cardId) {
+		Card card = cardRepository.findByIdAndDeletedAtIsNull(cardId)
+			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
+
+		if (!card.getUser().getId().equals(userId)) {
+			throw new TookException(CardErrorCode.INVALID_CARD_OWNER);
+		}
+		return card;
+	}
+
+	private void clearExistingPrimaryCard(Long userId) {
+		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+		cards.stream()
+			.filter(Card::getIsPrimary)
+			.forEach(card -> card.changePrimaryCard(false));
 	}
 
 	private Folder verifyFolderAccess(User user, Long folderId) {

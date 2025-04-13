@@ -25,6 +25,7 @@ public class S3TestConfig {
 	private LocalStackContainer localstack;
 	private final String TEST_BUCKET = "test-bucket";
 	private final String TEST_ENV = "test-env/";
+	private final String TEST_IMAGE_KEY = "base-image.png";
 
 	@PostConstruct
 	public void startLocalStack() {
@@ -90,7 +91,7 @@ public class S3TestConfig {
 		return new AwsS3Properties(
 			TEST_BUCKET,
 			TEST_ENV,
-			""
+			TEST_IMAGE_KEY
 		);
 	}
 

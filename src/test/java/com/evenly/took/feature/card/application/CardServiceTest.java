@@ -1,9 +1,11 @@
 package com.evenly.took.feature.card.application;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,6 +13,7 @@ import com.evenly.took.feature.card.dao.CardRepository;
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
+import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
@@ -156,4 +159,160 @@ public class CardServiceTest extends ServiceTest {
 	//
 	// 	assertThat(exception.getErrorCode()).isEqualTo(CardErrorCode.CARD_LIMIT_EXCEEDED);
 	// }
+
+	@Nested
+	class 대표_명함_기능 {
+
+		@Test
+		void 대표_명함_삭제_시_남은_명함이_대표로_지정된다() {
+			// given
+			User user = userFixture.create();
+			Card card1 = cardFixture.creator().user(user).isPrimary(true).create();
+			Card card2 = cardFixture.creator().user(user).create();
+
+			// when
+			cardService.softDeleteMyCard(user.getId(), card1.getId());
+
+			// then
+			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(user.getId());
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).getIsPrimary()).isTrue();
+		}
+
+		@Test
+		void 특정_명함을_대표로_설정하면_다른_명함은_대표가_해제된다() {
+			// given
+			User user = userFixture.create();
+			Card card1 = cardFixture.creator().user(user).isPrimary(true).create();
+			Card card2 = cardFixture.creator().user(user).isPrimary(false).create();
+
+			// when
+			cardService.setPrimaryCard(user.getId(), card2.getId());
+
+			// then
+			Card updatedCard1 = cardRepository.findById(card1.getId()).get();
+			Card updatedCard2 = cardRepository.findById(card2.getId()).get();
+
+			assertThat(updatedCard1.getIsPrimary()).isFalse();
+			assertThat(updatedCard2.getIsPrimary()).isTrue();
+		}
+
+		@Test
+		void 최초_명함_생성시_자동으로_대표_명함으로_지정된다() {
+			// given
+			User user = userFixture.create();
+			assertThat(cardRepository.countByUserIdAndDeletedAtIsNull(user.getId())).isZero();
+
+			AddCardRequest request = new AddCardRequest(
+				null,
+				"테스트닉네임",
+				1L,
+				List.of("AI", "백엔드"),
+				"요약입니다",
+				"조직명",
+				List.of(),
+				"서울",
+				"등산",
+				"뉴스",
+				List.of(),
+				List.of(),
+				PreviewInfoType.SNS
+			);
+
+			String profileImageKey = "test-image.jpg";
+
+			// when
+			cardService.createCard(user, request, profileImageKey);
+
+			// then
+			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(user.getId());
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).getIsPrimary()).isTrue();
+		}
+
+		@Test
+		void 기존_명함이_있을경우_새로_생성한_명함은_대표_명함이_아니다() {
+			// given
+			User user = userFixture.create();
+			cardFixture.creator().user(user).isPrimary(true).create();
+
+			AddCardRequest request = new AddCardRequest(
+				null,
+				"테스트닉네임",
+				1L,
+				List.of("AI", "백엔드"),
+				"요약입니다",
+				"조직명",
+				List.of(),
+				"서울",
+				"등산",
+				"뉴스",
+				List.of(),
+				List.of(),
+				PreviewInfoType.SNS
+			);
+			String profileImageKey = "test-image-2.jpg";
+
+			// when
+			cardService.createCard(user, request, profileImageKey);
+
+			// then
+			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(user.getId());
+			assertThat(cards).hasSize(2);
+			assertThat(cards.stream().filter(Card::getIsPrimary)).hasSize(1);
+		}
+
+		@Test
+		void 명함_생성_후_대표_삭제_시_다른_명함이_대표로_지정된다() {
+			// given
+			User user = userFixture.create();
+			String profileImageKey = "test-image.jpg";
+
+			AddCardRequest request1 = new AddCardRequest(
+				null,
+				"테스트닉네임1",
+				1L,
+				List.of("AI", "백엔드"),
+				"요약입니다",
+				"조직명",
+				List.of(),
+				"서울",
+				"등산",
+				"뉴스",
+				List.of(),
+				List.of(),
+				PreviewInfoType.SNS
+			);
+
+			cardService.createCard(user, request1, profileImageKey);
+
+			AddCardRequest request2 = new AddCardRequest(
+				null,
+				"일반명함",
+				1L,
+				List.of("프론트"),
+				"요약2",
+				"회사2",
+				List.of(),
+				"부산",
+				"독서",
+				"뉴스",
+				List.of(),
+				List.of(),
+				PreviewInfoType.SNS
+			);
+			cardService.createCard(user, request2, profileImageKey);
+
+			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(user.getId());
+			Card primaryCard = cards.stream().filter(Card::getIsPrimary).findFirst().orElseThrow();
+			Card nonPrimaryCard = cards.stream().filter(c -> !c.getIsPrimary()).findFirst().orElseThrow();
+
+			// when
+			cardService.softDeleteMyCard(user.getId(), primaryCard.getId());
+
+			// then
+			Card updated = cardRepository.findById(nonPrimaryCard.getId()).orElseThrow();
+			assertThat(updated.getIsPrimary()).isTrue();
+		}
+	}
 }

@@ -21,6 +21,7 @@ import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CardRequest;
+import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
@@ -39,6 +40,7 @@ import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.auth.meta.PublicApi;
+import com.evenly.took.global.monitoring.slack.SlackErrorAlert;
 import com.evenly.took.global.response.SuccessResponse;
 
 import jakarta.validation.ConstraintViolation;
@@ -50,6 +52,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@SlackErrorAlert
 @RestController
 @RequiredArgsConstructor
 public class CardController implements CardApi {
@@ -190,5 +193,31 @@ public class CardController implements CardApi {
 	) {
 		cardService.updateReceivedCard(user, request);
 		return SuccessResponse.ok("명함 업데이트 성공");
+	}
+
+	@PutMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public SuccessResponse<Void> fixCard(
+		@LoginUser User user,
+		@ModelAttribute FixCardRequest request,
+		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+
+		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+		Set<ConstraintViolation<FixCardRequest>> violations = validator.validate(request);
+
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException("요청 필드 유효성 검사 실패", violations);
+		}
+
+		cardService.updateCard(user, request, profileImage);
+		return SuccessResponse.ok("내 명함 수정 성공");
+	}
+
+	@PostMapping("/api/card/{id}/primary")
+	public SuccessResponse<Void> setPrimaryCard(
+		@LoginUser User user,
+		@PathVariable("id") Long cardId
+	) {
+		cardService.setPrimaryCard(user.getId(), cardId);
+		return SuccessResponse.ok("대표 명함 설정 성공");
 	}
 }
