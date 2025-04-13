@@ -192,7 +192,7 @@ public class CardService {
 			.isPrimary(isCreatingFirstCard(currentCardCount))
 			.build();
 
-		System.out.println(newCard.isPrimary());
+		System.out.println(newCard.getIsPrimary());
 		cardRepository.save(newCard);
 	}
 
@@ -394,7 +394,7 @@ public class CardService {
 		Card card = findCardOrThrow(cardId);
 		card.softDelete(userId);
 
-		if (card.isPrimary()) {
+		if (card.getIsPrimary()) {
 			card.changePrimaryCard(false);
 			assignNewPrimaryIfNecessary(userId);
 		}
@@ -428,7 +428,7 @@ public class CardService {
 	private void clearExistingPrimaryCard(Long userId) {
 		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
 		cards.stream()
-			.filter(Card::isPrimary)
+			.filter(Card::getIsPrimary)
 			.forEach(card -> card.changePrimaryCard(false));
 	}
 

@@ -1597,7 +1597,7 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			// then
 			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(mockUser.getId());
 			assertThat(cards).hasSize(1);
-			assertThat(cards.get(0).isPrimary()).isTrue();
+			assertThat(cards.get(0).getIsPrimary()).isTrue();
 		}
 
 		@Test
@@ -1629,10 +1629,10 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			// then
 			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(mockUser.getId());
 			assertThat(cards).hasSize(2);
-			long primaryCount = cards.stream().filter(Card::isPrimary).count();
+			long primaryCount = cards.stream().filter(Card::getIsPrimary).count();
 			assertThat(primaryCount).isEqualTo(1);
 			assertThat(
-				cards.stream().anyMatch(card -> !card.isPrimary())).isTrue();
+				cards.stream().anyMatch(card -> !card.getIsPrimary())).isTrue();
 		}
 
 		@Test
@@ -1653,8 +1653,8 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			// then
 			Card updatedCard1 = cardRepository.findById(card1.getId()).orElseThrow();
 			Card updatedCard2 = cardRepository.findById(card2.getId()).orElseThrow();
-			assertThat(updatedCard1.isPrimary()).isFalse();
-			assertThat(updatedCard2.isPrimary()).isTrue();
+			assertThat(updatedCard1.getIsPrimary()).isFalse();
+			assertThat(updatedCard2.getIsPrimary()).isTrue();
 		}
 
 		@Test
@@ -1676,7 +1676,7 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			Card updatedCard2 = cardRepository.findById(card2.getId()).orElseThrow();
 			Card deletedCard1 = cardRepository.findById(card1.getId()).orElseThrow();
 			assertThat(deletedCard1.getDeletedAt()).isNotNull();
-			assertThat(updatedCard2.isPrimary()).isTrue();
+			assertThat(updatedCard2.getIsPrimary()).isTrue();
 		}
 
 		@Test
@@ -1700,9 +1700,9 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			Card updatedCard3 = cardRepository.findById(card3.getId()).orElseThrow();
 
 			long primaryCount = 0;
-			if (updatedCard2.isPrimary())
+			if (updatedCard2.getIsPrimary())
 				primaryCount++;
-			if (updatedCard3.isPrimary())
+			if (updatedCard3.getIsPrimary())
 				primaryCount++;
 
 			assertThat(primaryCount).isEqualTo(1);

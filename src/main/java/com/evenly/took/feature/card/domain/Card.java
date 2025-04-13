@@ -3,6 +3,7 @@ package com.evenly.took.feature.card.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -94,13 +95,14 @@ public class Card extends BaseTimeEntity {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
+	@ColumnDefault("false")
 	@Column(name = "is_primary")
-	private boolean isPrimary;
+	private Boolean isPrimary;
 
 	@Builder
 	public Card(Career career, List<Content> content, String hobby, String imagePath, List<String> interestDomain,
 		LocalDateTime deletedAt, String news, String nickname, String organization, PreviewInfoType previewInfo,
-		List<Project> project, String region, List<SNS> sns, String summary, User user, boolean isPrimary) {
+		List<Project> project, String region, List<SNS> sns, String summary, User user, Boolean isPrimary) {
 		this.career = career;
 		this.content = content;
 		this.hobby = hobby;
@@ -134,7 +136,7 @@ public class Card extends BaseTimeEntity {
 		}
 	}
 
-	public void changePrimaryCard(boolean isPrimary) {
+	public void changePrimaryCard(Boolean isPrimary) {
 		this.isPrimary = isPrimary;
 	}
 }

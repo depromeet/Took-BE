@@ -176,7 +176,7 @@ public class CardServiceTest extends ServiceTest {
 			// then
 			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(user.getId());
 			assertThat(cards).hasSize(1);
-			assertThat(cards.get(0).isPrimary()).isTrue();
+			assertThat(cards.get(0).getIsPrimary()).isTrue();
 		}
 
 		@Test
@@ -193,8 +193,8 @@ public class CardServiceTest extends ServiceTest {
 			Card updatedCard1 = cardRepository.findById(card1.getId()).get();
 			Card updatedCard2 = cardRepository.findById(card2.getId()).get();
 
-			assertThat(updatedCard1.isPrimary()).isFalse();
-			assertThat(updatedCard2.isPrimary()).isTrue();
+			assertThat(updatedCard1.getIsPrimary()).isFalse();
+			assertThat(updatedCard2.getIsPrimary()).isTrue();
 		}
 
 		@Test
@@ -227,7 +227,7 @@ public class CardServiceTest extends ServiceTest {
 			// then
 			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(user.getId());
 			assertThat(cards).hasSize(1);
-			assertThat(cards.get(0).isPrimary()).isTrue();
+			assertThat(cards.get(0).getIsPrimary()).isTrue();
 		}
 
 		@Test
@@ -259,7 +259,7 @@ public class CardServiceTest extends ServiceTest {
 			// then
 			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(user.getId());
 			assertThat(cards).hasSize(2);
-			assertThat(cards.stream().filter(Card::isPrimary)).hasSize(1);
+			assertThat(cards.stream().filter(Card::getIsPrimary)).hasSize(1);
 		}
 
 		@Test
@@ -304,15 +304,15 @@ public class CardServiceTest extends ServiceTest {
 			cardService.createCard(user, request2, profileImageKey);
 
 			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(user.getId());
-			Card primaryCard = cards.stream().filter(Card::isPrimary).findFirst().orElseThrow();
-			Card nonPrimaryCard = cards.stream().filter(c -> !c.isPrimary()).findFirst().orElseThrow();
+			Card primaryCard = cards.stream().filter(Card::getIsPrimary).findFirst().orElseThrow();
+			Card nonPrimaryCard = cards.stream().filter(c -> !c.getIsPrimary()).findFirst().orElseThrow();
 
 			// when
 			cardService.softDeleteMyCard(user.getId(), primaryCard.getId());
 
 			// then
 			Card updated = cardRepository.findById(nonPrimaryCard.getId()).orElseThrow();
-			assertThat(updated.isPrimary()).isTrue();
+			assertThat(updated.getIsPrimary()).isTrue();
 		}
 	}
 }
