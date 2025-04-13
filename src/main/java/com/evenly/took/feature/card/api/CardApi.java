@@ -16,6 +16,7 @@ import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
+import com.evenly.took.feature.card.dto.request.SendCardRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CardResponse;
@@ -279,5 +280,23 @@ public interface CardApi {
 
 		@Parameter(description = "대표로 지정할 명함 ID", required = true)
 		Long cardId
+	);
+
+	@Operation(
+		summary = "명함 발신",
+		description = "선택된 유저에게 내가 소유한 특정 명함을 발신합니다."
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "201", description = "명함 발신 성공"),
+		@ApiResponse(responseCode = "400", description = "자기 자신에게 전송 시도 / 이미 보낸 명함",
+			content = @Content(schema = @Schema(implementation = com.evenly.took.global.exception.dto.ErrorResponse.class))),
+		@ApiResponse(responseCode = "404", description = "명함 또는 유저를 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = com.evenly.took.global.exception.dto.ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "본인 명함이 아님",
+			content = @Content(schema = @Schema(implementation = com.evenly.took.global.exception.dto.ErrorResponse.class)))
+	})
+	SuccessResponse<Void> sendCard(
+		@Parameter(description = "로그인한 사용자", hidden = true) User user,
+		SendCardRequest request
 	);
 }

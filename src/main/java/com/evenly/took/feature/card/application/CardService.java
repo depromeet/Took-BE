@@ -432,6 +432,29 @@ public class CardService {
 			.forEach(card -> card.changePrimaryCard(false));
 	}
 
+	@Transactional
+	public void sendCardToUser(Long senderUserId, Long targetUserId, Long cardId) {
+		if (senderUserId.equals(targetUserId)) {
+			throw new TookException(CardErrorCode.CANNOT_RECEIVE_OWN_CARD);
+		}
+
+		Card card = findOwnedCardOrThrow(senderUserId, cardId);
+
+		boolean alreadySent = receivedCardRepository.existsByUserIdAndCardIdAndDeletedAtIsNullOrderByIdDesc(
+			targetUserId, cardId);
+		if (alreadySent) {
+			throw new TookException(CardErrorCode.ALREADY_RECEIVED_CARD);
+		}
+
+		User receiver = User.toEntity(targetUserId);
+		ReceivedCard receivedCard = ReceivedCard.builder()
+			.user(receiver)
+			.card(card)
+			.build();
+
+		receivedCardRepository.save(receivedCard);
+	}
+
 	private Folder verifyFolderAccess(User user, Long folderId) {
 		Folder folder = folderRepository.findById(folderId)
 			.orElseThrow(() -> new TookException(FolderErrorCode.FOLDER_NOT_FOUND));

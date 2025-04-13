@@ -29,6 +29,7 @@ import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
+import com.evenly.took.feature.card.dto.request.SendCardRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CardResponse;
@@ -221,5 +222,14 @@ public class CardController implements CardApi {
 	) {
 		cardService.setPrimaryCard(user.getId(), cardId);
 		return SuccessResponse.ok("대표 명함 설정 성공");
+	}
+
+	@PostMapping("/api/card/send")
+	public SuccessResponse<Void> sendCard(
+		@LoginUser User user,
+		@RequestBody @Valid SendCardRequest request
+	) {
+		cardService.sendCardToUser(user.getId(), request.targetUserId(), request.cardId());
+		return SuccessResponse.created("명함 발신 성공");
 	}
 }
