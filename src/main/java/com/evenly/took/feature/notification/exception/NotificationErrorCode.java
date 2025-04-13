@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 public enum NotificationErrorCode implements ErrorCode {
 
 	FCM_INIT_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FCM 서버 연결 과정에서 에러가 발생하였습니다."),
-	FCM_4XX_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FCM 서버 내부에서 4xx 에러가 발생하였습니다."),
 	INVALID_SEND_TIME(HttpStatus.INTERNAL_SERVER_ERROR, "지원하지 않는 알림 전송 시간입니다."),
 	;
 
