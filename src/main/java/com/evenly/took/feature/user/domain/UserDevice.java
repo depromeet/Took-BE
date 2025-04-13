@@ -1,11 +1,6 @@
 package com.evenly.took.feature.user.domain;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import com.evenly.took.feature.common.model.BaseTimeEntity;
 
@@ -40,13 +35,6 @@ public class UserDevice extends BaseTimeEntity {
 	@Column(name = "fcm_token", unique = true, nullable = false)
 	private String fcmToken;
 
-	@Column(name = "allow_push_notification", nullable = false)
-	private boolean allowPushNotification;
-
-	@Column(name = "allow_push_content", nullable = false)
-	@JdbcTypeCode(SqlTypes.JSON)
-	private List<String> allowPushContent;  // TODO
-
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
@@ -54,8 +42,6 @@ public class UserDevice extends BaseTimeEntity {
 	public UserDevice(User user, String fcmToken) {
 		this.user = user;
 		this.fcmToken = fcmToken;
-		this.allowPushNotification = false;
-		this.allowPushContent = new ArrayList<>();
 		this.deletedAt = null;
 	}
 }

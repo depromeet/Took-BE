@@ -58,12 +58,13 @@ public class NotificationService {
 
 	private void sendFcmNotification(Map<User, List<Card>> receivedCardsGroupingByUser, LocalDateTime sendAt) {
 		List<FcmNotification> fcmNotifications = receivedCardsGroupingByUser.entrySet().stream()
-			.map(entry -> createdFcm(entry.getKey(), entry.getValue(), sendAt))
+			.filter(entry -> entry.getKey().isAllowPushNotification())
+			.map(entry -> createFcmNotification(entry.getKey(), entry.getValue(), sendAt))
 			.toList();
 		fcmEventPublisher.publishFcmSendEvent(fcmNotifications);
 	}
 
-	private FcmNotification createdFcm(User user, List<Card> cards, LocalDateTime sendAt) {
+	private FcmNotification createFcmNotification(User user, List<Card> cards, LocalDateTime sendAt) {
 		CardInterest myCard = new CardInterest("세부직군", "소속정보", List.of("도메인")); // TODO 대표명함 조회로 변경
 		List<CardInterest> receivedCards = cards.stream()
 			.map(CardInterest::from)

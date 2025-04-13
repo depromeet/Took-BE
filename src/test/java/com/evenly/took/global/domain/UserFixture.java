@@ -33,6 +33,7 @@ public class UserFixture extends UserBase {
 			.oauthIdentifier(oauthIdentifier)
 			.deletedAt(deletedAt)
 			.withdrawReasons(withdrawReasons)
+			.allowPush(allowPush)
 			.build();
 		return userRepository.save(user);
 	}

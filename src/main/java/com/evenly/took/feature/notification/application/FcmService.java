@@ -33,8 +33,7 @@ public class FcmService {
 			NotificationType type = fcmNotification.getNotificationType();
 			FcmData fcmData = FcmData.from(type);
 			List<UserDevice> userDevices = userDeviceRepository.findByUser(user);
-			userDevices.stream()
-				.filter(UserDevice::isAllowPushNotification) // TODO 기능별 allow
+			userDevices.stream()// TODO 기능별 allow
 				.map(FcmToken::from)
 				.map(fcmToken -> messageCreator.createMessage(fcmToken, fcmData))
 				.forEach(messages::add);
