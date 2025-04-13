@@ -1,6 +1,7 @@
 package com.evenly.took.global.redis;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.List;
 
@@ -15,12 +16,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.geo.Point;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.evenly.took.global.config.testcontainers.MySQLTestConfig;
 import com.evenly.took.global.config.testcontainers.RedisTestConfig;
 import com.evenly.took.global.redis.dto.NearbyUserDto;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(RedisTestConfig.class)
+@Import({RedisTestConfig.class, MySQLTestConfig.class})
 class RedisGeoSpatialTest {
 
 	@Autowired
