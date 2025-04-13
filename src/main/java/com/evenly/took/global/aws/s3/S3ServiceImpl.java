@@ -82,11 +82,19 @@ public class S3ServiceImpl implements S3Service {
 	}
 
 	public String uploadFile(MultipartFile file, String path) {
-		String fileName = createFileName(file.getOriginalFilename());
-		String key = awsProperties.s3().env() + path + fileName;
-
-		if (fileName.contains("default") || file.isEmpty()) {
+		String key;
+		String fileName;
+		if (file == null || file.isEmpty()) {
 			key = awsProperties.s3().baseImage();
+			return key;
+		} else {
+			fileName = createFileName(file.getOriginalFilename());
+			if (fileName.contains("default")) {
+				key = awsProperties.s3().baseImage();
+				return key;
+			} else {
+				key = awsProperties.s3().env() + path + fileName;
+			}
 		}
 
 		String bucket = awsProperties.s3().bucket();
