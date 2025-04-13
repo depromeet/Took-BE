@@ -39,38 +39,44 @@ public class AuthService {
 
 	@Transactional
 	public AuthResponse loginAndGenerateToken(OAuthType oauthType, String authCode, LoginRequest request) {
-		User user = userClientComposite.fetch(oauthType, authCode);
-		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
-			.orElseGet(() -> userRepository.save(user));
+		User savedUser = login(oauthType, authCode);
 		TokenDto tokens = tokenProvider.provideTokens(savedUser);
-		if (request == null) {
-			return new AuthResponse(tokens, savedUser, false);
-		}
-		String fcmToken = request.fcmToken();
-		boolean isFirstLogin = !userDeviceRepository.existsByUserAndFcmToken(savedUser, fcmToken);
-		if (isFirstLogin) {
-			UserDevice userDevice = new UserDevice(savedUser, fcmToken);
-			userDeviceRepository.save(userDevice);
-		}
+		boolean isFirstLogin = isFirstLogin(request, savedUser);
 		return new AuthResponse(tokens, savedUser, isFirstLogin);
+	}
+
+	private User login(OAuthType oauthType, String authCode) {
+		User user = userClientComposite.fetch(oauthType, authCode);
+		return userRepository.findByOauthIdentifier(user.getOauthIdentifier())
+			.orElseGet(() -> userRepository.save(user));
 	}
 
 	@Transactional
 	public AuthResponse loginAndGenerateToken(OAuthType oauthType, AuthContext context, LoginRequest request) {
-		User user = userClientComposite.fetch(oauthType, context);
-		User savedUser = userRepository.findByOauthIdentifier(user.getOauthIdentifier())
-			.orElseGet(() -> userRepository.save(user));
+		User savedUser = login(oauthType, context);
 		TokenDto tokens = tokenProvider.provideTokens(savedUser);
+		boolean isFirstLogin = isFirstLogin(request, savedUser);
+		return new AuthResponse(tokens, savedUser, isFirstLogin);
+	}
+
+	private User login(OAuthType oauthType, AuthContext context) {
+		User user = userClientComposite.fetch(oauthType, context);
+		return userRepository.findByOauthIdentifier(user.getOauthIdentifier())
+			.orElseGet(() -> userRepository.save(user));
+	}
+
+	private boolean isFirstLogin(LoginRequest request, User user) {
 		if (request == null) {
-			return new AuthResponse(tokens, savedUser, false);
+			return false;
 		}
 		String fcmToken = request.fcmToken();
-		boolean isFirstLogin = !userDeviceRepository.existsByUserAndFcmToken(savedUser, fcmToken);
-		if (isFirstLogin) {
-			UserDevice userDevice = new UserDevice(savedUser, fcmToken);
-			userDeviceRepository.save(userDevice);
+		boolean existDevice = userDeviceRepository.existsByUserAndFcmToken(user, fcmToken);
+		if (existDevice) {
+			return false;
 		}
-		return new AuthResponse(tokens, savedUser, isFirstLogin);
+		UserDevice userDevice = new UserDevice(user, fcmToken);
+		userDeviceRepository.save(userDevice);
+		return true;
 	}
 
 	public TokenResponse refreshToken(RefreshTokenRequest request) {
