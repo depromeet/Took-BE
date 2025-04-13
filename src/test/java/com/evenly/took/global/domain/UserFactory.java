@@ -2,6 +2,7 @@ package com.evenly.took.global.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.evenly.took.feature.user.domain.AllowPush;
 import com.evenly.took.feature.user.domain.User;
 
 public class UserFactory extends UserBase {
@@ -12,6 +13,10 @@ public class UserFactory extends UserBase {
 
 	@Override
 	public User create() {
+		AllowPush allowPush = AllowPush.builder()
+			.allowPushNotification(allowPushNotification)
+			.allowPushContent(allowPushContent)
+			.build();
 		User user = User.builder()
 			.name(name)
 			.email(email)

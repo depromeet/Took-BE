@@ -69,12 +69,12 @@ public class AuthService {
 		if (request == null) {
 			return false;
 		}
-		String fcmToken = request.fcmToken();
-		boolean existDevice = userDeviceRepository.existsByUserAndFcmToken(user, fcmToken);
+		String expoToken = request.expoToken();
+		boolean existDevice = userDeviceRepository.existsByUserAndExpoToken(user, expoToken);
 		if (existDevice) {
 			return false;
 		}
-		UserDevice userDevice = new UserDevice(user, fcmToken);
+		UserDevice userDevice = new UserDevice(user, expoToken);
 		userDeviceRepository.save(userDevice);
 		return true;
 	}

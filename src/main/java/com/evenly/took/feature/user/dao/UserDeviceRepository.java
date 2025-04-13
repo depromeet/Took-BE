@@ -11,5 +11,5 @@ public interface UserDeviceRepository extends JpaRepository<UserDevice, Long> {
 
 	List<UserDevice> findByUser(User user);
 
-	boolean existsByUserAndFcmToken(User user, String fcmToken);
+	boolean existsByUserAndExpoToken(User user, String expoToken);
 }

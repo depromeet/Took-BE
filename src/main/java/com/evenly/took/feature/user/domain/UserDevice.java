@@ -32,16 +32,16 @@ public class UserDevice extends BaseTimeEntity {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@Column(name = "fcm_token", unique = true, nullable = false)
-	private String fcmToken;
+	@Column(name = "expo_token", unique = true, nullable = false)
+	private String expoToken;
 
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
 	@Builder
-	public UserDevice(User user, String fcmToken) {
+	public UserDevice(User user, String expoToken) {
 		this.user = user;
-		this.fcmToken = fcmToken;
+		this.expoToken = expoToken;
 		this.deletedAt = null;
 	}
 }

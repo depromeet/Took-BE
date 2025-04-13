@@ -495,4 +495,12 @@ public class CardService {
 		}
 		return card;
 	}
+
+	public Card findPrimaryCard(User user) {
+		return cardRepository.findFirstByUserAndIsPrimaryTrueAndDeletedAtIsNull(user).orElse(null);
+	}
+
+	public List<ReceivedCard> findReceivedCardsCreatedBetween(LocalDateTime from, LocalDateTime to) {
+		return receivedCardRepository.findAllByCreatedAtAndDeletedAtIsNull(from, to);
+	}
 }

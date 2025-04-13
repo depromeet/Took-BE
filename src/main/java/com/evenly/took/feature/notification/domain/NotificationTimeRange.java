@@ -10,7 +10,7 @@ import com.evenly.took.global.exception.TookException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class NotificationCardsTimeRange {
+public class NotificationTimeRange {
 
 	private static final LocalTime SEND_TIME_10_00 = LocalTime.of(10, 0);
 	private static final LocalTime SEND_TIME_22_00 = LocalTime.of(22, 0);
@@ -20,8 +20,8 @@ public class NotificationCardsTimeRange {
 	private final LocalDate sendDate;
 	private final LocalTime sendTime;
 
-	public static NotificationCardsTimeRange from(LocalDateTime sendAt) {
-		return new NotificationCardsTimeRange(sendAt.toLocalDate(), sendAt.toLocalTime());
+	public static NotificationTimeRange from(LocalDateTime sendAt) {
+		return new NotificationTimeRange(sendAt.toLocalDate(), sendAt.toLocalTime());
 	}
 
 	/*

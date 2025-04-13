@@ -37,7 +37,7 @@ class AuthServiceTest extends ServiceTest {
 			.willReturn(user);
 
 		// when
-		LoginRequest request = new LoginRequest("fcmToken");
+		LoginRequest request = new LoginRequest("expoToken");
 		AuthResponse response = authService.loginAndGenerateToken(OAuthType.KAKAO, "code", request);
 
 		// then

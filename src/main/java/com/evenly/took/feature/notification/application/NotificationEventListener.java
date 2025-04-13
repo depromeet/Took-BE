@@ -5,19 +5,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.evenly.took.feature.notification.event.FcmSendEvent;
+import com.evenly.took.feature.notification.event.SendNotificationEvent;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component
-public class FcmEventListener {
+public class NotificationEventListener {
 
-	private final FcmService fcmService;
+	private final ExpoNotificationService expoNotificationService;
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Async
-	public void handleFcmSendEvent(FcmSendEvent event) {
-		fcmService.sendFcm(event.getFcmNotifications());
+	public void handleSendNotificationEvent(SendNotificationEvent event) {
+		expoNotificationService.sendNotification(event.getNotifications());
 	}
 }

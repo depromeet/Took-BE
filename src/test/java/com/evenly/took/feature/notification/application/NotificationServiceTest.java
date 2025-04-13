@@ -26,7 +26,9 @@ class NotificationServiceTest extends ServiceTest {
 			return; // 오후 10시 알림 범위면 PASS
 		}
 		// given
-		User me = userFixture.create();
+		User me = userFixture.creator()
+			.allowPushNotification(true)
+			.create();
 		User cardOwner = userFixture.create();
 		Card card = cardFixture.creator()
 			.user(cardOwner)
@@ -48,10 +50,12 @@ class NotificationServiceTest extends ServiceTest {
 	void 오후_10시_알림을_전송한다() {
 		// given
 		LocalTime nowTime = LocalTime.now();
-		if (nowTime.isBefore(LocalTime.of(6, 0)) || nowTime.isAfter(LocalTime.of(21, 1))) {
+		if (nowTime.isBefore(LocalTime.of(6, 0)) || nowTime.isAfter(LocalTime.of(21, 0))) {
 			return; // 오전 10시 알림 범위면 PASS
 		}
-		User me = userFixture.create();
+		User me = userFixture.creator()
+			.allowPushNotification(true)
+			.create();
 		User cardOwner = userFixture.create();
 		Card card = cardFixture.creator()
 			.user(cardOwner)

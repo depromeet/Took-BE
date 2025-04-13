@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.user.dao.UserRepository;
+import com.evenly.took.feature.user.domain.AllowPush;
 import com.evenly.took.feature.user.domain.User;
 
 @Component
@@ -26,6 +27,10 @@ public class UserFixture extends UserBase {
 		this.oauthIdentifier = OAuthIdentifier.builder()
 			.oauthId(UUID.randomUUID().toString())
 			.oauthType(OAuthType.GOOGLE)
+			.build();
+		AllowPush allowPush = AllowPush.builder()
+			.allowPushNotification(allowPushNotification)
+			.allowPushContent(allowPushContent)
 			.build();
 		User user = User.builder()
 			.name(name)

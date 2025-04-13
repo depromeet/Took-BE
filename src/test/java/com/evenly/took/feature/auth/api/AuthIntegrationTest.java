@@ -74,7 +74,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
 				.willReturn(user);
 
-			LoginRequest request = new LoginRequest("fcmToken");
+			LoginRequest request = new LoginRequest("expoToken");
 
 			boolean isFirstLogin1 = given().log().all()
 				.contentType(ContentType.JSON)
