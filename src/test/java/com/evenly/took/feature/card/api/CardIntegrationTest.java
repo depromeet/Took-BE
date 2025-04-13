@@ -25,6 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.evenly.took.feature.card.application.LinkExtractor;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
 import com.evenly.took.feature.card.domain.Card;
+import com.evenly.took.feature.card.domain.Career;
 import com.evenly.took.feature.card.domain.Folder;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.evenly.took.feature.card.domain.ReceivedCard;
@@ -44,6 +45,7 @@ import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.aws.s3.S3Service;
 import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.integration.JwtMockIntegrationTest;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -1222,6 +1224,331 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			// then
 			Map<String, Object> responseMap = response.as(Map.class);
 			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
+		}
+	}
+
+	@Nested
+	class 명함_수정 {
+
+		private Career career1;
+		private Career career2;
+		private Card existCard;
+		private MockMultipartFile testImageFile;
+		private final String existingImageKey = "card-profiles/existing-image.jpg"; // Example existing key
+
+		@BeforeEach
+		void setUp() {
+			career1 = careerFixture.serverDeveloper();
+			career2 = careerFixture.productDesigner();
+
+			existCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("닉네임1")
+				.previewInfo(PreviewInfoType.PROJECT)
+				.career(career1)
+				.imagePath(existingImageKey)
+				.create();
+
+			testImageFile = new MockMultipartFile(
+				"profileImage",
+				"new-image.jpg",
+				MediaType.IMAGE_JPEG_VALUE,
+				"new image content".getBytes()
+			);
+
+		}
+
+		@Test
+		void 명함_수정_성공_모든_필드_업데이트_및_이미지_교체() throws IOException {
+			// given
+			String newNickname = "newNickname";
+			String newSummary = "newSummary";
+			Long newDetailJobId = career2.getId();
+			List<String> newInterestDomain = List.of("newInterestDomain");
+			String newOrganization = "newOrganization";
+			String newRegion = "newRegion";
+			String newHobby = "newHobby";
+			String newNews = "newNews";
+			PreviewInfoType newPreviewType = PreviewInfoType.HOBBY;
+			List<Map<String, String>> newSns = List.of(Map.of("type", "GITHUB", "link", "https://github.com/new"));
+			List<Map<String, String>> newContent = List.of(
+				Map.of("title", "newContent", "link", "https://blog.com/new"));
+			List<Map<String, String>> newProject = List.of(
+				Map.of("title", "newProject", "link", "https://project.com/new"));
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", newNickname)
+				.multiPart("detailJobId", newDetailJobId)
+				.multiPart("interestDomain", objectMapper.writeValueAsString(newInterestDomain))
+				.multiPart("summary", newSummary)
+				.multiPart("organization", newOrganization)
+				.multiPart("region", newRegion)
+				.multiPart("hobby", newHobby)
+				.multiPart("news", newNews)
+				.multiPart("previewInfoType", newPreviewType.name())
+				.multiPart("sns", objectMapper.writeValueAsString(newSns))
+				.multiPart("content", objectMapper.writeValueAsString(newContent))
+				.multiPart("project", objectMapper.writeValueAsString(newProject))
+				.multiPart("profileImage", testImageFile.getOriginalFilename(), testImageFile.getBytes(),
+					testImageFile.getContentType())
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("status")).isEqualTo("OK");
+			assertThat(response.jsonPath().getString("message")).isEqualTo("내 명함 수정 성공");
+
+			ExtractableResponse<Response> detailResponse = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.queryParam("cardId", existCard.getId())
+				.when()
+				.get("/api/card/detail")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// 상세 조회 결과 검증
+			Map<String, Object> dataMap = detailResponse.jsonPath().getMap("data");
+			assertThat(dataMap.get("nickname")).isEqualTo(newNickname);
+			assertThat(dataMap.get("summary")).isEqualTo(newSummary);
+			assertThat(dataMap.get("job")).isEqualTo(career2.getJob().name());
+			assertThat(dataMap.get("detailJob")).isEqualTo(career2.getDetailJobEn());
+			assertThat(dataMap.get("organization")).isEqualTo(newOrganization);
+			assertThat((List<String>)dataMap.get("interestDomain")).containsExactlyElementsOf(newInterestDomain);
+			assertThat(dataMap).containsKey("imagePath");
+			List<Map<String, Object>> snsList = (List<Map<String, Object>>)dataMap.get("sns");
+			assertThat(snsList).hasSize(1);
+			assertThat(snsList.get(0).get("type")).isEqualTo("GITHUB");
+			assertThat(snsList.get(0).get("link")).isEqualTo("https://github.com/new");
+			List<Map<String, Object>> contentList = (List<Map<String, Object>>)dataMap.get("content");
+			assertThat(contentList).hasSize(1);
+			assertThat(contentList.get(0).get("title")).isEqualTo("newContent");
+			assertThat(contentList.get(0).get("link")).isEqualTo("https://blog.com/new");
+			List<Map<String, Object>> projectList = (List<Map<String, Object>>)dataMap.get("project");
+			assertThat(projectList).hasSize(1);
+			assertThat(projectList.get(0).get("title")).isEqualTo("newProject");
+			assertThat(projectList.get(0).get("link")).isEqualTo("https://project.com/new");
+
+		}
+
+		@Test
+		void 명함_수정_성공_기존_이미지_유지() throws JsonProcessingException {
+			// given
+			String updatedNickname = "newNickname";
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", updatedNickname)
+				.multiPart("detailJobId", existCard.getCareer().getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "newSummary")
+				.multiPart("isImageRemoved", false)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			ExtractableResponse<Response> detailResponse = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.queryParam("cardId", existCard.getId())
+				.when()
+				.get("/api/card/detail")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> dataMap = detailResponse.jsonPath().getMap("data");
+			assertThat(dataMap.get("nickname")).isEqualTo(updatedNickname);
+			assertThat(dataMap.get("imagePath")).isNotNull();
+			assertThat(dataMap.get("summary")).isEqualTo("newSummary");
+		}
+
+		@Test
+		void 명함_수정_성공_선택_필드_null_업데이트() throws JsonProcessingException {
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", "newNick")
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "summary")
+				.multiPart("isImageRemoved", false)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			ExtractableResponse<Response> detailResponse = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.queryParam("cardId", existCard.getId())
+				.when()
+				.get("/api/card/detail")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> dataMap = detailResponse.jsonPath().getMap("data");
+
+			assertThat(dataMap.get("nickname")).isEqualTo("newNick");
+			assertThat(dataMap.get("organization")).isNull();
+			assertThat(dataMap.get("hobby")).isNull();
+			assertThat(dataMap.get("news")).isNull();
+			assertThat(dataMap.get("previewInfo")).isNull();
+			assertThat(dataMap.get("sns")).isNull();
+			assertThat(dataMap.get("content")).isNull();
+			assertThat(dataMap.get("project")).isNull();
+
+			// assertThat(updatedCard.getImagePath()).isEqualTo(existingImageKey); // Image kept
+		}
+
+		@Test
+		void 명함_수정_성공_이미지_삭제() throws JsonProcessingException {
+			// given: Update fields, but send NO profileImage and NO originImageKey
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", "noImage")
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", existCard.getSummary())
+				.multiPart("isImageRemoved", true)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			ExtractableResponse<Response> detailResponse = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.queryParam("cardId", existCard.getId())
+				.when()
+				.get("/api/card/detail")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> dataMap = detailResponse.jsonPath().getMap("data");
+
+			assertThat(dataMap.get("nickname")).isEqualTo("noImage");
+			assertThat((String)dataMap.get("imagePath")).contains("base-image");
+
+		}
+
+		@Test
+		void 명함_수정_실패_필수_필드_누락_닉네임() throws JsonProcessingException {
+			// when
+			given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "요약")
+				.multiPart("originImageKey", existingImageKey)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.BAD_REQUEST.value());
+		}
+
+		@Test
+		void 명함_수정_실패_존재하지_않는_명함() throws JsonProcessingException {
+			// given
+			Long nonExistentCardId = 9999L;
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", nonExistentCardId)
+				.multiPart("nickname", "수정 시도")
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "요약")
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("message"))
+				.isEqualTo(CardErrorCode.CARD_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		void 명함_수정_실패_권한_없음_다른_사용자_명함() throws JsonProcessingException {
+			// given
+			User otherUser = userFixture.creator().name("다른사용자").create();
+			Card otherUsersCard = cardFixture.creator()
+				.user(otherUser)
+				.career(career2)
+				.nickname("nick")
+				.summary("sum")
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", otherUsersCard.getId())
+				.multiPart("nickname", "newNickname")
+				.multiPart("detailJobId", career2.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "summary")
+				.multiPart("isImageRemoved", false)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.BAD_REQUEST.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("message"))
+				.isEqualTo(CardErrorCode.INVALID_CARD_OWNER.getMessage());
+		}
+
+		@Test
+		void 명함_수정_실패_인증_없음() throws JsonProcessingException {
+			// when
+			given().log().all()
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", "newNickname")
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "summary")
+				.multiPart("originImageKey", existingImageKey)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.UNAUTHORIZED.value());
 		}
 	}
 }
