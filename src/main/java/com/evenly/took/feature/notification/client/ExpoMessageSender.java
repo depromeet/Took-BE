@@ -32,7 +32,7 @@ public class ExpoMessageSender {
 
 	private final RestClient restClient;
 
-	public ExpoMessageSender(RestClient.Builder restClientBuilder, ExpoErrorHandler errorHandler) {
+	public ExpoMessageSender(RestClient.Builder restClientBuilder, ExpoMessageSenderErrorHandler errorHandler) {
 		this.restClient = restClientBuilder.clone()
 			.defaultStatusHandler(errorHandler)
 			.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE, StandardCharsets.UTF_8.name())
