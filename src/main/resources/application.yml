@@ -25,6 +25,11 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 swagger:
   version: 0.0.1
   server-url: ${SERVER_URL:http://localhost:8080}
@@ -51,7 +56,7 @@ oauth:
     redirect-uri: ${APPLE_OAUTH_REDIRECT_URI}
     team-id: ${APPLE_OAUTH_TEAM_ID}
     key-id: ${APPLE_OAUTH_KEY_ID}
-    private-key: ${APPLE_OAUTH_PRIVATE_KEY}
+    private-key-path: ${APPLE_OAUTH_PRIVATE_KEY_PATH} # TODO prod 환경 분리
     url:
       token-url: ${APPLE_OAUTH_TOKEN_URL}
       auth-url: ${APPLE_OAUTH_AUTH_URL}
@@ -68,6 +73,7 @@ oauth:
 
   kakao:
     client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
     redirect-uri: ${KAKAO_REDIRECT_URI}
     url:
       auth-code-url: https://kauth.kakao.com/oauth/authorize
@@ -82,6 +88,20 @@ aws:
   s3:
     bucket: ${BUCKET_NAME}
     env: ${BUCKET_ENV}
+    base-image: ${BASE_KEY}
 
-crawling:
-  chrome-binary: /usr/bin/chromium
+fcm:
+  key-path: ${FCM_KEY_PATH} # TODO prod 환경 분리
+
+security:
+  rate-limit:
+    max-requests: 100 # 시간 윈도우당 최대 요청 수
+    window-seconds: 1 # 시간 윈도우(초)
+
+logging:
+  config: classpath:logback-spring.xml
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 30
+      total-size-cap: 3GB

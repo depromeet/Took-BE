@@ -68,3 +68,12 @@ bin/
 
 # SSH Tunneling
 *.pem
+
+# FCM
+src/main/resources/fcm
+
+# Apple Key
+src/main/resources/apple
+
+# TODO 임시 제거
+lambda

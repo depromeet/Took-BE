@@ -1,0 +1,43 @@
+name: Production deploy workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Push Image to AWS ECR Public Repo
+        id: ecr-image-push
+        run: |
+          aws ecr-public get-login-password --region ${{ secrets.AWS_PUBLIC_REPO_REGION }} | docker login --username AWS --password-stdin public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}
+          docker build -t ${{ secrets.PROD_ECR_REPO }}:latest .
+          docker tag ${{ secrets.PROD_ECR_REPO }}:latest public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ secrets.PROD_ECR_REPO }}:latest
+          docker push public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ secrets.PROD_ECR_REPO }}:latest
+
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy SpringBoot in EC2 using SSH script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ubuntu
+          key: ${{ secrets.PEM_KEY }}
+          script: |
+            ./deploy.sh

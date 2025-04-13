@@ -9,8 +9,10 @@ import org.hibernate.type.SqlTypes;
 import com.evenly.took.feature.card.domain.vo.Content;
 import com.evenly.took.feature.card.domain.vo.Project;
 import com.evenly.took.feature.card.domain.vo.SNS;
+import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.common.model.BaseTimeEntity;
 import com.evenly.took.feature.user.domain.User;
+import com.evenly.took.global.exception.TookException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,7 +55,7 @@ public class Card extends BaseTimeEntity {
 	@Column(name = "nickname", nullable = false)
 	private String nickname;
 
-	@Column(name = "image_path")
+	@Column(name = "image_path", nullable = false)
 	private String imagePath;
 
 	@Column(name = "interest_domain", nullable = false)
@@ -98,7 +100,6 @@ public class Card extends BaseTimeEntity {
 		this.content = content;
 		this.hobby = hobby;
 		this.imagePath = imagePath;
-		this.interestDomain = interestDomain;
 		this.deletedAt = deletedAt;
 		this.news = news;
 		this.nickname = nickname;
@@ -109,5 +110,21 @@ public class Card extends BaseTimeEntity {
 		this.sns = sns;
 		this.summary = summary;
 		this.user = user;
+		this.interestDomain = interestDomain;
+	}
+
+	public void setImageLink(String signedImageLink) {
+		this.imagePath = signedImageLink;
+	}
+
+	public void softDelete(Long userId) {
+		validateOwner(userId);
+		this.deletedAt = LocalDateTime.now();
+	}
+
+	private void validateOwner(Long userId) {
+		if (!userId.equals(this.user.getId())) {
+			throw new TookException(CardErrorCode.INVALID_CARD_OWNER);
+		}
 	}
 }

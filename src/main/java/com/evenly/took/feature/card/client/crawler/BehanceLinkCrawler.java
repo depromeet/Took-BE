@@ -3,7 +3,6 @@ package com.evenly.took.feature.card.client.crawler;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -21,10 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class BehanceLinkCrawler implements LinkCrawler {
 
-	private static final int TIMEOUT_MILLISECONDS = 10000;
+	private static final int TIMEOUT_MILLISECONDS = 20000;
 	private static final String EMPTY_STRING = "";
 
-	private final WebDriverManager webDriverManager;
+	private final WebDriverHandler webDriverHandler;
 
 	@Override
 	public LinkSource supportSource() {
@@ -33,7 +32,7 @@ public class BehanceLinkCrawler implements LinkCrawler {
 
 	@Override
 	public CrawledDto crawl(String link) {
-		WebDriver driver = webDriverManager.fetch();
+		WebDriver driver = webDriverHandler.fetch();
 		try {
 			scrap(driver, link);
 			String title = fetchMeta(driver, "title");
@@ -45,7 +44,7 @@ public class BehanceLinkCrawler implements LinkCrawler {
 			log.error("비핸스 크롤링에 실패하였습니다.");
 			throw ex;
 		} finally {
-			webDriverManager.quit(driver);
+			webDriverHandler.quit(driver);
 		}
 	}
 
@@ -63,7 +62,12 @@ public class BehanceLinkCrawler implements LinkCrawler {
 		String selector = "meta[property='og:%s']".formatted(tag);
 		try {
 			return driver.findElement(By.cssSelector(selector)).getAttribute("content");
-		} catch (NoSuchElementException ex) {
+		} catch (Exception ex) {
+			if (tag.equals("title")) {
+				return "저의 대표프로젝트를 소개할게요";
+			} else if (tag.equals("description")) {
+				return "썸네일을 눌러서 상세하게 살펴보세요";
+			}
 			return EMPTY_STRING;
 		}
 	}

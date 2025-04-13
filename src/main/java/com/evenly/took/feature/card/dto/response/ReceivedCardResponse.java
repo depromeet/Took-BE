@@ -1,5 +1,6 @@
 package com.evenly.took.feature.card.dto.response;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.evenly.took.feature.card.domain.Job;
@@ -9,9 +10,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record MyCardResponse(
+public record ReceivedCardResponse(
 	@Schema(description = "명함 ID", example = "1")
 	Long id,
+
+	@Schema(description = "명함 받은 시간", example = "2025-03-14 03:03:04.374273")
+	LocalDateTime receivedAt,
 
 	@Schema(description = "명함용 이름", example = "홍길동")
 	String nickname,
@@ -37,7 +41,7 @@ public record MyCardResponse(
 	@Schema(description = "대표 정보에 따른 상세 내용")
 	PreviewInfoResponse previewInfo,
 
-	@Schema(description = "프로필 사진 경로", example = "/images/profile/user1.jpg")
+	@Schema(description = "프로필 사진 url", example = "https://s3/images/profile/user1.jpg")
 	String imagePath
 ) {
 }

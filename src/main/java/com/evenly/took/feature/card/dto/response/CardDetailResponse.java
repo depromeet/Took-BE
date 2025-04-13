@@ -44,6 +44,16 @@ public record CardDetailResponse(
 	List<ContentResponse> content,
 
 	@Schema(description = "프로젝트 정보 (previewInfoType이 PROJECT일 때)")
-	List<ProjectResponse> project
+	List<ProjectResponse> project,
+
+	@Schema(description = "폴더 정보 (공유받은 명함 조회 시)")
+	List<FolderResponse> folders,
+
+	@Schema(description = "한 줄 메모 (공유받은 명함 조회 시)", example = "디프만 2팀 팀장님입니다.")
+	String memo,
+
+	@Schema(description = "프로필 사진 url", example = "https://s3/images/profile/user1.jpg")
+	String imagePath
 ) {
+
 }

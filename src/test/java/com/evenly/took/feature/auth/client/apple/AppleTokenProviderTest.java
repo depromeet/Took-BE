@@ -34,7 +34,7 @@ class AppleTokenProviderTest extends MockTest {
 			when(mockProps.keyId()).thenReturn("test_key_id");
 			when(mockProps.teamId()).thenReturn("test_team_id");
 			when(mockProps.clientId()).thenReturn("test_client_id");
-			when(mockProps.privateKey()).thenReturn(generateMockPrivateKey());
+			when(mockProps.privateKeyPath()).thenReturn(createTempPrivateKeyFile());
 
 			AppleUrlProperties mockUrlProps = mock(AppleUrlProperties.class);
 
@@ -74,8 +74,10 @@ class AppleTokenProviderTest extends MockTest {
 		@Test
 		void 개인키_파싱_테스트() throws Exception {
 			// Arrange
+			String tempFilePath = createTempPrivateKeyFile();
+
 			AppleProperties mockProps = mock(AppleProperties.class);
-			when(mockProps.privateKey()).thenReturn(generateMockPrivateKey());
+			when(mockProps.privateKeyPath()).thenReturn(tempFilePath);
 
 			AppleUrlProperties mockUrlProps = mock(AppleUrlProperties.class);
 
@@ -126,6 +128,13 @@ class AppleTokenProviderTest extends MockTest {
 		} catch (Exception e) {
 			throw new RuntimeException("테스트용 개인키 생성 실패", e);
 		}
+	}
+
+	private String createTempPrivateKeyFile() throws Exception {
+		String privateKeyContent = generateMockPrivateKey();
+		java.nio.file.Path tempFile = java.nio.file.Files.createTempFile("apple_test_key", ".p8");
+		java.nio.file.Files.write(tempFile, privateKeyContent.getBytes());
+		return tempFile.toString();
 	}
 
 	// 프라이빗 메서드 호출을 위한 유틸 메서드

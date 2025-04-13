@@ -41,6 +41,11 @@ public class BrunchLinkCrawler implements LinkCrawler {
 	private String fetchMeta(Document target, String tag) {
 		Element element = target.selectFirst("meta[property=og:%s]".formatted(tag));
 		if (element == null) {
+			if (tag.equals("title")) {
+				return "저의 대표프로젝트를 소개할게요";
+			} else if (tag.equals("description")) {
+				return "썸네일을 눌러서 상세하게 살펴보세요";
+			}
 			return EMPTY_STRING;
 		}
 		return element.attr("content");

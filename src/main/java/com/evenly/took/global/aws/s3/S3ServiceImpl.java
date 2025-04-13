@@ -33,7 +33,6 @@ public class S3ServiceImpl implements S3Service {
 
 	private final S3Presigner s3Presigner;
 	private final S3Client s3Client;
-
 	private final AwsProperties awsProperties;
 
 	public String generatePresignedUploadUrl(String fileName, String path) {
@@ -85,6 +84,11 @@ public class S3ServiceImpl implements S3Service {
 	public String uploadFile(MultipartFile file, String path) {
 		String fileName = createFileName(file.getOriginalFilename());
 		String key = awsProperties.s3().env() + path + fileName;
+
+		if (fileName.contains("default") || file.isEmpty()) {
+			key = null;
+		}
+
 		String bucket = awsProperties.s3().bucket();
 		try {
 			PutObjectRequest putObjectRequest = PutObjectRequest.builder()

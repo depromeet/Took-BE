@@ -2,15 +2,17 @@ package com.evenly.took.feature.card.client;
 
 import java.util.Arrays;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum LinkSource {
 
-	NAVER("https://blog.naver.com/", ""),
-	BRUNCH("https://brunch.co.kr/", ""),
-	BEHANCE("https://www.behance.net/", ""),
-	VELOG_MAIN("https://velog.io/", "/posts"),
+	NAVER("https://blog.naver.com", ""),
+	BRUNCH("https://brunch.co.kr", ""),
+	BEHANCE("https://www.behance.net", ""),
+	VELOG_MAIN("https://velog.io", "/posts"),
 	BASIC("basic", ""),
 	;
 

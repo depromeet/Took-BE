@@ -20,12 +20,15 @@ public abstract class JwtMockIntegrationTest extends IntegrationTest {
 	protected String authToken;
 	protected User mockUser;
 
+	// protected Card mockCard;
+
 	@BeforeEach
 	public void setUp() {
 		super.setUp();
 
 		// JWT Mocking
-		mockUser = userFixture.createUser("임손나");
+		mockUser = userFixture.create();
+		// mockCard = cardFixture.create();
 		authToken = "Bearer test-token";
 		when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
 		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUser);

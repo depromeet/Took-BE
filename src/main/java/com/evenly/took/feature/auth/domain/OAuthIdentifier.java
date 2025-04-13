@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,12 +15,10 @@ import lombok.NoArgsConstructor;
 public class OAuthIdentifier {
 
 	@Column(name = "oauth_id")
-	@NotNull
 	private String oauthId;
 
 	@Column(name = "oauth_type")
 	@Enumerated(EnumType.STRING)
-	@NotNull
 	private OAuthType oauthType;
 
 	@Builder
