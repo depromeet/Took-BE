@@ -22,7 +22,7 @@ public class AllowPush {
 	@Column(name = "allow_push_notification", nullable = false)
 	private boolean allowPushNotification;
 
-	@Column(name = "allow_push_content", nullable = false)
+	@Column(name = "allow_push_content")
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<AllowPushContent> allowPushContent;
 

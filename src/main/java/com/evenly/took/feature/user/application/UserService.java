@@ -35,7 +35,8 @@ public class UserService {
 	}
 
 	@Transactional
-	public void updateAllowNotification(User user, AllowNotificationRequest request) {
+	public void updateAllowNotification(Long userId, AllowNotificationRequest request) {
+		User user = findById(userId);
 		AllowPush allowPush = request.toDomain();
 		user.updateAllowPush(allowPush);
 	}

@@ -10,14 +10,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record AllowNotificationRequest(
 
 	@Schema(description = "전체 알림 허용 여부")
-	boolean isAllowPushNotification,
+	boolean isAllowPush,
 
 	@Schema(description = "알림 허용 목록 (정확한 형식을 지켜 입력해주세요)", example = "[\"흥미로운 명함 알림\", \"한 줄 메모 알림\", \"서비스 업데이트 알림\"]")
 	List<String> allowPushContent
 ) {
 
 	public AllowPush toDomain() {
-		return new AllowPush(isAllowPushNotification,
-			AllowPushContentMapper.asAllowPushContents(allowPushContent));
+		return new AllowPush(isAllowPush, AllowPushContentMapper.asAllowPushContents(allowPushContent));
 	}
 }

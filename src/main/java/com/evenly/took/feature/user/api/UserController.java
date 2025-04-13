@@ -30,7 +30,7 @@ public class UserController implements UserApi {
 	public SuccessResponse<Void> fixAllowNotification(
 		@LoginUser User user,
 		@RequestBody AllowNotificationRequest request) {
-		userService.updateAllowNotification(user, request);
+		userService.updateAllowNotification(user.getId(), request);
 		return SuccessResponse.ok("알림 설정 수정 성공");
 	}
 }

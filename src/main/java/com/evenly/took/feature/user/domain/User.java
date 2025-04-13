@@ -79,8 +79,8 @@ public class User extends BaseTimeEntity {
 		this.withdrawReasons = withdrawReasons;
 	}
 
-	public void updateAllowPush(AllowPush allowPush) {
-		this.allowPush = allowPush;
+	public void updateAllowPush(AllowPush updated) {
+		this.allowPush = updated;
 	}
 
 	public boolean isAllowPushNotification() {
