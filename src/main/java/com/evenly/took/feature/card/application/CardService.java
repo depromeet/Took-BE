@@ -82,7 +82,7 @@ public class CardService {
 
 	@Transactional(readOnly = true)
 	public MyCardListResponse findUserCardList(Long userId) {
-		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNullOrderByIsPrimaryDesc(userId);
 
 		cards.forEach(this::updatePresignedImagePath);
 
@@ -189,9 +189,15 @@ public class CardService {
 			.content(contentMapper.toEntity(request.content()))
 			.project(projectMapper.toEntity(request.project()))
 			.previewInfo(request.previewInfoType())
+			.isPrimary(isCreatingFirstCard(currentCardCount))
 			.build();
 
+		System.out.println(newCard.isPrimary());
 		cardRepository.save(newCard);
+	}
+
+	private boolean isCreatingFirstCard(Long currentCardCount) {
+		return currentCardCount == 0;
 	}
 
 	@Transactional
@@ -385,9 +391,45 @@ public class CardService {
 
 	@Transactional
 	public void softDeleteMyCard(Long userId, Long cardId) {
-		Card card = cardRepository.findById(cardId)
-			.orElseThrow(() -> new TookException(CardErrorCode.INVALID_CARD_OWNER));
+		Card card = findCardOrThrow(cardId);
 		card.softDelete(userId);
+
+		if (card.isPrimary()) {
+			card.changePrimaryCard(false);
+			assignNewPrimaryIfNecessary(userId);
+		}
+	}
+
+	private void assignNewPrimaryIfNecessary(Long userId) {
+		List<Card> remainingCards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+
+		if (!remainingCards.isEmpty()) {
+			remainingCards.get(0).changePrimaryCard(true);
+		}
+	}
+
+	@Transactional
+	public void setPrimaryCard(Long userId, Long cardId) {
+		Card targetCard = findOwnedCardOrThrow(userId, cardId);
+		clearExistingPrimaryCard(userId);
+		targetCard.changePrimaryCard(true);
+	}
+
+	private Card findOwnedCardOrThrow(Long userId, Long cardId) {
+		Card card = cardRepository.findByIdAndDeletedAtIsNull(cardId)
+			.orElseThrow(() -> new TookException(CardErrorCode.CARD_NOT_FOUND));
+
+		if (!card.getUser().getId().equals(userId)) {
+			throw new TookException(CardErrorCode.INVALID_CARD_OWNER);
+		}
+		return card;
+	}
+
+	private void clearExistingPrimaryCard(Long userId) {
+		List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+		cards.stream()
+			.filter(Card::isPrimary)
+			.forEach(card -> card.changePrimaryCard(false));
 	}
 
 	private Folder verifyFolderAccess(User user, Long folderId) {

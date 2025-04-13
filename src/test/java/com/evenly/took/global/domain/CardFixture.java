@@ -43,6 +43,7 @@ public class CardFixture extends CardBase {
 			.news(news)
 			.content(contents)
 			.project(projects)
+			.isPrimary(isPrimary)
 			.build();
 		return cardRepository.save(card);
 	}

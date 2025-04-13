@@ -30,6 +30,7 @@ public abstract class CardBase {
 	static List<Content> DEFAULT_CONTENTS = List.of(new Content("제목", "링크", "이미지", "설명"));
 	static List<Project> DEFAULT_PROJECTS = List.of(new Project("제목", "링크", "이미지", "설명"));
 	static LocalDateTime DEFAULT_DELETED_AT = null;
+	static boolean DEFAULT_IS_PRIMARY = false;
 
 	Long id;
 	User user;
@@ -47,6 +48,7 @@ public abstract class CardBase {
 	List<Content> contents;
 	List<Project> projects;
 	LocalDateTime deletedAt;
+	boolean isPrimary;
 
 	protected CardBase() {
 		init();
@@ -69,6 +71,7 @@ public abstract class CardBase {
 		this.contents = DEFAULT_CONTENTS;
 		this.projects = DEFAULT_PROJECTS;
 		this.deletedAt = DEFAULT_DELETED_AT;
+		this.isPrimary = DEFAULT_IS_PRIMARY;
 	}
 
 	public CardBase id(Long id) {
@@ -148,6 +151,11 @@ public abstract class CardBase {
 
 	public CardBase deletedAt(LocalDateTime deletedAt) {
 		this.deletedAt = deletedAt;
+		return this;
+	}
+
+	public CardBase isPrimary(boolean isPrimary) {
+		this.isPrimary = isPrimary;
 		return this;
 	}
 

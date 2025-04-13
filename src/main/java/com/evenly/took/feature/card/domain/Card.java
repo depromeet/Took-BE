@@ -94,10 +94,13 @@ public class Card extends BaseTimeEntity {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
+	@Column(name = "is_primary")
+	private boolean isPrimary;
+
 	@Builder
-	public Card(Career career, List<Content> content, String hobby, String imagePath,
-		List<String> interestDomain, LocalDateTime deletedAt, String news, String nickname, String organization,
-		PreviewInfoType previewInfo, List<Project> project, String region, List<SNS> sns, String summary, User user) {
+	public Card(Career career, List<Content> content, String hobby, String imagePath, List<String> interestDomain,
+		LocalDateTime deletedAt, String news, String nickname, String organization, PreviewInfoType previewInfo,
+		List<Project> project, String region, List<SNS> sns, String summary, User user, boolean isPrimary) {
 		this.career = career;
 		this.content = content;
 		this.hobby = hobby;
@@ -113,6 +116,7 @@ public class Card extends BaseTimeEntity {
 		this.summary = summary;
 		this.user = user;
 		this.interestDomain = interestDomain;
+		this.isPrimary = isPrimary;
 	}
 
 	public void setImageLink(String signedImageLink) {
@@ -128,5 +132,9 @@ public class Card extends BaseTimeEntity {
 		if (!userId.equals(this.user.getId())) {
 			throw new TookException(CardErrorCode.INVALID_CARD_OWNER);
 		}
+	}
+
+	public void changePrimaryCard(boolean isPrimary) {
+		this.isPrimary = isPrimary;
 	}
 }

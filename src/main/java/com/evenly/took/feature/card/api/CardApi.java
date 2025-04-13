@@ -262,4 +262,22 @@ public interface CardApi {
 		@Parameter(hidden = true)
 		MultipartFile profileImage
 	);
+
+	@Operation(
+		summary = "대표 명함 설정",
+		description = "사용자가 소유한 명함 중 하나를 대표 명함으로 설정합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "대표 명함 설정 성공"),
+		@ApiResponse(responseCode = "404", description = "명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "명함 소유자가 아님",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> setPrimaryCard(
+		@Parameter(description = "로그인 사용자", hidden = true)
+		User user,
+
+		@Parameter(description = "대표로 지정할 명함 ID", required = true)
+		Long cardId
+	);
 }

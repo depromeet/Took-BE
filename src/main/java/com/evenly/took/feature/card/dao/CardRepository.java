@@ -21,6 +21,14 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
 	List<Card> findAllByUserIdAndDeletedAtIsNull(Long userId);
 
+	@Query(value = """
+		SELECT * FROM cards
+		WHERE user_id = :userId
+		  AND deleted_at IS NULL
+		ORDER BY is_primary DESC, id ASC
+		""", nativeQuery = true)
+	List<Card> findAllByUserIdAndDeletedAtIsNullOrderByIsPrimaryDesc(@Param("userId") Long userId);
+
 	Optional<Card> findByIdAndDeletedAtIsNull(Long cardId);
 
 	@Modifying(clearAutomatically = true)
