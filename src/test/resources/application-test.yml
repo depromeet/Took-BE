@@ -48,3 +48,7 @@ fcm:
 #  rate-limit:
 #    max-requests: 10 # 시간 윈도우당 최대 요청 수
 #    window-seconds: 10 # 시간 윈도우(초)
+
+aws:
+  s3:
+    base-image: 'baseKey.png'

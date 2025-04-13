@@ -8,6 +8,7 @@ import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CardRequest;
+import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
@@ -243,6 +244,23 @@ public interface CardApi {
 	SuccessResponse<Void> fixReceivedCard(
 		User user,
 		FixReceivedCardRequest request
+	);
+
+	@Operation(
+		summary = "명함 수정",
+		description = "내 명함을 수정합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "내 명함 수정 성공"),
+		@ApiResponse(responseCode = "404", description = "내 명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "권한이 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> fixCard(
+		User user,
+		FixCardRequest request,
+		@Parameter(hidden = true)
+		MultipartFile profileImage
 	);
 
 	@Operation(
