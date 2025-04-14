@@ -29,4 +29,16 @@ public interface ReceivedCardRepository extends JpaRepository<ReceivedCard, Long
 		WHERE rc.createdAt >= :from AND rc.createdAt <= :to AND rc.deletedAt IS NULL
 		""")
 	List<ReceivedCard> findAllByCreatedAtAndDeletedAtIsNull(LocalDateTime from, LocalDateTime to);
+
+	/**
+	 * 특정 사용자의 baseTime 이전 하루 동안 새로 추가된 받은 명함 목록을 조회합니다.
+	 */
+	@Query("SELECT rc FROM ReceivedCard rc WHERE rc.user.id = :userId AND rc.deletedAt IS NULL " +
+		"AND rc.createdAt < :baseTime AND rc.createdAt >= :oneDayBefore " +
+		"ORDER BY rc.id DESC")
+	List<ReceivedCard> findNewReceivedCards(
+		@Param("userId") Long userId,
+		@Param("baseTime") LocalDateTime baseTime,
+		@Param("oneDayBefore") LocalDateTime oneDayBefore
+	);
 }

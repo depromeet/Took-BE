@@ -12,6 +12,7 @@ import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.NewReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
@@ -214,6 +215,28 @@ public interface CardApi {
 	SuccessResponse<ReceivedCardListResponse> getReceivedCards(
 		User user,
 		@ParameterObject ReceivedCardsRequest request
+	);
+	
+	@Operation(
+		summary = "흥미로운 명함 목록 조회 (내 대표명함의 관심사와 하나라도 겹치는 명함)",
+		description = "새로 추가된 받은 명함 중, 내 대표명함의 관심사와 하나라도 겹치는 명함들을 조회합니다. 대표 명함이 없거나 관심사가 없는 경우 빈 목록을 반환합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "흥미로운 명함 목록 조회 성공")
+	})
+	SuccessResponse<ReceivedCardListResponse> getInterestingNewReceivedCards(
+		User user,
+		@ParameterObject NewReceivedCardsRequest request
+	);
+	
+	@Operation(
+		summary = "한줄 메모 명함 목록 조회 (관심사 불일치 + 메모 없음)",
+		description = "새로 추가된 받은 명함 중, 내 대표명함의 관심사와 겹치지 않고 메모가 없는 명함들을 조회합니다. 대표 명함이 없는 경우 모든 메모가 없는 명함을 반환합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "한줄 메모 명함 목록 조회 성공")
+	})
+	SuccessResponse<ReceivedCardListResponse> getMemoNeededNewReceivedCards(
+		User user,
+		@ParameterObject NewReceivedCardsRequest request
 	);
 
 	@Operation(

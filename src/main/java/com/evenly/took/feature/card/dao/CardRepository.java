@@ -37,4 +37,9 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 	int softDeleteAllByUserId(@Param("userId") Long userId, @Param("now") LocalDateTime now);
 
 	Optional<Card> findFirstByUserAndIsPrimaryTrueAndDeletedAtIsNull(User user);
+
+	/**
+	 * 사용자의 대표 명함을 조회합니다.
+	 */
+	Optional<Card> findByUserIdAndIsPrimaryTrueAndDeletedAtIsNull(Long userId);
 }
