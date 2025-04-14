@@ -1,7 +1,9 @@
 package com.evenly.took.global.location.event;
 
-import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.evenly.took.global.redis.RedisGeoSpatialService;
 
@@ -15,7 +17,8 @@ public class LocationRegistrationEventHandler {
 
 	private final RedisGeoSpatialService redisGeoSpatialService;
 
-	@EventListener
+	@Async
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handle(LocationRegistrationEvent event) {
 		log.info("[이벤트 수신] userId={}, lon={}, lat={}", event.getUserId(), event.getLongitude(), event.getLatitude());
 
