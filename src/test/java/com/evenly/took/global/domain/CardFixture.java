@@ -30,7 +30,7 @@ public class CardFixture extends CardBase {
 		}
 		Card card = Card.builder()
 			.user(user)
-			.career(careerFixture.serverDeveloper())
+			.career(career)
 			.previewInfo(previewInfo)
 			.nickname(nickname)
 			.imagePath(imagePath)

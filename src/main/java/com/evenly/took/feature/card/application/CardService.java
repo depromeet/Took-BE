@@ -31,6 +31,7 @@ import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.NewReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
@@ -496,4 +497,149 @@ public class CardService {
 		}
 		return card;
 	}
+
+	/**
+	 * 새로 추가된 받은 명함 중, 내 대표명함과 관심사가 하나라도 겹치는 "흥미로운 명함" 목록을 조회합니다.
+	 * 관심사 기준: 관심도메인 겹침 or 소속정보 일치 or 세부직군 일치
+	 */
+	@Transactional(readOnly = true)
+	public ReceivedCardListResponse findInterestingNewReceivedCards(User user, NewReceivedCardsRequest request) {
+		LocalDateTime baseTime = request.baseTime() != null ? request.baseTime() : LocalDateTime.now();
+		LocalDateTime oneDayBefore = baseTime.minusDays(1);
+
+		Card primaryCard = getPrimaryCard(user.getId());
+		if (primaryCard == null) {
+			return new ReceivedCardListResponse(new ArrayList<>());
+		}
+
+		List<ReceivedCard> newReceivedCards = receivedCardRepository.findNewReceivedCards(
+			user.getId(), baseTime, oneDayBefore);
+
+		List<ReceivedCard> interestingCards = newReceivedCards.stream()
+			.filter(rc -> hasCommonInterest(primaryCard, rc.getCard()))
+			.collect(Collectors.toList());
+
+		interestingCards.forEach(rc -> updatePresignedImagePath(rc.getCard()));
+
+		return cardMapper.toReceivedCardListResponse(interestingCards);
+	}
+
+	/**
+	 * 새로 추가된 받은 명함 중, 내 대표명함과 관심사가 겹치지 않고 메모가 없는 "한줄 메모가 필요한 명함" 목록을 조회합니다.
+	 * 관심사 기준: 관심도메인 겹침 or 소속정보 일치 or 세부직군 일치
+	 */
+	@Transactional(readOnly = true)
+	public ReceivedCardListResponse findMemoNeededNewReceivedCards(User user, NewReceivedCardsRequest request) {
+		LocalDateTime baseTime = request.baseTime() != null ? request.baseTime() : LocalDateTime.now();
+		LocalDateTime oneDayBefore = baseTime.minusDays(1);
+
+		Card primaryCard = getPrimaryCard(user.getId());
+
+		List<ReceivedCard> newReceivedCards = receivedCardRepository.findNewReceivedCards(
+			user.getId(), baseTime, oneDayBefore);
+
+		List<ReceivedCard> memoNeededCards = newReceivedCards.stream()
+			.filter(rc -> {
+				// 메모가 있는 명함은 제외
+				if (rc.getMemo() != null && !rc.getMemo().trim().isEmpty()) {
+					return false;
+				}
+
+				// 대표 명함이 없는 경우, 메모가 없는 모든 명함 포함
+				if (primaryCard == null) {
+					return true;
+				}
+
+				// 공통 관심사가 없는 경우에만 포함
+				return !hasCommonInterest(primaryCard, rc.getCard());
+			})
+			.collect(Collectors.toList());
+
+		memoNeededCards.forEach(rc -> updatePresignedImagePath(rc.getCard()));
+
+		return cardMapper.toReceivedCardListResponse(memoNeededCards);
+	}
+
+	/**
+	 * 사용자의 대표 명함을 조회합니다.
+	 */
+	private Card getPrimaryCard(Long userId) {
+		try {
+			return cardRepository.findByUserIdAndIsPrimaryTrueAndDeletedAtIsNull(userId)
+				.orElse(null);
+		} catch (Exception e) {
+			log.warn("Failed to get primary card: {}", e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * 두 명함 간에 공통 관심사가 있는지 확인합니다.
+	 * 관심사 기준: 관심도메인 겹침 or 소속정보 일치 or 세부직군 일치
+	 */
+	private boolean hasCommonInterest(Card primaryCard, Card otherCard) {
+		if (hasCommonInterestDomain(primaryCard, otherCard)) {
+			return true;
+		}
+
+		if (hasSameOrganization(primaryCard, otherCard)) {
+			return true;
+		}
+
+		if (hasSameCareer(primaryCard, otherCard)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * 두 명함 간에 공통 관심 도메인이 있는지 확인합니다.
+	 */
+	private boolean hasCommonInterestDomain(Card primaryCard, Card otherCard) {
+		List<String> primaryInterests = primaryCard.getInterestDomain();
+		List<String> otherInterests = otherCard.getInterestDomain();
+
+		if (primaryInterests == null || primaryInterests.isEmpty() ||
+			otherInterests == null || otherInterests.isEmpty()) {
+			return false;
+		}
+
+		return otherInterests.stream().anyMatch(primaryInterests::contains);
+	}
+
+	/**
+	 * 두 명함의 소속정보가 일치하는지 확인합니다.
+	 */
+	private boolean hasSameOrganization(Card primaryCard, Card otherCard) {
+		String primaryOrg = primaryCard.getOrganization();
+		String otherOrg = otherCard.getOrganization();
+
+		if (primaryOrg == null || primaryOrg.trim().isEmpty() ||
+			otherOrg == null || otherOrg.trim().isEmpty()) {
+			return false;
+		}
+
+		return primaryOrg.trim().equalsIgnoreCase(otherOrg.trim());
+	}
+
+	/**
+	 * 두 명함의 세부직군이 일치하는지 확인합니다.
+	 */
+	private boolean hasSameCareer(Card primaryCard, Card otherCard) {
+		Career primaryCareer = primaryCard.getCareer();
+		Career otherCareer = otherCard.getCareer();
+
+		if (primaryCareer == null || otherCareer == null) {
+			return false;
+		}
+
+		// 직업 카테고리(Job) 일치 여부 확인
+		if (Objects.equals(primaryCareer.getId(), otherCareer.getId())) {
+			return true;
+		}
+
+		return false;
+	}
+
 }
