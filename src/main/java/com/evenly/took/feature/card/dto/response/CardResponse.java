@@ -41,6 +41,6 @@ public record CardResponse(
 	String imagePath,
 
 	@Schema(description = "대표 명함인지 확인", example = "true")
-	boolean isPrimary
+	Boolean isPrimary
 ) {
 }
