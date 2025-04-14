@@ -16,6 +16,7 @@ import com.evenly.took.feature.notification.domain.Notification;
 import com.evenly.took.feature.notification.domain.NotificationTimeRange;
 import com.evenly.took.feature.notification.domain.NotificationType;
 import com.evenly.took.feature.notification.domain.UserNotification;
+import com.evenly.took.feature.notification.dto.NotificationsResponse;
 import com.evenly.took.feature.user.dao.UserDeviceRepository;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.feature.user.domain.UserDevice;
@@ -30,6 +31,11 @@ public class NotificationService {
 	private final UserDeviceRepository userDeviceRepository;
 	private final CardService cardService;
 	private final NotificationEventPublisher notificationEventPublisher;
+
+	public NotificationsResponse findNotifications(User user) {
+		List<Notification> notifications = notificationRepository.findAllByUser(user);
+		return NotificationsResponse.from(notifications);
+	}
 
 	@Transactional
 	public void sendNotification(LocalDateTime sendAt) {
