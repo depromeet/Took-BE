@@ -131,7 +131,8 @@ public class CardService {
 				baseResponse.project(),
 				folderResponses,
 				memo,
-				baseResponse.imagePath()
+				baseResponse.imagePath(),
+				baseResponse.isPrimary()
 			);
 		}
 	}
