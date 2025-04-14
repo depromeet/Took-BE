@@ -1095,12 +1095,16 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 	class 흥미로운_받은_명함_목록_조회 {
 
 		@Test
-		void 관심사가_일치하는_흥미로운_명함_조회_성공() {
+		void 흥미로운_명함_조회_성공() {
+			Career career = careerFixture.serverDeveloper();
+			Career differentCareer = careerFixture.productDesigner();
 			// given
 			Card primaryCard = cardFixture.creator()
 				.user(mockUser)
+				.career(career)
 				.nickname("내 대표명함")
 				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
 				.isPrimary(true)
 				.create();
 
@@ -1109,8 +1113,10 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 				.create();
 			Card interestingCard = cardFixture.creator()
 				.user(cardOwner1)
+				.career(career)
 				.nickname("흥미로운 명함")
 				.interestDomain(List.of("웹", "프론트엔드"))  // 관심사 "웹"이 겹침
+				.organization("XYZ회사")
 				.create();
 
 			User cardOwner2 = userFixture.creator()
@@ -1118,8 +1124,10 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 				.create();
 			Card nonInterestingCard = cardFixture.creator()
 				.user(cardOwner2)
+				.career(differentCareer)
 				.nickname("관심없는 명함")
 				.interestDomain(List.of("클라우드", "AI"))  // 관심사가 겹치지 않음
+				.organization("DEF회사")
 				.create();
 
 			receivedCardFixture.creator()
@@ -1154,27 +1162,127 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		}
 
 		@Test
-		void 관심사가_없는_경우_빈_결과_반환() {
+		void 동일_소속사_명함은_관심도메인_불일치해도_흥미로운_명함_조회_성공() {
 			// given
 			Card primaryCard = cardFixture.creator()
 				.user(mockUser)
 				.nickname("내 대표명함")
-				.interestDomain(List.of())
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
 				.isPrimary(true)
 				.create();
 
 			User cardOwner = userFixture.creator()
 				.name("명함소유자")
 				.create();
-			Card otherCard = cardFixture.creator()
+			Card sameOrgCard = cardFixture.creator()
 				.user(cardOwner)
-				.nickname("다른 명함")
-				.interestDomain(List.of("웹", "백엔드"))
+				.nickname("동일회사 명함")
+				.interestDomain(List.of("클라우드", "AI"))  // 관심도메인 불일치
+				.organization("ABC회사")  // 소속정보 일치
 				.create();
 
 			receivedCardFixture.creator()
 				.user(mockUser)
-				.card(otherCard)
+				.card(sameOrgCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/interesting")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).get("nickname")).isEqualTo(sameOrgCard.getNickname());
+		}
+
+		@Test
+		void 동일_직군_명함은_관심도메인_불일치해도_흥미로운_명함_조회_성공() {
+			// given
+			Career myCareer = careerFixture.serverDeveloper();
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.career(myCareer)
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card sameJobCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("같은직군 명함")
+				.career(myCareer)  // 같은 직군
+				.interestDomain(List.of("클라우드", "AI"))  // 관심도메인 불일치
+				.organization("XYZ회사")  // 소속정보 불일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(sameJobCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/interesting")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).get("nickname")).isEqualTo(sameJobCard.getNickname());
+		}
+
+		@Test
+		void 세_조건_모두_불일치하는_명함은_흥미로운_명함에서_제외() {
+			// given
+			Career myCareer = careerFixture.serverDeveloper();
+			Career otherCareer = careerFixture.productDesigner();
+
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.career(myCareer)
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card nonMatchingCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("불일치 명함")
+				.career(otherCareer)  // 다른 직군
+				.interestDomain(List.of("클라우드", "AI"))  // 관심도메인 불일치
+				.organization("XYZ회사")  // 소속정보 불일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(nonMatchingCard)
 				.create();
 
 			// when
@@ -1237,10 +1345,15 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 		@Test
 		void 관심사가_겹치지_않고_메모가_없는_명함_조회_성공() {
 			// given
+			Career myCareer = careerFixture.serverDeveloper();
+			Career otherCareer = careerFixture.productDesigner();
+
 			Card primaryCard = cardFixture.creator()
 				.user(mockUser)
 				.nickname("내 대표명함")
+				.career(myCareer)
 				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
 				.isPrimary(true)
 				.create();
 
@@ -1250,7 +1363,9 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			Card memoNeededCard = cardFixture.creator()
 				.user(cardOwner1)
 				.nickname("메모 필요한 명함")
+				.career(otherCareer)  // 다른 직군
 				.interestDomain(List.of("클라우드", "AI"))  // 관심사가 겹치지 않음
+				.organization("XYZ회사")  // 다른 회사
 				.create();
 
 			User cardOwner2 = userFixture.creator()
@@ -1259,7 +1374,9 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			Card interestingCard = cardFixture.creator()
 				.user(cardOwner2)
 				.nickname("관심사 일치 명함")
-				.interestDomain(List.of("웹", "프론트엔드"))
+				.career(myCareer)  // 같은 직군
+				.interestDomain(List.of("웹", "프론트엔드"))  // 관심도메인 일치
+				.organization("DEF회사")  // 다른 회사
 				.create();
 
 			User cardOwner3 = userFixture.creator()
@@ -1268,7 +1385,9 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			Card cardWithMemo = cardFixture.creator()
 				.user(cardOwner3)
 				.nickname("메모 있는 명함")
-				.interestDomain(List.of("데이터", "ML"))
+				.career(otherCareer)  // 다른 직군
+				.interestDomain(List.of("데이터", "ML"))  // 관심사 불일치
+				.organization("GHI회사")  // 다른 회사
 				.create();
 
 			receivedCardFixture.creator()
@@ -1306,6 +1425,139 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 			assertThat(cards).hasSize(1);
 			assertThat(cards.get(0).get("nickname")).isEqualTo(memoNeededCard.getNickname());
+		}
+
+		@Test
+		void 메모_있는_명함은_관심사_불일치해도_제외() {
+			// given
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.interestDomain(List.of("웹", "백엔드"))
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card nonMatchingWithMemo = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("관심사 불일치 메모있는 명함")
+				.interestDomain(List.of("클라우드", "AI"))  // 관심사 불일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(nonMatchingWithMemo)
+				.memo("메모 있음") // 메모 있음
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/memo")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
+		}
+
+		@Test
+		void 같은_직군명함은_메모가_없어도_메모필요에서_제외() {
+			// given
+			Career myCareer = careerFixture.serverDeveloper();
+
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.career(myCareer)
+				.interestDomain(List.of("웹", "백엔드"))
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card sameJobCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("같은직군 명함")
+				.career(myCareer)  // 같은 직군
+				.interestDomain(List.of("클라우드", "AI"))  // 관심사 불일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(sameJobCard)
+				.create();  // 메모 없음
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/memo")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
+		}
+
+		@Test
+		void 같은_소속사_명함은_메모가_없어도_메모필요에서_제외() {
+			// given
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card sameOrgCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("동일회사 명함")
+				.interestDomain(List.of("클라우드", "AI"))  // 관심사 불일치
+				.organization("ABC회사")  // 소속정보 일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(sameOrgCard)
+				.create();  // 메모 없음
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/memo")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
 		}
 
 		@Test
