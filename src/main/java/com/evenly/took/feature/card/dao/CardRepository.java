@@ -34,4 +34,9 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE Card c SET c.deletedAt = :now WHERE c.user.id = :userId AND c.deletedAt IS NULL")
 	int softDeleteAllByUserId(@Param("userId") Long userId, @Param("now") LocalDateTime now);
+	
+	/**
+	 * 사용자의 대표 명함을 조회합니다.
+	 */
+	Optional<Card> findByUserIdAndIsPrimaryTrueAndDeletedAtIsNull(Long userId);
 }

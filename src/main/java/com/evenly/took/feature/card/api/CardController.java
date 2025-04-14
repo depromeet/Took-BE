@@ -25,6 +25,7 @@ import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.NewReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
@@ -174,6 +175,32 @@ public class CardController implements CardApi {
 		@ModelAttribute ReceivedCardsRequest request
 	) {
 		ReceivedCardListResponse response = cardService.findReceivedCards(user, request);
+		return SuccessResponse.of(response);
+	}
+	
+	/**
+	 * 흥미로운 명함 목록 조회 (내 대표명함의 관심사와 하나라도 겹치는 명함)
+	 * 새로 추가된 받은 명함 중, 내 대표명함의 관심사와 하나라도 겹치는 명함들을 반환합니다.
+	 */
+	@GetMapping("/api/card/receive/interesting")
+	public SuccessResponse<ReceivedCardListResponse> getInterestingNewReceivedCards(
+		@LoginUser User user,
+		@ModelAttribute NewReceivedCardsRequest request
+	) {
+		ReceivedCardListResponse response = cardService.findInterestingNewReceivedCards(user, request);
+		return SuccessResponse.of(response);
+	}
+	
+	/**
+	 * 한줄 메모 명함 목록 조회 (관심사 불일치 + 메모 없음)
+	 * 새로 추가된 받은 명함 중, 내 대표명함의 관심사와 겹치지 않고 메모가 없는 명함들을 반환합니다.
+	 */
+	@GetMapping("/api/card/receive/memo")
+	public SuccessResponse<ReceivedCardListResponse> getMemoNeededNewReceivedCards(
+		@LoginUser User user,
+		@ModelAttribute NewReceivedCardsRequest request
+	) {
+		ReceivedCardListResponse response = cardService.findMemoNeededNewReceivedCards(user, request);
 		return SuccessResponse.of(response);
 	}
 

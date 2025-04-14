@@ -31,6 +31,7 @@ import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.NewReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
@@ -496,4 +497,107 @@ public class CardService {
 		}
 		return card;
 	}
+
+	/**
+	 * 새로 추가된 받은 명함 중, 내 대표명함의 관심사와 하나라도 겹치는 "흥미로운 명함" 목록을 조회합니다.
+	 */
+	@Transactional(readOnly = true)
+	public ReceivedCardListResponse findInterestingNewReceivedCards(User user, NewReceivedCardsRequest request) {
+		LocalDateTime baseTime = request.baseTime() != null ? request.baseTime() : LocalDateTime.now();
+		LocalDateTime oneDayBefore = baseTime.minusDays(1);
+
+		List<String> userInterests = new ArrayList<>();
+		try {
+			Card primaryCard = cardRepository.findByUserIdAndIsPrimaryTrueAndDeletedAtIsNull(user.getId())
+				.orElse(null);
+
+			// 대표 명함이 있고, 관심 도메인이 있는 경우만 처리
+			if (primaryCard != null && primaryCard.getInterestDomain() != null) {
+				userInterests = primaryCard.getInterestDomain();
+			}
+		} catch (Exception e) {
+			log.warn("Failed to get primary card: {}", e.getMessage());
+		}
+
+		if (userInterests.isEmpty()) {
+			return new ReceivedCardListResponse(new ArrayList<>());
+		}
+
+		List<ReceivedCard> newReceivedCards = receivedCardRepository.findNewReceivedCards(
+			user.getId(), baseTime, oneDayBefore);
+
+		List<String> finalUserInterests = userInterests;
+		List<ReceivedCard> interestingCards = newReceivedCards.stream()
+			.filter(rc -> {
+				List<String> cardInterests = rc.getCard().getInterestDomain();
+				if (cardInterests == null || cardInterests.isEmpty()) {
+					return false;
+				}
+
+				// 하나라도 겹치는지 확인
+				return cardInterests.stream().anyMatch(finalUserInterests::contains);
+			})
+			.collect(Collectors.toList());
+
+		interestingCards.forEach(rc -> updatePresignedImagePath(rc.getCard()));
+
+		return cardMapper.toReceivedCardListResponse(interestingCards);
+	}
+
+	/**
+	 * 새로 추가된 받은 명함 중, 내 대표명함의 관심사와 겹치지 않고 메모가 없는 "한줄 메모가 필요한 명함" 목록을 조회합니다.
+	 */
+	@Transactional(readOnly = true)
+	public ReceivedCardListResponse findMemoNeededNewReceivedCards(User user, NewReceivedCardsRequest request) {
+		LocalDateTime baseTime = request.baseTime() != null ? request.baseTime() : LocalDateTime.now();
+		LocalDateTime oneDayBefore = baseTime.minusDays(1);
+
+		List<String> userInterests = new ArrayList<>();
+		try {
+			Card primaryCard = cardRepository.findByUserIdAndIsPrimaryTrueAndDeletedAtIsNull(user.getId())
+				.orElse(null);
+
+			// 대표 명함이 있고, 관심 도메인이 있는 경우만 처리
+			if (primaryCard != null && primaryCard.getInterestDomain() != null) {
+				userInterests = primaryCard.getInterestDomain();
+			}
+		} catch (Exception e) {
+			log.warn("Failed to get primary card: {}", e.getMessage());
+		}
+
+		List<ReceivedCard> newReceivedCards = receivedCardRepository.findNewReceivedCards(
+			user.getId(), baseTime, oneDayBefore);
+
+		final List<String> finalUserInterests = userInterests;
+
+		List<ReceivedCard> memoNeededCards = newReceivedCards.stream()
+			.filter(rc -> {
+				// 메모가 있는 명함은 제외
+				if (rc.getMemo() != null && !rc.getMemo().trim().isEmpty()) {
+					return false;
+				}
+
+				// 대표 명함이 없거나 관심사가 없는 경우, 메모가 없는 모든 명함 포함
+				if (finalUserInterests.isEmpty()) {
+					return true;
+				}
+
+				// 카드의 관심 도메인 확인
+				List<String> cardInterests = rc.getCard().getInterestDomain();
+
+				// 카드에 관심 도메인이 없는 경우 포함
+				if (cardInterests == null || cardInterests.isEmpty()) {
+					return true;
+				}
+
+				// 겹치는 관심사가 없는 경우에만 포함
+				return cardInterests.stream().noneMatch(finalUserInterests::contains);
+			})
+			.collect(Collectors.toList());
+
+		memoNeededCards.forEach(rc -> updatePresignedImagePath(rc.getCard()));
+
+		return cardMapper.toReceivedCardListResponse(memoNeededCards);
+	}
+
 }
