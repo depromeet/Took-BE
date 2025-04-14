@@ -11,6 +11,6 @@ public class AsyncErrorHandler implements AsyncUncaughtExceptionHandler {
 
 	@Override
 	public void handleUncaughtException(Throwable throwable, Method method, Object... obj) {
-		log.info("비동기 예외 발생", throwable); // TODO 재시도 구현
+		log.info("비동기 예외 발생", throwable);
 	}
 }

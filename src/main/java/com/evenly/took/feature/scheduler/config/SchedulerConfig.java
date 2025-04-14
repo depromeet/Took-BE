@@ -6,6 +6,4 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @Configuration
 public class SchedulerConfig {
-
-	// TODO error handler 구현하기
 }
