@@ -90,9 +90,6 @@ aws:
     env: ${BUCKET_ENV}
     base-image: ${BASE_KEY}
 
-fcm:
-  key-path: ${FCM_KEY_PATH} # TODO prod 환경 분리
-
 security:
   rate-limit:
     max-requests: 100 # 시간 윈도우당 최대 요청 수
