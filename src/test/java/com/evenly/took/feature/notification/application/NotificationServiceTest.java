@@ -20,10 +20,10 @@ class NotificationServiceTest extends ServiceTest {
 	NotificationService notificationService;
 
 	@Test
-	void 오전_10시_알림을_전송한다() {
+	void 오전_10시_알림을_전송한다() { // 실행 시간 범위: 00:00 ~ 05:59 || 21:01 ~ 23:59
 		LocalTime nowTime = LocalTime.now();
 		if (nowTime.isAfter(LocalTime.of(5, 59)) && nowTime.isBefore(LocalTime.of(21, 1))) {
-			return; // 오후 10시 알림 범위면 PASS
+			return;
 		}
 		// given
 		User me = userFixture.creator()
@@ -47,11 +47,11 @@ class NotificationServiceTest extends ServiceTest {
 	}
 
 	@Test
-	void 오후_10시_알림을_전송한다() {
+	void 오후_10시_알림을_전송한다() { // 실행 시간 범위: 06:00 ~ 21:00
 		// given
 		LocalTime nowTime = LocalTime.now();
 		if (nowTime.isBefore(LocalTime.of(6, 0)) || nowTime.isAfter(LocalTime.of(21, 0))) {
-			return; // 오전 10시 알림 범위면 PASS
+			return;
 		}
 		User me = userFixture.creator()
 			.allowPushNotification(true)
