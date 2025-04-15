@@ -12,12 +12,14 @@ import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.NewReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.SendCardRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsMemoRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
@@ -216,6 +218,28 @@ public interface CardApi {
 		User user,
 		@ParameterObject ReceivedCardsRequest request
 	);
+	
+	@Operation(
+		summary = "흥미로운 명함 목록 조회 (내 대표명함의 관심사와 하나라도 겹치는 명함)",
+		description = "새로 추가된 받은 명함 중, 내 대표명함의 관심사와 하나라도 겹치는 명함들을 조회합니다. 대표 명함이 없거나 관심사가 없는 경우 빈 목록을 반환합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "흥미로운 명함 목록 조회 성공")
+	})
+	SuccessResponse<ReceivedCardListResponse> getInterestingNewReceivedCards(
+		User user,
+		@ParameterObject NewReceivedCardsRequest request
+	);
+	
+	@Operation(
+		summary = "한줄 메모 명함 목록 조회 (관심사 불일치 + 메모 없음)",
+		description = "새로 추가된 받은 명함 중, 내 대표명함의 관심사와 겹치지 않고 메모가 없는 명함들을 조회합니다. 대표 명함이 없는 경우 모든 메모가 없는 명함을 반환합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "한줄 메모 명함 목록 조회 성공")
+	})
+	SuccessResponse<ReceivedCardListResponse> getMemoNeededNewReceivedCards(
+		User user,
+		@ParameterObject NewReceivedCardsRequest request
+	);
 
 	@Operation(
 		summary = "받은 명함 삭제",
@@ -245,6 +269,21 @@ public interface CardApi {
 	SuccessResponse<Void> fixReceivedCard(
 		User user,
 		FixReceivedCardRequest request
+	);
+	
+	@Operation(
+		summary = "여러 개의 받은 명함에 한줄 메모 추가",
+		description = "여러 개의 수신한 명함에 한 번에 한줄 메모를 추가합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "한줄 메모 추가 성공"),
+		@ApiResponse(responseCode = "404", description = "받은 명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "권한이 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> setReceivedCardsMemo(
+		User user,
+		SetReceivedCardsMemoRequest request
 	);
 
 	@Operation(
