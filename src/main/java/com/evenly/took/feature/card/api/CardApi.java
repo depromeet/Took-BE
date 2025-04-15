@@ -18,6 +18,7 @@ import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsMemoRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
@@ -267,6 +268,21 @@ public interface CardApi {
 	SuccessResponse<Void> fixReceivedCard(
 		User user,
 		FixReceivedCardRequest request
+	);
+	
+	@Operation(
+		summary = "여러 개의 받은 명함에 한줄 메모 추가",
+		description = "여러 개의 수신한 명함에 한 번에 한줄 메모를 추가합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "한줄 메모 추가 성공"),
+		@ApiResponse(responseCode = "404", description = "받은 명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "권한이 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> setReceivedCardsMemo(
+		User user,
+		SetReceivedCardsMemoRequest request
 	);
 
 	@Operation(

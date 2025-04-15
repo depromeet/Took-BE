@@ -31,6 +31,7 @@ import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsMemoRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
@@ -220,6 +221,15 @@ public class CardController implements CardApi {
 	) {
 		cardService.updateReceivedCard(user, request);
 		return SuccessResponse.ok("명함 업데이트 성공");
+	}
+	
+	@PutMapping("/api/card/receive/memo/batch")
+	public SuccessResponse<Void> setReceivedCardsMemo(
+		@LoginUser User user,
+		@RequestBody @Valid SetReceivedCardsMemoRequest request
+	) {
+		cardService.updateReceivedCardsMemo(user, request.cardMemos());
+		return SuccessResponse.ok("한줄 메모 추가 성공");
 	}
 
 	@PutMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

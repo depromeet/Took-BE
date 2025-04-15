@@ -37,6 +37,7 @@ import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsMemoRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
@@ -322,6 +323,14 @@ public class CardService {
 	public void updateReceivedCard(User user, FixReceivedCardRequest request) {
 		ReceivedCard receivedCard = findReceivedCardByUserAndCardId(user.getId(), request.cardId());
 		receivedCard.updateMemo(request.memo());
+	}
+	
+	@Transactional
+	public void updateReceivedCardsMemo(User user, List<SetReceivedCardsMemoRequest.CardMemo> cardMemos) {
+		for (SetReceivedCardsMemoRequest.CardMemo cardMemo : cardMemos) {
+			ReceivedCard receivedCard = findReceivedCardByUserAndCardId(user.getId(), cardMemo.cardId());
+			receivedCard.updateMemo(cardMemo.memo());
+		}
 	}
 
 	@Transactional
