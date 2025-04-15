@@ -507,6 +507,14 @@ public class CardService {
 		return card;
 	}
 
+	public Card findPrimaryCard(User user) {
+		return cardRepository.findFirstByUserAndIsPrimaryTrueAndDeletedAtIsNull(user).orElse(null);
+	}
+
+	public List<ReceivedCard> findReceivedCardsCreatedBetween(LocalDateTime from, LocalDateTime to) {
+		return receivedCardRepository.findAllByCreatedAtAndDeletedAtIsNull(from, to);
+	}
+
 	/**
 	 * 새로 추가된 받은 명함 중, 내 대표명함과 관심사가 하나라도 겹치는 "흥미로운 명함" 목록을 조회합니다.
 	 * 관심사 기준: 관심도메인 겹침 or 소속정보 일치 or 세부직군 일치
@@ -650,5 +658,4 @@ public class CardService {
 
 		return false;
 	}
-
 }

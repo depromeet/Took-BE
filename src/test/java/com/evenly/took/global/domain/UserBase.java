@@ -1,11 +1,11 @@
 package com.evenly.took.global.domain;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
 
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
-import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.card.domain.vo.WithdrawReasons;
+import com.evenly.took.feature.user.domain.AllowPushContent;
 import com.evenly.took.feature.user.domain.User;
 
 public abstract class UserBase {
@@ -16,6 +16,8 @@ public abstract class UserBase {
 	static OAuthIdentifier DEFAULT_OAUTH_IDENTIFIER = null;
 	static LocalDateTime DEFAULT_DELETED_AT = null;
 	static WithdrawReasons DEFAULT_WITHDRAW_REASONS = null;
+	static boolean DEFAULT_ALLOW_PUSH_NOTIFICATION = false;
+	static List<AllowPushContent> DEFAULT_ALLOW_PUSH_CONTENT = List.of();
 
 	Long id;
 	String name;
@@ -23,6 +25,8 @@ public abstract class UserBase {
 	OAuthIdentifier oauthIdentifier;
 	LocalDateTime deletedAt;
 	WithdrawReasons withdrawReasons;
+	boolean allowPushNotification;
+	List<AllowPushContent> allowPushContent;
 
 	protected UserBase() {
 		init();
@@ -32,12 +36,11 @@ public abstract class UserBase {
 		this.id = DEFAULT_ID;
 		this.name = DEFAULT_NAME;
 		this.email = DEFAULT_EMAIL;
-		this.oauthIdentifier = OAuthIdentifier.builder()
-			.oauthId(UUID.randomUUID().toString())
-			.oauthType(OAuthType.GOOGLE)
-			.build();
+		this.oauthIdentifier = DEFAULT_OAUTH_IDENTIFIER;
 		this.deletedAt = DEFAULT_DELETED_AT;
 		this.withdrawReasons = DEFAULT_WITHDRAW_REASONS;
+		this.allowPushNotification = DEFAULT_ALLOW_PUSH_NOTIFICATION;
+		this.allowPushContent = DEFAULT_ALLOW_PUSH_CONTENT;
 	}
 
 	public UserBase id(Long id) {
@@ -67,6 +70,16 @@ public abstract class UserBase {
 
 	public UserBase withdrawReasons(WithdrawReasons withdrawReasons) {
 		this.withdrawReasons = withdrawReasons;
+		return this;
+	}
+
+	public UserBase allowPushNotification(boolean allowPushNotification) {
+		this.allowPushNotification = allowPushNotification;
+		return this;
+	}
+
+	public UserBase allowPushContent(List<AllowPushContent> allowPushContent) {
+		this.allowPushContent = allowPushContent;
 		return this;
 	}
 

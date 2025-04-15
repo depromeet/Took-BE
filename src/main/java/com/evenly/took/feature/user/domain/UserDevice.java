@@ -1,9 +1,8 @@
-package com.evenly.took.feature.notification.domain;
+package com.evenly.took.feature.user.domain;
 
 import java.time.LocalDateTime;
 
 import com.evenly.took.feature.common.model.BaseTimeEntity;
-import com.evenly.took.feature.user.domain.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,25 +32,16 @@ public class UserDevice extends BaseTimeEntity {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@Column(name = "fcm_token", unique = true, nullable = false)
-	private String fcmToken;
-
-	@Column(name = "platform", nullable = false)
-	private DevicePlatform platform;
-
-	@Column(name = "allow_push_notification", nullable = false)
-	private boolean allowPushNotification;
+	@Column(name = "expo_token", unique = true, nullable = false)
+	private String expoToken;
 
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
 	@Builder
-	public UserDevice(Long id, User user, String fcmToken, DevicePlatform platform) {
-		this.id = id;
+	public UserDevice(User user, String expoToken) {
 		this.user = user;
-		this.fcmToken = fcmToken;
-		this.platform = platform;
-		this.allowPushNotification = false;
+		this.expoToken = expoToken;
 		this.deletedAt = null;
 	}
 }

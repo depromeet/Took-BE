@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "로그인 응답")
 public record AuthResponse(
 	@Schema(description = "액세스 토큰 및 리프레시 토큰 정보") TokenResponse token,
-	@Schema(description = "로그인 사용자 정보") UserResponse user
+	@Schema(description = "로그인 사용자 정보") UserResponse user,
+	@Schema(description = "기기의 첫 로그인 여부") boolean isFirstLogin
 ) {
 
-	public AuthResponse(TokenDto tokens, User user) {
+	public AuthResponse(TokenDto tokens, User user, boolean isFirstLogin) {
 		this(new TokenResponse(tokens.accessToken(), tokens.refreshToken()),
-			new UserResponse(user));
+			new UserResponse(user),
+			isFirstLogin);
 	}
 }

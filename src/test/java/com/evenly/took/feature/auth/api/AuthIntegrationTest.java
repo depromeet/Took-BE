@@ -1,9 +1,8 @@
 package com.evenly.took.feature.auth.api;
 
-import static io.restassured.RestAssured.given;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static io.restassured.RestAssured.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.mockito.ArgumentMatchers.*;
 
 import java.util.List;
 
@@ -15,6 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.auth.dto.request.LoginRequest;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.TokenResponse;
@@ -62,9 +62,43 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.willReturn(user);
 
 			given().log().all()
+				.contentType(ContentType.JSON)
 				.when().post("/api/auth/login/KAKAO?code=code")
 				.then().log().all()
 				.statusCode(200);
+		}
+
+		@Test
+		void 로그인시_첫_로그인_여부를_판단한다() {
+			User user = userFixture.create();
+			BDDMockito.given(userClientComposite.fetch(any(OAuthType.class), anyString()))
+				.willReturn(user);
+
+			LoginRequest request = new LoginRequest("expoToken");
+
+			boolean isFirstLogin1 = given().log().all()
+				.contentType(ContentType.JSON)
+				.body(request)
+				.contentType(ContentType.JSON)
+				.when().post("/api/auth/login/KAKAO?code=code")
+				.then().log().all()
+				.statusCode(200)
+				.extract()
+				.jsonPath()
+				.getBoolean("data.isFirstLogin");
+			assertThat(isFirstLogin1).isTrue();
+
+			boolean isFirstLogin2 = given().log().all()
+				.contentType(ContentType.JSON)
+				.body(request)
+				.contentType(ContentType.JSON)
+				.when().post("/api/auth/login/KAKAO?code=code")
+				.then().log().all()
+				.statusCode(200)
+				.extract()
+				.jsonPath()
+				.getBoolean("data.isFirstLogin");
+			assertThat(isFirstLogin2).isFalse();
 		}
 
 		@Test
@@ -87,6 +121,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.willReturn(user);
 
 			TokenResponse tokens = given().log().all()
+				.contentType(ContentType.JSON)
 				.when().post("/api/auth/login/KAKAO?code=code")
 				.then().log().all()
 				.statusCode(200)
@@ -126,6 +161,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.willReturn(user);
 
 			TokenResponse tokens = given().log().all()
+				.contentType(ContentType.JSON)
 				.when().post("/api/auth/login/KAKAO?code=code")
 				.then().log().all()
 				.statusCode(200)
@@ -152,6 +188,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 				.willReturn(user);
 
 			TokenResponse tokens = given().log().all()
+				.contentType(ContentType.JSON)
 				.when().post("/api/auth/login/KAKAO?code=code")
 				.then().log().all()
 				.statusCode(200)
@@ -194,6 +231,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 			cardFixture.creator().user(user).create();
 
 			TokenResponse tokens = given().log().all()
+				.contentType(ContentType.JSON)
 				.when().post("/api/auth/login/KAKAO?code=code")
 				.then().log().all()
 				.statusCode(200)
@@ -235,6 +273,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 			cardFixture.creator().user(user).create();
 
 			TokenResponse tokens = given().log().all()
+				.contentType(ContentType.JSON)
 				.when().post("/api/auth/login/KAKAO?code=code")
 				.then().log().all()
 				.statusCode(200)

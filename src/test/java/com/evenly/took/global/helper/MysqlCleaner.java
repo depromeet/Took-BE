@@ -18,7 +18,7 @@ public class MysqlCleaner {
 	private EntityManager entityManager;
 
 	@Transactional
-	public void execute() {
+	public void execute() { // TODO 테이블 읽어서 한 번에 클리어
 		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
 		clearAll();
 		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();

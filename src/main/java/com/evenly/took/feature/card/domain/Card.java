@@ -63,7 +63,7 @@ public class Card extends BaseTimeEntity {
 
 	@Column(name = "interest_domain", nullable = false)
 	@JdbcTypeCode(SqlTypes.JSON)
-	private List<String> interestDomain;
+	private List<String> interestDomain; // TODO Set 어떨지
 
 	@Column(name = "summary", nullable = false)
 	private String summary;

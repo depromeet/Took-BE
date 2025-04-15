@@ -8,7 +8,6 @@ import com.evenly.took.global.config.testcontainers.RedisTestConfig;
 import com.evenly.took.global.config.testcontainers.S3TestConfig;
 
 @Import({
-	FcmTestConfig.class,
 	MySQLTestConfig.class,
 	S3TestConfig.class,
 	RedisTestConfig.class

@@ -40,9 +40,6 @@ oauth:
     client-id: clientId
     redirect-uri: redirectUri
 
-fcm:
-  key-path: test
-
 # BlacklistedIPLoggingTest 실행시에만 추가
 #security:
 #  rate-limit:

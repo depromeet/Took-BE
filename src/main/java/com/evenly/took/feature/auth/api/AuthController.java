@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.evenly.took.feature.auth.application.AuthService;
 import com.evenly.took.feature.auth.client.AuthContext;
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.auth.dto.request.LoginRequest;
 import com.evenly.took.feature.auth.dto.request.RefreshTokenRequest;
 import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
@@ -48,16 +49,17 @@ public class AuthController implements AuthApi {
 	public SuccessResponse<AuthResponse> login(
 		@PathVariable OAuthType oauthType,
 		@RequestParam String code,
-		@RequestParam(required = false) String name) {
+		@RequestParam(required = false) String name,
+		@RequestBody(required = false) LoginRequest request) {
 
 		if (oauthType == OAuthType.APPLE && name != null) {
 			// 애플 로그인에서 사용자 정보가 있는 경우
 			AuthContext context = new AuthContext(code, name);
-			AuthResponse response = authService.loginAndGenerateToken(oauthType, context);
+			AuthResponse response = authService.loginAndGenerateToken(oauthType, context, request);
 			return SuccessResponse.of(response);
 		} else {
 			// 기존 로직 그대로 사용
-			AuthResponse response = authService.loginAndGenerateToken(oauthType, code);
+			AuthResponse response = authService.loginAndGenerateToken(oauthType, code, request);
 			return SuccessResponse.of(response);
 		}
 	}
