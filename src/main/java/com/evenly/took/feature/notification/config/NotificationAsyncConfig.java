@@ -9,11 +9,11 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.evenly.took.feature.notification.exception.AsyncErrorHandler;
+import com.evenly.took.global.exception.AsyncErrorHandler;
 
 @EnableAsync
 @Configuration
-public class AsyncConfig implements AsyncConfigurer {
+public class NotificationAsyncConfig implements AsyncConfigurer {
 
 	@Override
 	public Executor getAsyncExecutor() {
@@ -23,7 +23,8 @@ public class AsyncConfig implements AsyncConfigurer {
 		executor.setMaxPoolSize(processors * 10);
 		executor.setQueueCapacity(500);
 		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-		executor.setThreadNamePrefix("AsyncExecutor-");
+		executor.setThreadNamePrefix("NotificationAsyncExecutor-");
+		executor.setBeanName("NotificationAsyncExecutor");
 		executor.initialize();
 		return executor;
 	}

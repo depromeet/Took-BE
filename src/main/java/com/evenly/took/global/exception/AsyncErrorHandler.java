@@ -1,4 +1,4 @@
-package com.evenly.took.feature.notification.exception;
+package com.evenly.took.global.exception;
 
 import java.lang.reflect.Method;
 

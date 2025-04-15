@@ -19,7 +19,7 @@ public class NotificationEventListener {
 	private final ExpoNotificationService expoNotificationService;
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	@Async
+	@Async("NotificationAsyncExecutor")
 	public void handleSendNotificationEvent(SendNotificationEvent event) throws InterruptedException {
 		List<String> ticketIds = expoNotificationService.sendNotifications(event.getNotifications());
 		pause(MINUTES_15);
