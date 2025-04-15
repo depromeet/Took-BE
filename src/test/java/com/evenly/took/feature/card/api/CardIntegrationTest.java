@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -22,9 +23,14 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.evenly.took.feature.auth.domain.OAuthIdentifier;
+import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.card.application.LinkExtractor;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
+import com.evenly.took.feature.card.dao.CardRepository;
+import com.evenly.took.feature.card.dao.ReceivedCardRepository;
 import com.evenly.took.feature.card.domain.Card;
+import com.evenly.took.feature.card.domain.Career;
 import com.evenly.took.feature.card.domain.Folder;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.evenly.took.feature.card.domain.ReceivedCard;
@@ -35,8 +41,11 @@ import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
+import com.evenly.took.feature.card.dto.request.SendCardRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsMemoRequest;
 import com.evenly.took.feature.card.dto.response.CardResponse;
+import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
 import com.evenly.took.feature.card.exception.FolderErrorCode;
@@ -44,6 +53,7 @@ import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.aws.s3.S3Service;
 import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.integration.JwtMockIntegrationTest;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -56,6 +66,12 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 	@Autowired
 	S3Service s3Service;
+
+	@Autowired
+	CardRepository cardRepository;
+
+	@Autowired
+	ReceivedCardRepository receivedCardRepository;
 
 	@Nested
 	class 내_명함_목록_조회 {
@@ -1085,6 +1101,570 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 	}
 
 	@Nested
+	class 흥미로운_받은_명함_목록_조회 {
+
+		@Test
+		void 흥미로운_명함_조회_성공() {
+			Career career = careerFixture.serverDeveloper();
+			Career differentCareer = careerFixture.productDesigner();
+			// given
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.career(career)
+				.nickname("내 대표명함")
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
+				.isPrimary(true)
+				.create();
+
+			User cardOwner1 = userFixture.creator()
+				.name("명함소유자1")
+				.create();
+			Card interestingCard = cardFixture.creator()
+				.user(cardOwner1)
+				.career(career)
+				.nickname("흥미로운 명함")
+				.interestDomain(List.of("웹", "프론트엔드"))  // 관심사 "웹"이 겹침
+				.organization("XYZ회사")
+				.create();
+
+			User cardOwner2 = userFixture.creator()
+				.name("명함소유자2")
+				.create();
+			Card nonInterestingCard = cardFixture.creator()
+				.user(cardOwner2)
+				.career(differentCareer)
+				.nickname("관심없는 명함")
+				.interestDomain(List.of("클라우드", "AI"))  // 관심사가 겹치지 않음
+				.organization("DEF회사")
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(interestingCard)
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(nonInterestingCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/interesting")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).get("nickname")).isEqualTo(interestingCard.getNickname());
+		}
+
+		@Test
+		void 동일_소속사_명함은_관심도메인_불일치해도_흥미로운_명함_조회_성공() {
+			// given
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card sameOrgCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("동일회사 명함")
+				.interestDomain(List.of("클라우드", "AI"))  // 관심도메인 불일치
+				.organization("ABC회사")  // 소속정보 일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(sameOrgCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/interesting")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).get("nickname")).isEqualTo(sameOrgCard.getNickname());
+		}
+
+		@Test
+		void 동일_직군_명함은_관심도메인_불일치해도_흥미로운_명함_조회_성공() {
+			// given
+			Career myCareer = careerFixture.serverDeveloper();
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.career(myCareer)
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card sameJobCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("같은직군 명함")
+				.career(myCareer)  // 같은 직군
+				.interestDomain(List.of("클라우드", "AI"))  // 관심도메인 불일치
+				.organization("XYZ회사")  // 소속정보 불일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(sameJobCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/interesting")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).get("nickname")).isEqualTo(sameJobCard.getNickname());
+		}
+
+		@Test
+		void 세_조건_모두_불일치하는_명함은_흥미로운_명함에서_제외() {
+			// given
+			Career myCareer = careerFixture.serverDeveloper();
+			Career otherCareer = careerFixture.productDesigner();
+
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.career(myCareer)
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card nonMatchingCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("불일치 명함")
+				.career(otherCareer)  // 다른 직군
+				.interestDomain(List.of("클라우드", "AI"))  // 관심도메인 불일치
+				.organization("XYZ회사")  // 소속정보 불일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(nonMatchingCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/interesting")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
+		}
+
+		@Test
+		void 대표_명함이_없는_경우_빈_목록_반환() {
+			// given
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card otherCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("다른 명함")
+				.interestDomain(List.of("웹", "백엔드"))
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(otherCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/interesting")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
+		}
+	}
+
+	@Nested
+	class 메모가_필요한_받은_명함_목록_조회 {
+
+		@Test
+		void 관심사가_겹치지_않고_메모가_없는_명함_조회_성공() {
+			// given
+			Career myCareer = careerFixture.serverDeveloper();
+			Career otherCareer = careerFixture.productDesigner();
+
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.career(myCareer)
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
+				.isPrimary(true)
+				.create();
+
+			User cardOwner1 = userFixture.creator()
+				.name("명함소유자1")
+				.create();
+			Card memoNeededCard = cardFixture.creator()
+				.user(cardOwner1)
+				.nickname("메모 필요한 명함")
+				.career(otherCareer)  // 다른 직군
+				.interestDomain(List.of("클라우드", "AI"))  // 관심사가 겹치지 않음
+				.organization("XYZ회사")  // 다른 회사
+				.create();
+
+			User cardOwner2 = userFixture.creator()
+				.name("명함소유자2")
+				.create();
+			Card interestingCard = cardFixture.creator()
+				.user(cardOwner2)
+				.nickname("관심사 일치 명함")
+				.career(myCareer)  // 같은 직군
+				.interestDomain(List.of("웹", "프론트엔드"))  // 관심도메인 일치
+				.organization("DEF회사")  // 다른 회사
+				.create();
+
+			User cardOwner3 = userFixture.creator()
+				.name("명함소유자3")
+				.create();
+			Card cardWithMemo = cardFixture.creator()
+				.user(cardOwner3)
+				.nickname("메모 있는 명함")
+				.career(otherCareer)  // 다른 직군
+				.interestDomain(List.of("데이터", "ML"))  // 관심사 불일치
+				.organization("GHI회사")  // 다른 회사
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(memoNeededCard)
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(interestingCard)
+				.create();
+
+			ReceivedCard receivedWithMemo = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(cardWithMemo)
+				.memo("이 사람은 데이터 분석가입니다.")
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/memo")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).get("nickname")).isEqualTo(memoNeededCard.getNickname());
+		}
+
+		@Test
+		void 메모_있는_명함은_관심사_불일치해도_제외() {
+			// given
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.interestDomain(List.of("웹", "백엔드"))
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card nonMatchingWithMemo = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("관심사 불일치 메모있는 명함")
+				.interestDomain(List.of("클라우드", "AI"))  // 관심사 불일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(nonMatchingWithMemo)
+				.memo("메모 있음") // 메모 있음
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/memo")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
+		}
+
+		@Test
+		void 같은_직군명함은_메모가_없어도_메모필요에서_제외() {
+			// given
+			Career myCareer = careerFixture.serverDeveloper();
+
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.career(myCareer)
+				.interestDomain(List.of("웹", "백엔드"))
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card sameJobCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("같은직군 명함")
+				.career(myCareer)  // 같은 직군
+				.interestDomain(List.of("클라우드", "AI"))  // 관심사 불일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(sameJobCard)
+				.create();  // 메모 없음
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/memo")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
+		}
+
+		@Test
+		void 같은_소속사_명함은_메모가_없어도_메모필요에서_제외() {
+			// given
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.interestDomain(List.of("웹", "백엔드"))
+				.organization("ABC회사")
+				.isPrimary(true)
+				.create();
+
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card sameOrgCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("동일회사 명함")
+				.interestDomain(List.of("클라우드", "AI"))  // 관심사 불일치
+				.organization("ABC회사")  // 소속정보 일치
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(sameOrgCard)
+				.create();  // 메모 없음
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/memo")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
+		}
+
+		@Test
+		void 대표_명함이_없는_경우에도_메모가_없는_명함_조회_가능() {
+			// given
+			User cardOwner = userFixture.creator()
+				.name("명함소유자")
+				.create();
+			Card otherCard = cardFixture.creator()
+				.user(cardOwner)
+				.nickname("메모 필요한 명함")
+				.interestDomain(List.of("웹", "백엔드"))
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(otherCard)
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/memo")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).get("nickname")).isEqualTo(otherCard.getNickname());
+		}
+
+		@Test
+		void 모든_명함에_메모가_있는_경우_빈_결과_반환() {
+			// given
+			Card primaryCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("내 대표명함")
+				.interestDomain(List.of("웹", "백엔드"))
+				.isPrimary(true)
+				.create();
+
+			User cardOwner1 = userFixture.creator()
+				.name("명함소유자1")
+				.create();
+			Card card1 = cardFixture.creator()
+				.user(cardOwner1)
+				.nickname("메모있는 명함1")
+				.interestDomain(List.of("클라우드", "AI"))  // 관심사가 겹치지 않음
+				.create();
+
+			User cardOwner2 = userFixture.creator()
+				.name("명함소유자2")
+				.create();
+			Card card2 = cardFixture.creator()
+				.user(cardOwner2)
+				.nickname("메모있는 명함2")
+				.interestDomain(List.of("데이터", "ML"))  // 관심사가 겹치지 않음
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(card1)
+				.memo("첫번째 명함 메모")
+				.create();
+
+			receivedCardFixture.creator()
+				.user(mockUser)
+				.card(card2)
+				.memo("두번째 명함 메모")
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/receive/memo")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)responseMap.get("data");
+			List<Map<String, Object>> cards = (List<Map<String, Object>>)dataMap.get("cards");
+
+			assertThat(cards).isEmpty();
+		}
+	}
+
+	@Nested
 	class 받은_명함_삭제 {
 
 		@Test
@@ -1222,6 +1802,883 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			// then
 			Map<String, Object> responseMap = response.as(Map.class);
 			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
+		}
+	}
+
+	@Nested
+	class 명함_수정 {
+
+		private Career career1;
+		private Career career2;
+		private Card existCard;
+		private MockMultipartFile testImageFile;
+		private final String existingImageKey = "card-profiles/existing-image.jpg"; // Example existing key
+
+		@BeforeEach
+		void setUp() {
+			career1 = careerFixture.serverDeveloper();
+			career2 = careerFixture.productDesigner();
+
+			existCard = cardFixture.creator()
+				.user(mockUser)
+				.nickname("닉네임1")
+				.previewInfo(PreviewInfoType.PROJECT)
+				.career(career1)
+				.imagePath(existingImageKey)
+				.create();
+
+			testImageFile = new MockMultipartFile(
+				"profileImage",
+				"new-image.jpg",
+				MediaType.IMAGE_JPEG_VALUE,
+				"new image content".getBytes()
+			);
+
+		}
+
+		@Test
+		void 명함_수정_성공_모든_필드_업데이트_및_이미지_교체() throws IOException {
+			// given
+			String newNickname = "newNickname";
+			String newSummary = "newSummary";
+			Long newDetailJobId = career2.getId();
+			List<String> newInterestDomain = List.of("newInterestDomain");
+			String newOrganization = "newOrganization";
+			String newRegion = "newRegion";
+			String newHobby = "newHobby";
+			String newNews = "newNews";
+			PreviewInfoType newPreviewType = PreviewInfoType.HOBBY;
+			List<Map<String, String>> newSns = List.of(Map.of("type", "GITHUB", "link", "https://github.com/new"));
+			List<Map<String, String>> newContent = List.of(
+				Map.of("title", "newContent", "link", "https://blog.com/new"));
+			List<Map<String, String>> newProject = List.of(
+				Map.of("title", "newProject", "link", "https://project.com/new"));
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", newNickname)
+				.multiPart("detailJobId", newDetailJobId)
+				.multiPart("interestDomain", objectMapper.writeValueAsString(newInterestDomain))
+				.multiPart("summary", newSummary)
+				.multiPart("organization", newOrganization)
+				.multiPart("region", newRegion)
+				.multiPart("hobby", newHobby)
+				.multiPart("news", newNews)
+				.multiPart("previewInfoType", newPreviewType.name())
+				.multiPart("sns", objectMapper.writeValueAsString(newSns))
+				.multiPart("content", objectMapper.writeValueAsString(newContent))
+				.multiPart("project", objectMapper.writeValueAsString(newProject))
+				.multiPart("profileImage", testImageFile.getOriginalFilename(), testImageFile.getBytes(),
+					testImageFile.getContentType())
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("status")).isEqualTo("OK");
+			assertThat(response.jsonPath().getString("message")).isEqualTo("내 명함 수정 성공");
+
+			ExtractableResponse<Response> detailResponse = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.queryParam("cardId", existCard.getId())
+				.when()
+				.get("/api/card/detail")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// 상세 조회 결과 검증
+			Map<String, Object> dataMap = detailResponse.jsonPath().getMap("data");
+			assertThat(dataMap.get("nickname")).isEqualTo(newNickname);
+			assertThat(dataMap.get("summary")).isEqualTo(newSummary);
+			assertThat(dataMap.get("job")).isEqualTo(career2.getJob().name());
+			assertThat(dataMap.get("detailJob")).isEqualTo(career2.getDetailJobEn());
+			assertThat(dataMap.get("organization")).isEqualTo(newOrganization);
+			assertThat((List<String>)dataMap.get("interestDomain")).containsExactlyElementsOf(newInterestDomain);
+			assertThat(dataMap).containsKey("imagePath");
+			List<Map<String, Object>> snsList = (List<Map<String, Object>>)dataMap.get("sns");
+			assertThat(snsList).hasSize(1);
+			assertThat(snsList.get(0).get("type")).isEqualTo("GITHUB");
+			assertThat(snsList.get(0).get("link")).isEqualTo("https://github.com/new");
+			List<Map<String, Object>> contentList = (List<Map<String, Object>>)dataMap.get("content");
+			assertThat(contentList).hasSize(1);
+			assertThat(contentList.get(0).get("title")).isEqualTo("newContent");
+			assertThat(contentList.get(0).get("link")).isEqualTo("https://blog.com/new");
+			List<Map<String, Object>> projectList = (List<Map<String, Object>>)dataMap.get("project");
+			assertThat(projectList).hasSize(1);
+			assertThat(projectList.get(0).get("title")).isEqualTo("newProject");
+			assertThat(projectList.get(0).get("link")).isEqualTo("https://project.com/new");
+
+		}
+
+		@Test
+		void 명함_수정_성공_기존_이미지_유지() throws JsonProcessingException {
+			// given
+			String updatedNickname = "newNickname";
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", updatedNickname)
+				.multiPart("detailJobId", existCard.getCareer().getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "newSummary")
+				.multiPart("isImageRemoved", false)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			ExtractableResponse<Response> detailResponse = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.queryParam("cardId", existCard.getId())
+				.when()
+				.get("/api/card/detail")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> dataMap = detailResponse.jsonPath().getMap("data");
+			assertThat(dataMap.get("nickname")).isEqualTo(updatedNickname);
+			assertThat(dataMap.get("imagePath")).isNotNull();
+			assertThat(dataMap.get("summary")).isEqualTo("newSummary");
+		}
+
+		@Test
+		void 명함_수정_성공_선택_필드_null_업데이트() throws JsonProcessingException {
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", "newNick")
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "summary")
+				.multiPart("isImageRemoved", false)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			ExtractableResponse<Response> detailResponse = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.queryParam("cardId", existCard.getId())
+				.when()
+				.get("/api/card/detail")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> dataMap = detailResponse.jsonPath().getMap("data");
+
+			assertThat(dataMap.get("nickname")).isEqualTo("newNick");
+			assertThat(dataMap.get("organization")).isNull();
+			assertThat(dataMap.get("hobby")).isNull();
+			assertThat(dataMap.get("news")).isNull();
+			assertThat(dataMap.get("previewInfo")).isNull();
+			assertThat(dataMap.get("sns")).isNull();
+			assertThat(dataMap.get("content")).isNull();
+			assertThat(dataMap.get("project")).isNull();
+
+			// assertThat(updatedCard.getImagePath()).isEqualTo(existingImageKey); // Image kept
+		}
+
+		@Test
+		void 명함_수정_성공_이미지_삭제() throws JsonProcessingException {
+			// given: Update fields, but send NO profileImage and NO originImageKey
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", "noImage")
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", existCard.getSummary())
+				.multiPart("isImageRemoved", true)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			ExtractableResponse<Response> detailResponse = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.queryParam("cardId", existCard.getId())
+				.when()
+				.get("/api/card/detail")
+				.then().log().all()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> dataMap = detailResponse.jsonPath().getMap("data");
+
+			assertThat(dataMap.get("nickname")).isEqualTo("noImage");
+			assertThat((String)dataMap.get("imagePath")).contains("base-image");
+
+		}
+
+		@Test
+		void 명함_수정_실패_필수_필드_누락_닉네임() throws JsonProcessingException {
+			// when
+			given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "요약")
+				.multiPart("originImageKey", existingImageKey)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.BAD_REQUEST.value());
+		}
+
+		@Test
+		void 명함_수정_실패_존재하지_않는_명함() throws JsonProcessingException {
+			// given
+			Long nonExistentCardId = 9999L;
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", nonExistentCardId)
+				.multiPart("nickname", "수정 시도")
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "요약")
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("message"))
+				.isEqualTo(CardErrorCode.CARD_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		void 명함_수정_실패_권한_없음_다른_사용자_명함() throws JsonProcessingException {
+			// given
+			User otherUser = userFixture.creator().name("다른사용자").create();
+			Card otherUsersCard = cardFixture.creator()
+				.user(otherUser)
+				.career(career2)
+				.nickname("nick")
+				.summary("sum")
+				.create();
+
+			// when
+			ExtractableResponse<Response> response = given().log().all()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", otherUsersCard.getId())
+				.multiPart("nickname", "newNickname")
+				.multiPart("detailJobId", career2.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "summary")
+				.multiPart("isImageRemoved", false)
+				.multiPart("previewInfoType", PreviewInfoType.SNS)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.BAD_REQUEST.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("message"))
+				.isEqualTo(CardErrorCode.INVALID_CARD_OWNER.getMessage());
+		}
+
+		@Test
+		void 명함_수정_실패_인증_없음() throws JsonProcessingException {
+			// when
+			given().log().all()
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+				.multiPart("cardId", existCard.getId())
+				.multiPart("nickname", "newNickname")
+				.multiPart("detailJobId", career1.getId())
+				.multiPart("interestDomain", objectMapper.writeValueAsString(existCard.getInterestDomain()))
+				.multiPart("summary", "summary")
+				.multiPart("originImageKey", existingImageKey)
+				.when()
+				.put("/api/card")
+				.then().log().all()
+				.statusCode(HttpStatus.UNAUTHORIZED.value());
+		}
+	}
+
+	@Nested
+	class 대표_명함_시나리오 {
+
+		@Test
+		void 최초_명함은_자동으로_대표로_지정된다() throws IOException {
+			// given
+			MockMultipartFile profileImage = new MockMultipartFile(
+				"profileImage",
+				"first.jpg",
+				"image/jpeg",
+				"fake-image".getBytes()
+			);
+
+			// when
+			given()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType("multipart/form-data")
+				.multiPart("profileImage", profileImage.getOriginalFilename(), profileImage.getBytes(),
+					profileImage.getContentType())
+				.multiPart("nickname", "윤장원")
+				.multiPart("detailJobId", "1")
+				.multiPart("interestDomain", "[\"웹\", \"모바일\", \"클라우드\"]")
+				.multiPart("summary", "백엔드 개발을 좋아하는 개발자입니다")
+				.multiPart("organization", "ABC 회사")
+				.multiPart("sns", "[{\"type\":\"LINKEDIN\",\"link\":\"https://linkedin.com/in/username\"}]")
+				.multiPart("region", "서울 강남구")
+				.multiPart("hobby", "등산, 독서")
+				.multiPart("news", "최근 블로그 포스팅 시작했습니다")
+				.multiPart("content",
+					"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
+				.multiPart("project",
+					"[{\"type\":\"project\",\"title\":\"Took-BE\",\"link\":\"https://github.com/depromeet/Took-BE\",\"imageUrl\":\"https://opengraph.githubassets.com/image.jpg\",\"description\":\"Server 레포입니다.\"}]")
+				.multiPart("previewInfoType", "SNS")
+				.when().post("/api/card")
+				.then().statusCode(201);
+
+			// then
+			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(mockUser.getId());
+			assertThat(cards).hasSize(1);
+			assertThat(cards.get(0).getIsPrimary()).isTrue();
+		}
+
+		@Test
+		void 기존_명함이_있는_상태에서_생성된_명함은_대표가_아니다() throws IOException {
+			// given
+			cardFixture.creator().user(mockUser).isPrimary(true).create();
+
+			MockMultipartFile profileImage = new MockMultipartFile(
+				"profileImage",
+				"second.jpg",
+				"image/jpeg",
+				"fake-image".getBytes()
+			);
+
+			// when
+			given()
+				.header("Authorization", "Bearer %s".formatted(authToken))
+				.contentType("multipart/form-data")
+				.multiPart("previewInfoType", "SNS")
+				.multiPart("profileImage", profileImage.getOriginalFilename(), profileImage.getBytes(),
+					profileImage.getContentType())
+				.multiPart("nickname", "윤장원2")
+				.multiPart("detailJobId", "1")
+				.multiPart("interestDomain", "[\"웹\"]")
+				.multiPart("summary", "두 번째 명함")
+				.when().post("/api/card")
+				.then().statusCode(201);
+
+			// then
+			List<Card> cards = cardRepository.findAllByUserIdAndDeletedAtIsNull(mockUser.getId());
+			assertThat(cards).hasSize(2);
+			long primaryCount = cards.stream().filter(Card::getIsPrimary).count();
+			assertThat(primaryCount).isEqualTo(1);
+			assertThat(
+				cards.stream().anyMatch(card -> !card.getIsPrimary())).isTrue();
+		}
+
+		@Test
+		void 대표_명함을_수동으로_설정하면_기존_대표가_해제된다() {
+			// given
+			Card card1 = cardFixture.creator().user(mockUser).nickname("기존대표").isPrimary(true).create();
+			Card card2 = cardFixture.creator().user(mockUser).nickname("신규후보").create();
+
+			// when
+			given()
+				.header("Authorization", authToken)
+				.contentType(ContentType.JSON)
+				.when()
+				.post("/api/card/{cardId}/primary", card2.getId())
+				.then()
+				.statusCode(HttpStatus.OK.value());
+
+			// then
+			Card updatedCard1 = cardRepository.findById(card1.getId()).orElseThrow();
+			Card updatedCard2 = cardRepository.findById(card2.getId()).orElseThrow();
+			assertThat(updatedCard1.getIsPrimary()).isFalse();
+			assertThat(updatedCard2.getIsPrimary()).isTrue();
+		}
+
+		@Test
+		void 대표_명함_삭제시_남은_한_명이_대표로_승격된다() {
+			// given
+			Card card1 = cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
+			Card card2 = cardFixture.creator().user(mockUser).nickname("후보").create();
+
+			// when
+			given()
+				.header("Authorization", authToken)
+				.contentType(ContentType.JSON)
+				.when()
+				.delete("/api/card/{cardId}", card1.getId())
+				.then()
+				.statusCode(HttpStatus.NO_CONTENT.value());
+
+			// then
+			Card updatedCard2 = cardRepository.findById(card2.getId()).orElseThrow();
+			Card deletedCard1 = cardRepository.findById(card1.getId()).orElseThrow();
+			assertThat(deletedCard1.getDeletedAt()).isNotNull();
+			assertThat(updatedCard2.getIsPrimary()).isTrue();
+		}
+
+		@Test
+		void 대표_명함_삭제시_여러_명함_중_임의_하나가_대표로_선정된다() {
+			// given
+			Card card1 = cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
+			Card card2 = cardFixture.creator().user(mockUser).nickname("후보1").create();
+			Card card3 = cardFixture.creator().user(mockUser).nickname("후보2").create();
+
+			// when
+			given()
+				.header("Authorization", authToken)
+				.contentType(ContentType.JSON)
+				.when()
+				.delete("/api/card/{cardId}", card1.getId())
+				.then()
+				.statusCode(HttpStatus.NO_CONTENT.value());
+
+			// then
+			Card updatedCard2 = cardRepository.findById(card2.getId()).orElseThrow();
+			Card updatedCard3 = cardRepository.findById(card3.getId()).orElseThrow();
+
+			long primaryCount = 0;
+			if (updatedCard2.getIsPrimary())
+				primaryCount++;
+			if (updatedCard3.getIsPrimary())
+				primaryCount++;
+
+			assertThat(primaryCount).isEqualTo(1);
+		}
+
+		@Test
+		void 모든_명함을_삭제하면_대표_명함은_존재하지_않는다() {
+			// given
+			Card card1 = cardFixture.creator().user(mockUser).create();
+			Card card2 = cardFixture.creator().user(mockUser).create();
+
+			// when
+			given().header("Authorization", authToken)
+				.when().delete("/api/card/{cardId}", card1.getId())
+				.then().statusCode(HttpStatus.NO_CONTENT.value());
+
+			given().header("Authorization", authToken)
+				.when().delete("/api/card/{cardId}", card2.getId())
+				.then().statusCode(HttpStatus.NO_CONTENT.value());
+
+			// then
+			List<Card> remaining = cardRepository.findAllByUserIdAndDeletedAtIsNull(mockUser.getId());
+			assertThat(remaining).isEmpty();
+		}
+	}
+
+	@Nested
+	class 명함_조회_우선순위 {
+
+		@Test
+		void 대표_명함이_항상_가장_먼저_조회된다_중간() {
+			// given
+			cardFixture.creator().user(mockUser).nickname("후보1").isPrimary(false).create();
+			cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
+			cardFixture.creator().user(mockUser).nickname("후보2").isPrimary(false).create();
+
+			// when
+			MyCardListResponse response = given()
+				.contentType(ContentType.JSON)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/my")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract()
+				.jsonPath()
+				.getObject("data", MyCardListResponse.class);
+
+			// then
+			assertThat(response.cards()).hasSize(3);
+			assertThat(response.cards().get(0).nickname()).isEqualTo("대표");
+			assertThat(response.cards().get(0).isPrimary()).isEqualTo(true);
+			assertThat(response.cards().get(1).isPrimary()).isEqualTo(false);
+			assertThat(response.cards().get(2).isPrimary()).isEqualTo(false);
+		}
+
+		@Test
+		void 대표_명함이_항상_가장_먼저_조회된다_끝() {
+			// given
+			cardFixture.creator().user(mockUser).nickname("후보1").isPrimary(false).create();
+			cardFixture.creator().user(mockUser).nickname("후보2").isPrimary(false).create();
+			cardFixture.creator().user(mockUser).nickname("대표").isPrimary(true).create();
+
+			// when
+			MyCardListResponse response = given()
+				.contentType(ContentType.JSON)
+				.header("Authorization", authToken)
+				.when()
+				.get("/api/card/my")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract()
+				.jsonPath()
+				.getObject("data", MyCardListResponse.class);
+
+			// then
+			assertThat(response.cards()).hasSize(3);
+			assertThat(response.cards().get(0).nickname()).isEqualTo("대표");
+			assertThat(response.cards().get(0).isPrimary()).isEqualTo(true);
+			assertThat(response.cards().get(1).isPrimary()).isEqualTo(false);
+			assertThat(response.cards().get(2).isPrimary()).isEqualTo(false);
+		}
+	}
+
+	@Nested
+	class 명함_발신 {
+
+		@Test
+		void 다른_유저에게_명함을_발신하면_성공한다() {
+			// given
+			User sender = userFixture.creator()
+				.id(110L)
+				.name("발신자")
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("c9").oauthType(OAuthType.GOOGLE).build())
+				.create();
+
+			User receiver = userFixture.creator()
+				.id(111L)
+				.name("수신자")
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("c3").oauthType(OAuthType.APPLE).build())
+				.create();
+
+			Card card = cardFixture.creator()
+				.user(sender)
+				.isPrimary(true)
+				.create();
+
+			SendCardRequest request = new SendCardRequest(receiver.getId(), card.getId());
+
+			String senderToken = generateTokenFor(sender);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", senderToken)
+				.body(request)
+				.when()
+				.post("/api/card/send")
+				.then()
+				.log().all()
+				.statusCode(HttpStatus.CREATED.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("message")).isEqualTo("명함 발신 성공");
+			boolean exists = receivedCardRepository.existsByUserIdAndCardIdAndDeletedAtIsNullOrderByIdDesc(
+				receiver.getId(), card.getId());
+			assertThat(exists).isTrue();
+		}
+
+		@Test
+		void 자신의_명함을_자신에게_발신하면_예외를_반환한다() {
+			// given
+			User sender = userFixture.creator()
+				.id(102L)
+				.name("발신자")
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("c2").oauthType(OAuthType.GOOGLE).build())
+				.create();
+
+			User invalidUser = userFixture.creator()
+				.id(999L)
+				.name("잘못된 유저")
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("invalid3").oauthType(OAuthType.KAKAO).build())
+				.create();
+
+			Card card = cardFixture.creator()
+				.user(sender)
+				.create();
+
+			SendCardRequest request = new SendCardRequest(sender.getId(), card.getId());
+			String invalidToken = generateTokenFor(invalidUser);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", invalidToken)
+				.body(request)
+				.when()
+				.post("/api/card/send")
+				.then()
+				.statusCode(HttpStatus.BAD_REQUEST.value())
+				.log().all()
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("message")).isEqualTo("자신이 소유한 카드만 수정할 수 있습니다.");
+		}
+	}
+
+	@Nested
+	class 여러_개의_받은_명함에_한줄_메모_추가 {
+		private User cardOwner1;
+		private User cardOwner2;
+		private Card card1;
+		private Card card2;
+		private ReceivedCard receivedCard1;
+		private ReceivedCard receivedCard2;
+
+		@BeforeEach
+		void setUp() {
+			cardOwner1 = userFixture.creator()
+				.name("명함소유자1")
+				.create();
+
+			cardOwner2 = userFixture.creator()
+				.name("명함소유자2")
+				.create();
+
+			card1 = cardFixture.creator()
+				.user(cardOwner1)
+				.nickname("명함1")
+				.create();
+
+			card2 = cardFixture.creator()
+				.user(cardOwner2)
+				.nickname("명함2")
+				.create();
+
+			receivedCard1 = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(card1)
+				.create();
+
+			receivedCard2 = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(card2)
+				.create();
+		}
+
+		@Test
+		void 여러_개의_받은_명함에_메모_추가_성공() {
+			// given
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card1.getId(), "명함1에 대한 메모"));
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card2.getId(), "명함2에 대한 메모"));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+			assertThat(responseMap.get("message")).isEqualTo("한줄 메모 추가 성공");
+
+			// 각 명함에 메모가 제대로 추가되었는지 확인
+			ExtractableResponse<Response> detailResponse = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.param("cardId", card1.getId())
+				.when()
+				.get("/api/card/detail")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> detailResponseMap = detailResponse.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)detailResponseMap.get("data");
+			assertThat(dataMap.get("memo")).isEqualTo("명함1에 대한 메모");
+
+			ExtractableResponse<Response> detailResponse2 = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.param("cardId", card2.getId())
+				.when()
+				.get("/api/card/detail")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> detailResponseMap2 = detailResponse2.as(Map.class);
+			Map<String, Object> dataMap2 = (Map<String, Object>)detailResponseMap2.get("data");
+			assertThat(dataMap2.get("memo")).isEqualTo("명함2에 대한 메모");
+		}
+
+		@Test
+		void 존재하지_않는_명함에_메모_추가시_404_에러() {
+			// given
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card1.getId(), "명함1에 대한 메모"));
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(9999L, "존재하지 않는 명함에 대한 메모"));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		void 다른_사용자의_받은_명함에_메모_추가시_404_에러() {
+			// given
+			User otherUser = userFixture.creator()
+				.name("다른 사용자")
+				.create();
+
+			Card otherCard = cardFixture.creator()
+				.user(cardOwner1)
+				.nickname("다른 카드")
+				.create();
+
+			ReceivedCard otherUserReceivedCard = receivedCardFixture.creator()
+				.user(otherUser)
+				.card(otherCard)
+				.create();
+
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(otherCard.getId(), "다른 사용자의 받은 명함에 메모"));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		void 빈_메모_리스트로_요청시_400_에러() {
+			// given
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(new ArrayList<>());
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.BAD_REQUEST.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getList("errors.message", String.class))
+				.contains("최소 하나 이상의 명함 정보가 필요합니다");
+		}
+
+		@Test
+		void 인증되지_않은_요청시_401_에러() {
+			// given
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card1.getId(), "명함1에 대한 메모"));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when & then
+			given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.UNAUTHORIZED.value());
+		}
+
+		@Test
+		void 메모_내용이_null인_경우도_처리_성공() {
+			// given
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card1.getId(), null));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+			assertThat(responseMap.get("message")).isEqualTo("한줄 메모 추가 성공");
+
+			// 메모가 null로 설정되었는지 확인
+			ExtractableResponse<Response> detailResponse = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.param("cardId", card1.getId())
+				.when()
+				.get("/api/card/detail")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> detailResponseMap = detailResponse.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)detailResponseMap.get("data");
+			assertThat(dataMap.get("memo")).isNull();
 		}
 	}
 }

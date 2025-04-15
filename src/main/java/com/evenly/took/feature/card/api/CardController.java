@@ -21,14 +21,18 @@ import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CardRequest;
+import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.NewReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
+import com.evenly.took.feature.card.dto.request.SendCardRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsMemoRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
@@ -39,6 +43,8 @@ import com.evenly.took.feature.card.dto.response.ScrapResponse;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.auth.meta.LoginUser;
 import com.evenly.took.global.auth.meta.PublicApi;
+import com.evenly.took.global.location.meta.RegisterLocation;
+import com.evenly.took.global.monitoring.slack.SlackErrorAlert;
 import com.evenly.took.global.response.SuccessResponse;
 
 import jakarta.validation.ConstraintViolation;
@@ -50,6 +56,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@SlackErrorAlert
+@RegisterLocation
 @RestController
 @RequiredArgsConstructor
 public class CardController implements CardApi {
@@ -173,6 +181,32 @@ public class CardController implements CardApi {
 		ReceivedCardListResponse response = cardService.findReceivedCards(user, request);
 		return SuccessResponse.of(response);
 	}
+	
+	/**
+	 * 흥미로운 명함 목록 조회 (내 대표명함의 관심사와 하나라도 겹치는 명함)
+	 * 새로 추가된 받은 명함 중, 내 대표명함의 관심사와 하나라도 겹치는 명함들을 반환합니다.
+	 */
+	@GetMapping("/api/card/receive/interesting")
+	public SuccessResponse<ReceivedCardListResponse> getInterestingNewReceivedCards(
+		@LoginUser User user,
+		@ModelAttribute NewReceivedCardsRequest request
+	) {
+		ReceivedCardListResponse response = cardService.findInterestingNewReceivedCards(user, request);
+		return SuccessResponse.of(response);
+	}
+	
+	/**
+	 * 한줄 메모 명함 목록 조회 (관심사 불일치 + 메모 없음)
+	 * 새로 추가된 받은 명함 중, 내 대표명함의 관심사와 겹치지 않고 메모가 없는 명함들을 반환합니다.
+	 */
+	@GetMapping("/api/card/receive/memo")
+	public SuccessResponse<ReceivedCardListResponse> getMemoNeededNewReceivedCards(
+		@LoginUser User user,
+		@ModelAttribute NewReceivedCardsRequest request
+	) {
+		ReceivedCardListResponse response = cardService.findMemoNeededNewReceivedCards(user, request);
+		return SuccessResponse.of(response);
+	}
 
 	@DeleteMapping("/api/card/receive")
 	public SuccessResponse<Void> removeReceivedCards(
@@ -190,5 +224,49 @@ public class CardController implements CardApi {
 	) {
 		cardService.updateReceivedCard(user, request);
 		return SuccessResponse.ok("명함 업데이트 성공");
+	}
+	
+	@PutMapping("/api/card/receive/memo/batch")
+	public SuccessResponse<Void> setReceivedCardsMemo(
+		@LoginUser User user,
+		@RequestBody @Valid SetReceivedCardsMemoRequest request
+	) {
+		cardService.updateReceivedCardsMemo(user, request.cardMemos());
+		return SuccessResponse.ok("한줄 메모 추가 성공");
+	}
+
+	@PutMapping(value = "/api/card", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public SuccessResponse<Void> fixCard(
+		@LoginUser User user,
+		@ModelAttribute FixCardRequest request,
+		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+
+		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+		Set<ConstraintViolation<FixCardRequest>> violations = validator.validate(request);
+
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException("요청 필드 유효성 검사 실패", violations);
+		}
+
+		cardService.updateCard(user, request, profileImage);
+		return SuccessResponse.ok("내 명함 수정 성공");
+	}
+
+	@PostMapping("/api/card/{id}/primary")
+	public SuccessResponse<Void> setPrimaryCard(
+		@LoginUser User user,
+		@PathVariable("id") Long cardId
+	) {
+		cardService.setPrimaryCard(user.getId(), cardId);
+		return SuccessResponse.ok("대표 명함 설정 성공");
+	}
+
+	@PostMapping("/api/card/send")
+	public SuccessResponse<Void> sendCard(
+		@LoginUser User user,
+		@RequestBody @Valid SendCardRequest request
+	) {
+		cardService.sendCardToUser(user.getId(), request.targetUserId(), request.cardId());
+		return SuccessResponse.created("명함 발신 성공");
 	}
 }

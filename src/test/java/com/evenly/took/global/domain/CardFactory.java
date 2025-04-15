@@ -6,8 +6,8 @@ import com.evenly.took.feature.card.domain.Card;
 
 public class CardFactory extends CardBase {
 
-	UserFactory userFactory;
-	CareerFactory careerFactory;
+	UserFactory userFactory = new UserFactory();
+	CareerFactory careerFactory = new CareerFactory();
 
 	public CardBase creator() {
 		return new CardFactory();

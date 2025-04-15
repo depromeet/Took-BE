@@ -6,8 +6,8 @@ import com.evenly.took.feature.card.domain.ReceivedCard;
 
 public class ReceivedCardFactory extends ReceivedCardBase {
 
-	UserFactory userFactory;
-	CardFactory cardFactory;
+	UserFactory userFactory = new UserFactory();
+	CardFactory cardFactory = new CardFactory();
 
 	public ReceivedCardBase creator() {
 		return new ReceivedCardFactory();

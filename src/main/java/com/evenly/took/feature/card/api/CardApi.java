@@ -8,14 +8,18 @@ import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.AddFolderRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.request.CardRequest;
+import com.evenly.took.feature.card.dto.request.FixCardRequest;
 import com.evenly.took.feature.card.dto.request.FixFolderRequest;
 import com.evenly.took.feature.card.dto.request.FixReceivedCardRequest;
 import com.evenly.took.feature.card.dto.request.LinkRequest;
+import com.evenly.took.feature.card.dto.request.NewReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.ReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
+import com.evenly.took.feature.card.dto.request.SendCardRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsMemoRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
@@ -214,6 +218,28 @@ public interface CardApi {
 		User user,
 		@ParameterObject ReceivedCardsRequest request
 	);
+	
+	@Operation(
+		summary = "흥미로운 명함 목록 조회 (내 대표명함의 관심사와 하나라도 겹치는 명함)",
+		description = "새로 추가된 받은 명함 중, 내 대표명함의 관심사와 하나라도 겹치는 명함들을 조회합니다. 대표 명함이 없거나 관심사가 없는 경우 빈 목록을 반환합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "흥미로운 명함 목록 조회 성공")
+	})
+	SuccessResponse<ReceivedCardListResponse> getInterestingNewReceivedCards(
+		User user,
+		@ParameterObject NewReceivedCardsRequest request
+	);
+	
+	@Operation(
+		summary = "한줄 메모 명함 목록 조회 (관심사 불일치 + 메모 없음)",
+		description = "새로 추가된 받은 명함 중, 내 대표명함의 관심사와 겹치지 않고 메모가 없는 명함들을 조회합니다. 대표 명함이 없는 경우 모든 메모가 없는 명함을 반환합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "한줄 메모 명함 목록 조회 성공")
+	})
+	SuccessResponse<ReceivedCardListResponse> getMemoNeededNewReceivedCards(
+		User user,
+		@ParameterObject NewReceivedCardsRequest request
+	);
 
 	@Operation(
 		summary = "받은 명함 삭제",
@@ -243,5 +269,73 @@ public interface CardApi {
 	SuccessResponse<Void> fixReceivedCard(
 		User user,
 		FixReceivedCardRequest request
+	);
+	
+	@Operation(
+		summary = "여러 개의 받은 명함에 한줄 메모 추가",
+		description = "여러 개의 수신한 명함에 한 번에 한줄 메모를 추가합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "한줄 메모 추가 성공"),
+		@ApiResponse(responseCode = "404", description = "받은 명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "권한이 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> setReceivedCardsMemo(
+		User user,
+		SetReceivedCardsMemoRequest request
+	);
+
+	@Operation(
+		summary = "명함 수정",
+		description = "내 명함을 수정합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "내 명함 수정 성공"),
+		@ApiResponse(responseCode = "404", description = "내 명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "권한이 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> fixCard(
+		User user,
+		FixCardRequest request,
+		@Parameter(hidden = true)
+		MultipartFile profileImage
+	);
+
+	@Operation(
+		summary = "대표 명함 설정",
+		description = "사용자가 소유한 명함 중 하나를 대표 명함으로 설정합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "대표 명함 설정 성공"),
+		@ApiResponse(responseCode = "404", description = "명함을 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "명함 소유자가 아님",
+			content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	SuccessResponse<Void> setPrimaryCard(
+		@Parameter(description = "로그인 사용자", hidden = true)
+		User user,
+
+		@Parameter(description = "대표로 지정할 명함 ID", required = true)
+		Long cardId
+	);
+
+	@Operation(
+		summary = "명함 발신",
+		description = "선택된 유저에게 내가 소유한 특정 명함을 발신합니다."
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "201", description = "명함 발신 성공"),
+		@ApiResponse(responseCode = "400", description = "자기 자신에게 전송 시도 / 이미 보낸 명함",
+			content = @Content(schema = @Schema(implementation = com.evenly.took.global.exception.dto.ErrorResponse.class))),
+		@ApiResponse(responseCode = "404", description = "명함 또는 유저를 찾을 수 없음",
+			content = @Content(schema = @Schema(implementation = com.evenly.took.global.exception.dto.ErrorResponse.class))),
+		@ApiResponse(responseCode = "403", description = "본인 명함이 아님",
+			content = @Content(schema = @Schema(implementation = com.evenly.took.global.exception.dto.ErrorResponse.class)))
+	})
+	SuccessResponse<Void> sendCard(
+		@Parameter(description = "로그인한 사용자", hidden = true) User user,
+		SendCardRequest request
 	);
 }

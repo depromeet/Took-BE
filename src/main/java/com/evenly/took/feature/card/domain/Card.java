@@ -3,6 +3,7 @@ package com.evenly.took.feature.card.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -29,11 +30,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "cards")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 public class Card extends BaseTimeEntity {
 
 	@Id
@@ -92,10 +95,14 @@ public class Card extends BaseTimeEntity {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
+	@ColumnDefault("false")
+	@Column(name = "is_primary")
+	private Boolean isPrimary;
+
 	@Builder
-	public Card(Career career, List<Content> content, String hobby, String imagePath,
-		List<String> interestDomain, LocalDateTime deletedAt, String news, String nickname, String organization,
-		PreviewInfoType previewInfo, List<Project> project, String region, List<SNS> sns, String summary, User user) {
+	public Card(Career career, List<Content> content, String hobby, String imagePath, List<String> interestDomain,
+		LocalDateTime deletedAt, String news, String nickname, String organization, PreviewInfoType previewInfo,
+		List<Project> project, String region, List<SNS> sns, String summary, User user, Boolean isPrimary) {
 		this.career = career;
 		this.content = content;
 		this.hobby = hobby;
@@ -111,6 +118,7 @@ public class Card extends BaseTimeEntity {
 		this.summary = summary;
 		this.user = user;
 		this.interestDomain = interestDomain;
+		this.isPrimary = isPrimary;
 	}
 
 	public void setImageLink(String signedImageLink) {
@@ -126,5 +134,9 @@ public class Card extends BaseTimeEntity {
 		if (!userId.equals(this.user.getId())) {
 			throw new TookException(CardErrorCode.INVALID_CARD_OWNER);
 		}
+	}
+
+	public void changePrimaryCard(Boolean isPrimary) {
+		this.isPrimary = isPrimary;
 	}
 }

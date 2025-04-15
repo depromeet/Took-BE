@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.evenly.took.global.domain.CardFixture;
 import com.evenly.took.global.domain.CareerFixture;
 import com.evenly.took.global.domain.FolderFixture;
+import com.evenly.took.global.domain.NotificationFixture;
 import com.evenly.took.global.domain.ReceivedCardFixture;
 import com.evenly.took.global.domain.ReceivedCardFolderFixture;
 import com.evenly.took.global.domain.UserFixture;
@@ -34,6 +35,9 @@ public abstract class DatabaseManager {
 
 	@Autowired
 	protected ReceivedCardFolderFixture receivedCardFolderFixture;
+
+	@Autowired
+	protected NotificationFixture notificationFixture;
 
 	@BeforeEach
 	void setUp() {

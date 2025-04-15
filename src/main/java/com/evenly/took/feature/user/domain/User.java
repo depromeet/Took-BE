@@ -53,14 +53,18 @@ public class User extends BaseTimeEntity {
 	@JdbcTypeCode(SqlTypes.JSON)
 	private WithdrawReasons withdrawReasons;
 
+	@Embedded
+	private AllowPush allowPush;
+
 	@Builder
 	public User(OAuthIdentifier oauthIdentifier, String name, String email, LocalDateTime deletedAt,
-		WithdrawReasons withdrawReasons) {
+		WithdrawReasons withdrawReasons, AllowPush allowPush) {
 		this.oauthIdentifier = oauthIdentifier;
 		this.name = name;
 		this.email = email;
 		this.deletedAt = deletedAt;
 		this.withdrawReasons = withdrawReasons;
+		this.allowPush = allowPush;
 	}
 
 	public static User toEntity(Long id) {
@@ -73,5 +77,13 @@ public class User extends BaseTimeEntity {
 		this.deletedAt = LocalDateTime.now();
 		this.oauthIdentifier = null;
 		this.withdrawReasons = withdrawReasons;
+	}
+
+	public void updateAllowPush(AllowPush updated) {
+		this.allowPush = updated;
+	}
+
+	public boolean isAllowPushNotification() {
+		return allowPush.isAllowPushNotification();
 	}
 }

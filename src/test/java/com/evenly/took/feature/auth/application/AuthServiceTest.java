@@ -1,12 +1,8 @@
 package com.evenly.took.feature.auth.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.doNothing;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
 
@@ -16,6 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.evenly.took.feature.auth.client.UserClientComposite;
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.auth.dto.request.LoginRequest;
 import com.evenly.took.feature.auth.dto.request.WithdrawRequest;
 import com.evenly.took.feature.auth.dto.response.AuthResponse;
 import com.evenly.took.feature.user.domain.User;
@@ -40,12 +37,14 @@ class AuthServiceTest extends ServiceTest {
 			.willReturn(user);
 
 		// when
-		AuthResponse response = authService.loginAndGenerateToken(OAuthType.KAKAO, "code");
+		LoginRequest request = new LoginRequest("expoToken");
+		AuthResponse response = authService.loginAndGenerateToken(OAuthType.KAKAO, "code", request);
 
 		// then
 		assertThat(response.token().accessToken()).containsAnyOf(".");
 		assertThat(response.token().refreshToken()).isNotBlank();
 		assertThat(response.user().name()).isEqualTo(user.getName());
+		assertThat(response.isFirstLogin()).isTrue();
 	}
 
 	@Test
