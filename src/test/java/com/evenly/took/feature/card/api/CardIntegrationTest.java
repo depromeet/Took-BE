@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -38,6 +39,7 @@ import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
+import com.evenly.took.feature.card.dto.request.SetReceivedCardsMemoRequest;
 import com.evenly.took.feature.card.dto.response.CardResponse;
 import com.evenly.took.feature.card.dto.response.MyCardListResponse;
 import com.evenly.took.feature.card.dto.response.ScrapResponse;
@@ -2347,6 +2349,244 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			assertThat(response.cards().get(0).isPrimary()).isEqualTo(true);
 			assertThat(response.cards().get(1).isPrimary()).isEqualTo(false);
 			assertThat(response.cards().get(2).isPrimary()).isEqualTo(false);
+		}
+	}
+
+	@Nested
+	class 여러_개의_받은_명함에_한줄_메모_추가 {
+		private User cardOwner1;
+		private User cardOwner2;
+		private Card card1;
+		private Card card2;
+		private ReceivedCard receivedCard1;
+		private ReceivedCard receivedCard2;
+
+		@BeforeEach
+		void setUp() {
+			cardOwner1 = userFixture.creator()
+				.name("명함소유자1")
+				.create();
+
+			cardOwner2 = userFixture.creator()
+				.name("명함소유자2")
+				.create();
+
+			card1 = cardFixture.creator()
+				.user(cardOwner1)
+				.nickname("명함1")
+				.create();
+
+			card2 = cardFixture.creator()
+				.user(cardOwner2)
+				.nickname("명함2")
+				.create();
+
+			receivedCard1 = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(card1)
+				.create();
+
+			receivedCard2 = receivedCardFixture.creator()
+				.user(mockUser)
+				.card(card2)
+				.create();
+		}
+
+		@Test
+		void 여러_개의_받은_명함에_메모_추가_성공() {
+			// given
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card1.getId(), "명함1에 대한 메모"));
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card2.getId(), "명함2에 대한 메모"));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+			assertThat(responseMap.get("message")).isEqualTo("한줄 메모 추가 성공");
+
+			// 각 명함에 메모가 제대로 추가되었는지 확인
+			ExtractableResponse<Response> detailResponse = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.param("cardId", card1.getId())
+				.when()
+				.get("/api/card/detail")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> detailResponseMap = detailResponse.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)detailResponseMap.get("data");
+			assertThat(dataMap.get("memo")).isEqualTo("명함1에 대한 메모");
+
+			ExtractableResponse<Response> detailResponse2 = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.param("cardId", card2.getId())
+				.when()
+				.get("/api/card/detail")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> detailResponseMap2 = detailResponse2.as(Map.class);
+			Map<String, Object> dataMap2 = (Map<String, Object>)detailResponseMap2.get("data");
+			assertThat(dataMap2.get("memo")).isEqualTo("명함2에 대한 메모");
+		}
+
+		@Test
+		void 존재하지_않는_명함에_메모_추가시_404_에러() {
+			// given
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card1.getId(), "명함1에 대한 메모"));
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(9999L, "존재하지 않는 명함에 대한 메모"));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		void 다른_사용자의_받은_명함에_메모_추가시_404_에러() {
+			// given
+			User otherUser = userFixture.creator()
+				.name("다른 사용자")
+				.create();
+
+			Card otherCard = cardFixture.creator()
+				.user(cardOwner1)
+				.nickname("다른 카드")
+				.create();
+
+			ReceivedCard otherUserReceivedCard = receivedCardFixture.creator()
+				.user(otherUser)
+				.card(otherCard)
+				.create();
+
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(otherCard.getId(), "다른 사용자의 받은 명함에 메모"));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.NOT_FOUND.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("message")).isEqualTo(CardErrorCode.RECEIVED_CARD_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		void 빈_메모_리스트로_요청시_400_에러() {
+			// given
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(new ArrayList<>());
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.BAD_REQUEST.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getList("errors.message", String.class))
+				.contains("최소 하나 이상의 명함 정보가 필요합니다");
+		}
+
+		@Test
+		void 인증되지_않은_요청시_401_에러() {
+			// given
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card1.getId(), "명함1에 대한 메모"));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when & then
+			given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.UNAUTHORIZED.value());
+		}
+
+		@Test
+		void 메모_내용이_null인_경우도_처리_성공() {
+			// given
+			List<SetReceivedCardsMemoRequest.CardMemo> cardMemos = new ArrayList<>();
+			cardMemos.add(new SetReceivedCardsMemoRequest.CardMemo(card1.getId(), null));
+
+			SetReceivedCardsMemoRequest request = new SetReceivedCardsMemoRequest(cardMemos);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.body(request)
+				.when()
+				.put("/api/card/receive/memo/batch")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			// then
+			Map<String, Object> responseMap = response.as(Map.class);
+			assertThat(responseMap.get("status")).isEqualTo("OK");
+			assertThat(responseMap.get("message")).isEqualTo("한줄 메모 추가 성공");
+
+			// 메모가 null로 설정되었는지 확인
+			ExtractableResponse<Response> detailResponse = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", authToken)
+				.param("cardId", card1.getId())
+				.when()
+				.get("/api/card/detail")
+				.then()
+				.statusCode(HttpStatus.OK.value())
+				.extract();
+
+			Map<String, Object> detailResponseMap = detailResponse.as(Map.class);
+			Map<String, Object> dataMap = (Map<String, Object>)detailResponseMap.get("data");
+			assertThat(dataMap.get("memo")).isNull();
 		}
 	}
 }
