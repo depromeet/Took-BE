@@ -15,6 +15,8 @@ import com.evenly.took.global.exception.AsyncErrorHandler;
 @Configuration
 public class NotificationAsyncConfig implements AsyncConfigurer {
 
+	private static final int AWAIT_SECONDS = 600;
+
 	@Override
 	public Executor getAsyncExecutor() {
 		int processors = Runtime.getRuntime().availableProcessors();
@@ -23,6 +25,8 @@ public class NotificationAsyncConfig implements AsyncConfigurer {
 		executor.setMaxPoolSize(processors * 10);
 		executor.setQueueCapacity(500);
 		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+		executor.setWaitForTasksToCompleteOnShutdown(true);
+		executor.setAwaitTerminationSeconds(AWAIT_SECONDS);
 		executor.setThreadNamePrefix("NotificationAsyncExecutor-");
 		executor.setBeanName("NotificationAsyncExecutor");
 		executor.initialize();
