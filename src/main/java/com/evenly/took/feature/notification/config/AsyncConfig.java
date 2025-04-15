@@ -16,12 +16,12 @@ import com.evenly.took.feature.notification.exception.AsyncErrorHandler;
 public class AsyncConfig implements AsyncConfigurer {
 
 	@Override
-	public Executor getAsyncExecutor() { // TODO 데이터 조정
+	public Executor getAsyncExecutor() {
 		int processors = Runtime.getRuntime().availableProcessors();
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(processors);
-		executor.setMaxPoolSize(processors * 2);
-		executor.setQueueCapacity(100);
+		executor.setCorePoolSize(processors * 5);
+		executor.setMaxPoolSize(processors * 10);
+		executor.setQueueCapacity(500);
 		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		executor.setThreadNamePrefix("AsyncExecutor-");
 		executor.initialize();
