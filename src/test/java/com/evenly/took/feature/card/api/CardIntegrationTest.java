@@ -23,9 +23,12 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.evenly.took.feature.auth.domain.OAuthIdentifier;
+import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.card.application.LinkExtractor;
 import com.evenly.took.feature.card.client.dto.CrawledDto;
 import com.evenly.took.feature.card.dao.CardRepository;
+import com.evenly.took.feature.card.dao.ReceivedCardRepository;
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Career;
 import com.evenly.took.feature.card.domain.Folder;
@@ -38,6 +41,7 @@ import com.evenly.took.feature.card.dto.request.LinkRequest;
 import com.evenly.took.feature.card.dto.request.ReceiveCardRequest;
 import com.evenly.took.feature.card.dto.request.RemoveFolderRequest;
 import com.evenly.took.feature.card.dto.request.RemoveReceivedCardsRequest;
+import com.evenly.took.feature.card.dto.request.SendCardRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsFolderRequest;
 import com.evenly.took.feature.card.dto.request.SetReceivedCardsMemoRequest;
 import com.evenly.took.feature.card.dto.response.CardResponse;
@@ -65,6 +69,9 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 
 	@Autowired
 	CardRepository cardRepository;
+
+	@Autowired
+	ReceivedCardRepository receivedCardRepository;
 
 	@Nested
 	class 내_명함_목록_조회 {
@@ -2349,6 +2356,91 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			assertThat(response.cards().get(0).isPrimary()).isEqualTo(true);
 			assertThat(response.cards().get(1).isPrimary()).isEqualTo(false);
 			assertThat(response.cards().get(2).isPrimary()).isEqualTo(false);
+		}
+	}
+
+	@Nested
+	class 명함_발신 {
+
+		@Test
+		void 다른_유저에게_명함을_발신하면_성공한다() {
+			// given
+			User sender = userFixture.creator()
+				.id(110L)
+				.name("발신자")
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("c9").oauthType(OAuthType.GOOGLE).build())
+				.create();
+
+			User receiver = userFixture.creator()
+				.id(111L)
+				.name("수신자")
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("c3").oauthType(OAuthType.APPLE).build())
+				.create();
+
+			Card card = cardFixture.creator()
+				.user(sender)
+				.isPrimary(true)
+				.create();
+
+			SendCardRequest request = new SendCardRequest(receiver.getId(), card.getId());
+
+			String senderToken = generateTokenFor(sender);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", senderToken)
+				.body(request)
+				.when()
+				.post("/api/card/send")
+				.then()
+				.log().all()
+				.statusCode(HttpStatus.CREATED.value())
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("message")).isEqualTo("명함 발신 성공");
+			boolean exists = receivedCardRepository.existsByUserIdAndCardIdAndDeletedAtIsNullOrderByIdDesc(
+				receiver.getId(), card.getId());
+			assertThat(exists).isTrue();
+		}
+
+		@Test
+		void 자신의_명함을_자신에게_발신하면_예외를_반환한다() {
+			// given
+			User sender = userFixture.creator()
+				.id(102L)
+				.name("발신자")
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("c2").oauthType(OAuthType.GOOGLE).build())
+				.create();
+
+			User invalidUser = userFixture.creator()
+				.id(999L)
+				.name("잘못된 유저")
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("invalid3").oauthType(OAuthType.KAKAO).build())
+				.create();
+
+			Card card = cardFixture.creator()
+				.user(sender)
+				.create();
+
+			SendCardRequest request = new SendCardRequest(sender.getId(), card.getId());
+			String invalidToken = generateTokenFor(invalidUser);
+
+			// when
+			ExtractableResponse<Response> response = given()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", invalidToken)
+				.body(request)
+				.when()
+				.post("/api/card/send")
+				.then()
+				.statusCode(HttpStatus.BAD_REQUEST.value())
+				.log().all()
+				.extract();
+
+			// then
+			assertThat(response.jsonPath().getString("message")).isEqualTo("자신이 소유한 카드만 수정할 수 있습니다.");
 		}
 	}
 

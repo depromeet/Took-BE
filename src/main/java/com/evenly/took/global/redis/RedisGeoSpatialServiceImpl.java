@@ -29,43 +29,34 @@ public class RedisGeoSpatialServiceImpl implements RedisGeoSpatialService {
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
-	private static final String LOCATION_KEY_PREFIX = "user_locations:"; // TODO: 임시 key prefix
-	private static final Duration DEFAULT_TTL = Duration.ofHours(2); // TODO: 임시 TTL
+	private static final String LOCATION_KEY = "user_locations";
+	private static final Duration DEFAULT_TTL = Duration.ofHours(2);
 
-	public boolean registerUserLocation(String userId, double longitude, double latitude, String sessionId) {
+	@Override
+	public boolean registerUserLocation(String userId, double longitude, double latitude) {
 		try {
-			String key = buildLocationKey(sessionId);
 			Point userLocation = new Point(longitude, latitude);
-			Long locationAddResult = redisTemplate.opsForGeo().add(key, userLocation, userId);
-
-			redisTemplate.expire(key, DEFAULT_TTL);
-
-			return isLocationAddSuccessful(locationAddResult);
+			Long locationAddResult = redisTemplate.opsForGeo().add(LOCATION_KEY, userLocation, userId);
+			redisTemplate.expire(LOCATION_KEY, DEFAULT_TTL);
+			log.info("Redis 위치 등록 시도: userId={}, lon={}, lat={}", userId, longitude, latitude);
+			return locationAddResult != null && locationAddResult > 0;
 		} catch (Exception e) {
 			log.error("Redis Geo Add Error :: {}", e.getMessage(), e);
 			return false;
 		}
 	}
 
-	private boolean isLocationAddSuccessful(final Long locationAddResult) {
-		return locationAddResult != null && locationAddResult > 0;
-	}
-
-	public List<NearbyUserDto> findNearbyUsers(double longitude, double latitude,
-		double radiusMeters, String sessionId) {
+	@Override
+	public List<NearbyUserDto> findNearbyUsers(double longitude, double latitude, double radiusMeters) {
 		try {
-			String key = buildLocationKey(sessionId);
-
 			SearchParameters params = createSearchParameters(longitude, latitude, radiusMeters);
-
-			GeoResults<GeoLocation<Object>> results = executeGeoRadiusSearch(key, params);
+			GeoResults<GeoLocation<Object>> results = redisTemplate.opsForGeo()
+				.radius(LOCATION_KEY, params.circle(), params.args());
 
 			if (results == null) {
 				return Collections.emptyList();
 			}
-
 			return convertToNearbyUserDtoList(results);
-
 		} catch (Exception e) {
 			log.error("Redis Geo Radius Error :: {}", e.getMessage(), e);
 			return Collections.emptyList();
@@ -77,7 +68,8 @@ public class RedisGeoSpatialServiceImpl implements RedisGeoSpatialService {
 		Distance radius = new Distance(radiusMeters, DistanceUnit.METERS);
 		Circle circle = new Circle(center, radius);
 
-		RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs()
+		RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs
+			.newGeoRadiusArgs()
 			.includeDistance()
 			.includeCoordinates()
 			.sortAscending();
@@ -85,17 +77,11 @@ public class RedisGeoSpatialServiceImpl implements RedisGeoSpatialService {
 		return new SearchParameters(circle, args);
 	}
 
-	private GeoResults<GeoLocation<Object>> executeGeoRadiusSearch(String key, SearchParameters params) {
-		return redisTemplate.opsForGeo().radius(key, params.circle(), params.args());
-	}
-
 	private List<NearbyUserDto> convertToNearbyUserDtoList(GeoResults<GeoLocation<Object>> results) {
 		List<NearbyUserDto> nearbyUsers = new ArrayList<>();
-
 		for (GeoResult<GeoLocation<Object>> result : results) {
 			nearbyUsers.add(convertToNearbyUserDto(result));
 		}
-
 		return nearbyUsers;
 	}
 
@@ -103,13 +89,13 @@ public class RedisGeoSpatialServiceImpl implements RedisGeoSpatialService {
 		String userId = (String)result.getContent().getName();
 		Point point = result.getContent().getPoint();
 		double distance = result.getDistance().getValue();
-
 		return new NearbyUserDto(userId, point.getX(), point.getY(), distance);
 	}
 
-	public double calculateDistance(String userId1, String userId2, String sessionId) {
+	@Override
+	public double calculateDistance(String userId1, String userId2) {
 		try {
-			String key = buildLocationKey(sessionId);
+			String key = buildLocationKey();
 			Distance distance = redisTemplate.opsForGeo().distance(key, userId1, userId2, DistanceUnit.METERS);
 			return distance != null ? distance.getValue() : -1;
 		} catch (Exception e) {
@@ -118,25 +104,10 @@ public class RedisGeoSpatialServiceImpl implements RedisGeoSpatialService {
 		}
 	}
 
-	public boolean removeUserLocation(String userId, String sessionId) {
+	@Override
+	public Point getUserPosition(String userId) {
 		try {
-			String key = buildLocationKey(sessionId);
-			Long removed = redisTemplate.opsForGeo().remove(key, userId);
-			return removed != null && removed > 0;
-		} catch (Exception e) {
-			log.error("Redis Geo Remove Error :: {}", e.getMessage(), e);
-			return false;
-		}
-	}
-
-	public boolean expireSessionData(String sessionId, Duration ttl) {
-		String key = buildLocationKey(sessionId);
-		return Boolean.TRUE.equals(redisTemplate.expire(key, ttl));
-	}
-
-	public Point getUserPosition(String userId, String sessionId) {
-		try {
-			String key = buildLocationKey(sessionId);
+			String key = buildLocationKey();
 			List<Point> positions = redisTemplate.opsForGeo().position(key, userId);
 			return positions != null && !positions.isEmpty() ? positions.get(0) : null;
 		} catch (Exception e) {
@@ -145,38 +116,19 @@ public class RedisGeoSpatialServiceImpl implements RedisGeoSpatialService {
 		}
 	}
 
-	public String getUserGeohash(String userId, String sessionId) {
+	@Override
+	public boolean removeUserLocation(String userId) {
 		try {
-			String key = buildLocationKey(sessionId);
-			List<String> geohashes = redisTemplate.opsForGeo().hash(key, userId);
-			return geohashes != null && !geohashes.isEmpty() ? geohashes.get(0) : null;
+			String key = buildLocationKey();
+			Long removed = redisTemplate.opsForGeo().remove(key, userId);
+			return removed != null && removed > 0;
 		} catch (Exception e) {
-			log.error("Redis Geo Hash Error :: {}", e.getMessage(), e);
-			return null;
+			log.error("Redis Geo Remove Error :: {}", e.getMessage(), e);
+			return false;
 		}
 	}
 
-	public List<String> getAllUsersInSession(String sessionId) {
-		try {
-			String key = buildLocationKey(sessionId);
-			Circle circle = new Circle(new Point(0, 0), new Distance(Double.MAX_VALUE, DistanceUnit.KILOMETERS));
-			GeoResults<GeoLocation<Object>> results = redisTemplate.opsForGeo().radius(key, circle);
-
-			List<String> userIds = new ArrayList<>();
-			if (results != null) {
-				for (GeoResult<GeoLocation<Object>> result : results) {
-					userIds.add((String)result.getContent().getName());
-				}
-			}
-
-			return userIds;
-		} catch (Exception e) {
-			log.error("Redis Get All Users Error :: {}", e.getMessage(), e);
-			return Collections.emptyList();
-		}
-	}
-
-	private String buildLocationKey(String sessionId) {
-		return LOCATION_KEY_PREFIX + sessionId;
+	private String buildLocationKey() {
+		return LOCATION_KEY;
 	}
 }

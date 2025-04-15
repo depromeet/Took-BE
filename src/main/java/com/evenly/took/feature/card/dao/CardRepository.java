@@ -42,4 +42,6 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 	 * 사용자의 대표 명함을 조회합니다.
 	 */
 	Optional<Card> findByUserIdAndIsPrimaryTrueAndDeletedAtIsNull(Long userId);
+
+	List<Card> findAllByUserIdInAndIsPrimaryTrueAndDeletedAtIsNull(List<Long> userId);
 }

@@ -1,6 +1,10 @@
 package com.evenly.took.global.integration;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -26,13 +30,31 @@ public abstract class JwtMockIntegrationTest extends IntegrationTest {
 	public void setUp() {
 		super.setUp();
 
-		// JWT Mocking
 		mockUser = userFixture.create();
-		// mockCard = cardFixture.create();
-		authToken = "Bearer test-token";
+
+		String userId = mockUser.getId().toString();
+		authToken = "Bearer token-for-user-" + userId;
+
 		when(loginUserArgumentResolver.supportsParameter(any())).thenReturn(true);
-		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(mockUser);
+		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+			.thenReturn(mockUser);
+
 		doNothing().when(tokenProvider).validateAccessToken(anyString());
-		when(tokenProvider.getUserIdFromAccessToken(anyString())).thenReturn(mockUser.getId().toString());
+
+		when(tokenProvider.getUserIdFromAccessToken(anyString()))
+			.thenAnswer(invocation -> {
+				String token = invocation.getArgument(0, String.class);
+				if (token.contains("token-for-user-")) {
+					return token.replace("Bearer token-for-user-", "");
+				}
+				return mockUser.getId().toString();
+			});
+	}
+
+	protected String generateTokenFor(User user) {
+		String token = "Bearer token-for-user-" + user.getId();
+		when(tokenProvider.getUserIdFromAccessToken(eq(token))).thenReturn(user.getId().toString());
+		when(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(user);
+		return token;
 	}
 }

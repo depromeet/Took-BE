@@ -5,19 +5,25 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.evenly.took.feature.auth.domain.OAuthIdentifier;
+import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.card.dao.CardRepository;
+import com.evenly.took.feature.card.dao.ReceivedCardRepository;
 import com.evenly.took.feature.card.domain.Card;
 import com.evenly.took.feature.card.domain.Job;
 import com.evenly.took.feature.card.domain.PreviewInfoType;
+import com.evenly.took.feature.card.domain.ReceivedCard;
 import com.evenly.took.feature.card.dto.request.AddCardRequest;
 import com.evenly.took.feature.card.dto.request.CardDetailRequest;
 import com.evenly.took.feature.card.dto.response.CardDetailResponse;
 import com.evenly.took.feature.card.dto.response.CareersResponse;
 import com.evenly.took.feature.card.exception.CardErrorCode;
+import com.evenly.took.feature.user.dao.UserRepository;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.exception.TookException;
 import com.evenly.took.global.service.ServiceTest;
@@ -27,13 +33,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CardServiceTest extends ServiceTest {
 
 	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
 	CardService cardService;
 
 	@Autowired
 	CardRepository cardRepository;
 
 	@Autowired
+	ReceivedCardRepository receivedCardRepository;
+
+	@Autowired
 	ObjectMapper objectMapper;
+
+	@BeforeEach
+	void setUp() {
+		userRepository.deleteAll();
+	}
 
 	@Test
 	void 디자인_직군에_해당하는_모든_커리어를_조회한다() {
@@ -313,6 +330,98 @@ public class CardServiceTest extends ServiceTest {
 			// then
 			Card updated = cardRepository.findById(nonPrimaryCard.getId()).orElseThrow();
 			assertThat(updated.getIsPrimary()).isTrue();
+		}
+	}
+
+	@Nested
+	class 명함_발신_기능 {
+
+		@Test
+		void 정상적으로_명함을_발신한다() {
+			// given
+			User sender = userFixture.creator()
+				.id(1L)
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("o1").oauthType(OAuthType.APPLE).build())
+				.create();
+
+			User receiver = userFixture.creator()
+				.id(2L)
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("o2").oauthType(OAuthType.GOOGLE).build())
+				.create();
+
+			Card card = cardFixture.creator().user(sender).create();
+
+			// when
+			cardService.sendCardToUser(sender.getId(), receiver.getId(), card.getId());
+
+			// then
+			List<ReceivedCard> received = receivedCardRepository.findAll();
+			assertThat(received).hasSize(1);
+			assertThat(received.get(0).getUser().getId()).isEqualTo(receiver.getId());
+			assertThat(received.get(0).getCard().getId()).isEqualTo(card.getId());
+		}
+
+		@Test
+		void 본인에게_보낼_수는_없다() {
+			// given
+			User sender = userFixture.creator()
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("self1").oauthType(OAuthType.APPLE).build())
+				.create();
+
+			Card card = cardFixture.creator().user(sender).create();
+
+			// when & then
+			assertThatThrownBy(() -> cardService.sendCardToUser(sender.getId(), sender.getId(), card.getId()))
+				.isInstanceOf(TookException.class)
+				.hasMessageContaining("자신의 명함은 수신할 수 없습니다.");
+		}
+
+		@Test
+		void 이미_받은_명함은_중복으로_보낼_수_없다() {
+			// given
+			User sender = userFixture.creator()
+				.id(1L)
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("o3").oauthType(OAuthType.GOOGLE).build())
+				.create();
+
+			User receiver = userFixture.creator()
+				.id(2L)
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("o4").oauthType(OAuthType.GOOGLE).build())
+				.create();
+
+			Card card = cardFixture.creator().user(sender).create();
+			cardService.sendCardToUser(sender.getId(), receiver.getId(), card.getId());
+
+			// when & then
+			assertThatThrownBy(() -> cardService.sendCardToUser(sender.getId(), receiver.getId(), card.getId()))
+				.isInstanceOf(TookException.class)
+				.hasMessageContaining("이미 수신한 명함입니다.");
+		}
+
+		@Test
+		void 본인_소유가_아닌_카드는_보낼_수_없다() {
+			// given
+			User sender = userFixture.creator()
+				.id(1L)
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("o5").oauthType(OAuthType.APPLE).build())
+				.create();
+
+			User other = userFixture.creator()
+				.id(2L)
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("o6").oauthType(OAuthType.APPLE).build())
+				.create();
+
+			User receiver = userFixture.creator()
+				.id(3L)
+				.oauthIdentifier(OAuthIdentifier.builder().oauthId("o7").oauthType(OAuthType.APPLE).build())
+				.create();
+
+			Card card = cardFixture.creator().user(other).create();
+
+			// when & then
+			assertThatThrownBy(() -> cardService.sendCardToUser(sender.getId(), receiver.getId(), card.getId()))
+				.isInstanceOf(TookException.class)
+				.hasMessageContaining("자신이 소유한 카드만 수정할 수 있습니다.");
 		}
 	}
 }

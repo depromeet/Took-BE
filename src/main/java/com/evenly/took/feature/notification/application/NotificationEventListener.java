@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class NotificationEventListener {
 
-	public static final int MINUTES_15 = 900_000;
+	private static final int MINUTES_15 = 900_000;
 	private final ExpoNotificationService expoNotificationService;
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
