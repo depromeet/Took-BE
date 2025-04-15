@@ -17,7 +17,7 @@ public class LocationRegistrationEventHandler {
 
 	private final RedisGeoSpatialService redisGeoSpatialService;
 
-	@Async
+	@Async("LocationAsyncExecutor")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handle(LocationRegistrationEvent event) {
 		log.info("[이벤트 수신] userId={}, lon={}, lat={}", event.getUserId(), event.getLongitude(), event.getLatitude());
