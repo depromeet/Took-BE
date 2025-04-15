@@ -72,6 +72,9 @@ dependencies {
 
     // Slack
     implementation 'com.slack.api:slack-api-client:1.30.0'
+
+    // retry
+    implementation 'org.springframework.retry:spring-retry'
 }
 
 tasks.named('test') {
