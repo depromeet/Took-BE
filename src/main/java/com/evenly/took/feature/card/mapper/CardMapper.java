@@ -112,6 +112,8 @@ public interface CardMapper {
 
 	@Mapping(source = "career.job", target = "job")
 	@Mapping(source = "career.detailJobEn", target = "detailJob")
+	@Mapping(source = "previewInfo", target = "previewInfoType")
+	@Mapping(source = "card", target = "previewInfo", qualifiedByName = "toPreviewInfoResponse")
 	CardDetailResponse toCardDetailResponse(Card card);
 
 	ProjectResponse toProjectResponse(Project project);

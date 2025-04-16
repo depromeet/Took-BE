@@ -1,13 +1,15 @@
 package com.evenly.took.feature.card.api;
 
-import static io.restassured.RestAssured.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -1989,7 +1991,7 @@ public class CardIntegrationTest extends JwtMockIntegrationTest {
 			assertThat(dataMap.get("organization")).isNull();
 			assertThat(dataMap.get("hobby")).isNull();
 			assertThat(dataMap.get("news")).isNull();
-			assertThat(dataMap.get("previewInfo")).isNull();
+			assertThat(dataMap.get("previewInfo")).isEqualTo(Collections.emptyMap());
 			assertThat(dataMap.get("sns")).isNull();
 			assertThat(dataMap.get("content")).isNull();
 			assertThat(dataMap.get("project")).isNull();
