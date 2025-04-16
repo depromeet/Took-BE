@@ -8,6 +8,7 @@ import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoTokenResponse
 import com.evenly.took.feature.auth.client.kakao.dto.response.KakaoUserResponse;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
+import com.evenly.took.feature.user.domain.AllowPush;
 import com.evenly.took.feature.user.domain.User;
 
 import lombok.RequiredArgsConstructor;
@@ -36,10 +37,17 @@ public class KakaoUserClient implements UserClient {
 			.oauthId(response.id().toString())
 			.oauthType(supportType())
 			.build();
+
+		AllowPush allowPush = AllowPush.builder()
+			.allowPushContent(null)
+			.allowPushNotification(false)
+			.build();
+
 		return User.builder()
 			.name(response.kakaoAccount().nickname())
 			.email(response.kakaoAccount().email())
 			.oauthIdentifier(oAuthIdentifier)
+			.allowPush(allowPush)
 			.build();
 	}
 }

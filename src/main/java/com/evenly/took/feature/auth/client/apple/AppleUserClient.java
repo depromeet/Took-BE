@@ -9,6 +9,7 @@ import com.evenly.took.feature.auth.client.apple.dto.response.AppleUserResponse;
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
+import com.evenly.took.feature.user.domain.AllowPush;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.exception.TookException;
 
@@ -61,10 +62,16 @@ public class AppleUserClient implements UserClient {
 			.oauthType(supportType())
 			.build();
 
+		AllowPush allowPush = AllowPush.builder()
+			.allowPushContent(null)
+			.allowPushNotification(false)
+			.build();
+
 		return User.builder()
 			.name(response.name() != null ? response.name() : response.email())
 			.email(response.email())
 			.oauthIdentifier(oAuthIdentifier)
+			.allowPush(allowPush)
 			.build();
 	}
 }

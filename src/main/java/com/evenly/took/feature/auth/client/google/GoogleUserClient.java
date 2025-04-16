@@ -10,6 +10,7 @@ import com.evenly.took.feature.auth.client.google.dto.response.GoogleUserInfoRes
 import com.evenly.took.feature.auth.domain.OAuthIdentifier;
 import com.evenly.took.feature.auth.domain.OAuthType;
 import com.evenly.took.feature.auth.exception.AuthErrorCode;
+import com.evenly.took.feature.user.domain.AllowPush;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.global.exception.TookException;
 
@@ -45,10 +46,16 @@ public class GoogleUserClient implements UserClient {
 			.oauthType(OAuthType.GOOGLE)
 			.build();
 
+		AllowPush allowPush = AllowPush.builder()
+			.allowPushContent(null)
+			.allowPushNotification(false)
+			.build();
+
 		return User.builder()
 			.oauthIdentifier(oauthIdentifier)
 			.name(userInfoResponse.name())
 			.email(userInfoResponse.email())
+			.allowPush(allowPush)
 			.build();
 	}
 }
