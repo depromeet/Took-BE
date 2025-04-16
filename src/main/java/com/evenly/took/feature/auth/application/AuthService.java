@@ -70,6 +70,9 @@ public class AuthService {
 			return false;
 		}
 		String expoToken = request.expoToken();
+		if (expoToken == null) {
+			return false;
+		}
 		boolean existDevice = userDeviceRepository.existsByUserAndExpoToken(user, expoToken);
 		if (existDevice) {
 			return false;
