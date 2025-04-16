@@ -20,14 +20,14 @@ public class AllowPush {
 
 	@ColumnDefault("false")
 	@Column(name = "allow_push_notification", nullable = false)
-	private boolean allowPushNotification;
+	private Boolean allowPushNotification;
 
 	@Column(name = "allow_push_content")
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<AllowPushContent> allowPushContent;
 
 	@Builder
-	public AllowPush(boolean allowPushNotification, List<AllowPushContent> allowPushContent) {
+	public AllowPush(Boolean allowPushNotification, List<AllowPushContent> allowPushContent) {
 		this.allowPushNotification = allowPushNotification;
 		this.allowPushContent = allowPushContent;
 	}
