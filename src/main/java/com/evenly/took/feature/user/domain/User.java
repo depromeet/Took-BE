@@ -84,6 +84,6 @@ public class User extends BaseTimeEntity {
 	}
 
 	public boolean isAllowPushNotification() {
-		return allowPush.isAllowPushNotification();
+		return allowPush.getAllowPushNotification();
 	}
 }

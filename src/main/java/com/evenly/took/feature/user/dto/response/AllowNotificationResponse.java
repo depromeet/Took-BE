@@ -18,7 +18,7 @@ public record AllowNotificationResponse(
 ) {
 
 	public AllowNotificationResponse(AllowPush allowPush) {
-		this(allowPush.isAllowPushNotification(),
+		this(allowPush.getAllowPushNotification(),
 			allowPush.getAllowPushContent() != null ?
 				AllowPushContentMapper.asResponses(allowPush.getAllowPushContent()) : List.of());
 	}
