@@ -134,7 +134,9 @@ public class CardService {
 				folderResponses,
 				memo,
 				baseResponse.imagePath(),
-				baseResponse.isPrimary()
+				baseResponse.isPrimary(),
+				baseResponse.previewInfoType(),
+				baseResponse.previewInfo()
 			);
 		}
 	}
@@ -324,7 +326,7 @@ public class CardService {
 		ReceivedCard receivedCard = findReceivedCardByUserAndCardId(user.getId(), request.cardId());
 		receivedCard.updateMemo(request.memo());
 	}
-	
+
 	@Transactional
 	public void updateReceivedCardsMemo(User user, List<SetReceivedCardsMemoRequest.CardMemo> cardMemos) {
 		for (SetReceivedCardsMemoRequest.CardMemo cardMemo : cardMemos) {

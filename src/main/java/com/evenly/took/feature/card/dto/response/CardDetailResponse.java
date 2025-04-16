@@ -3,6 +3,7 @@ package com.evenly.took.feature.card.dto.response;
 import java.util.List;
 
 import com.evenly.took.feature.card.domain.Job;
+import com.evenly.took.feature.card.domain.PreviewInfoType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -56,6 +57,12 @@ public record CardDetailResponse(
 	String imagePath,
 
 	@Schema(description = "대표 명함인지 확인", example = "true")
-	Boolean isPrimary
+	Boolean isPrimary,
+
+	@Schema(description = "썸네일 대표 정보 타입", example = "PROJECT")
+	PreviewInfoType previewInfoType,
+
+	@Schema(description = "대표 정보에 따른 상세 내용")
+	PreviewInfoResponse previewInfo
 ) {
 }
