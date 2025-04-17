@@ -33,7 +33,7 @@ public class UserIntegrationTest extends JwtMockIntegrationTest {
 		void 알림_설정을_수정한다() {
 			// given
 			boolean isAllowPush = true;
-			List<String> allowPushContent = List.of("흥미로운 명함 알림", "한 줄 메모 알림");
+			List<String> allowPushContent = List.of("INTERESTING", "MEMO");
 
 			// when & then
 			AllowNotificationRequest request = new AllowNotificationRequest(isAllowPush, allowPushContent);
@@ -41,7 +41,7 @@ public class UserIntegrationTest extends JwtMockIntegrationTest {
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.header("Authorization", authToken)
 				.body(request)
-				.when().put("/api/user/notification-allow")
+				.when().patch("/api/user/notification-allow")
 				.then().log().all()
 				.statusCode(200);
 		}
