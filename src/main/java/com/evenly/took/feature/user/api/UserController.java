@@ -3,12 +3,12 @@ package com.evenly.took.feature.user.api;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.evenly.took.feature.user.application.UserService;
 import com.evenly.took.feature.user.application.FindNearbyUserService;
+import com.evenly.took.feature.user.application.UserService;
 import com.evenly.took.feature.user.domain.User;
 import com.evenly.took.feature.user.dto.request.AllowNotificationRequest;
 import com.evenly.took.feature.user.dto.response.AllowNotificationResponse;
@@ -39,7 +39,7 @@ public class UserController implements UserApi {
 		return SuccessResponse.of(response);
 	}
 
-	@PutMapping("/api/user/notification-allow")
+	@PatchMapping("/api/user/notification-allow")
 	public SuccessResponse<Void> fixAllowNotification(
 		@LoginUser User user,
 		@RequestBody AllowNotificationRequest request) {

@@ -17,6 +17,11 @@ public class NotificationData {
 		"어떤 사람인지 살펴보세요",
 		"/received/interesting"
 	);
+	private static final NotificationData SYSTEM_DATA = new NotificationData(
+		"새로운 기능이 찾아왔어요!",
+		"지금 바로 확인해 보세요",
+		""
+	);
 
 	private final String title;
 	private final String body;
@@ -26,6 +31,7 @@ public class NotificationData {
 		return switch (notificationType) {
 			case MEMO -> MEMO_DATA;
 			case INTERESTING -> INTERESTING_DATA;
+			case SYSTEM -> SYSTEM_DATA;
 		};
 	}
 }
