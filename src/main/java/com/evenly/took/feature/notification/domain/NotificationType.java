@@ -9,6 +9,7 @@ public enum NotificationType {
 
 	MEMO,
 	INTERESTING,
+	SYSTEM,
 	;
 
 	/*

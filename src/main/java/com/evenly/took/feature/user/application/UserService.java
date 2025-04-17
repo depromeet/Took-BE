@@ -32,7 +32,7 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public AllowNotificationResponse getAllowNotification(User user) {
-		return new AllowNotificationResponse(user.getAllowPush());
+		return AllowNotificationResponse.from(user.getAllowPush());
 	}
 
 	@Transactional

@@ -3,6 +3,7 @@ package com.evenly.took.feature.user.dto.request;
 import java.util.List;
 
 import com.evenly.took.feature.user.domain.AllowPush;
+import com.evenly.took.feature.user.domain.AllowPushContent;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -12,11 +13,16 @@ public record AllowNotificationRequest(
 	@Schema(description = "전체 알림 허용 여부")
 	boolean isAllowPush,
 
-	@Schema(description = "알림 허용 목록 (정확한 형식을 지켜 입력해주세요)", example = "[\"흥미로운 명함 알림\", \"한 줄 메모 알림\", \"서비스 업데이트 알림\"]")
+	@Schema(description = "알림 허용 목록 (허용한 알림 목록만)", example = "[\"MEMO\", \"INTERESTING\"]")
 	List<String> allowPushContent
 ) {
 
 	public AllowPush toDomain() {
-		return new AllowPush(isAllowPush, AllowPushContentMapper.asAllowPushContents(allowPushContent));
+		if (!isAllowPush) {
+			return new AllowPush(isAllowPush, List.of());
+		}
+		return new AllowPush(isAllowPush, allowPushContent.stream()
+			.map(AllowPushContent::asContent)
+			.toList());
 	}
 }
