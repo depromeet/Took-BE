@@ -18,7 +18,10 @@ public class LocationRegistrationEventHandler {
 	private final RedisGeoSpatialService redisGeoSpatialService;
 
 	@Async("LocationAsyncExecutor")
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@TransactionalEventListener(
+		phase = TransactionPhase.AFTER_COMMIT,
+		fallbackExecution = true
+	)
 	public void handle(LocationRegistrationEvent event) {
 		log.info("[이벤트 수신] userId={}, lon={}, lat={}", event.getUserId(), event.getLongitude(), event.getLatitude());
 
@@ -28,6 +31,6 @@ public class LocationRegistrationEventHandler {
 			event.getLatitude()
 		);
 
-		log.info("[Redis 등록 결과] success={}", success);
+		log.info("[Redis 등록/갱신 결과] success={}", success);
 	}
 }

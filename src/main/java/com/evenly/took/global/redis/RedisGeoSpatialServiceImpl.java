@@ -35,11 +35,13 @@ public class RedisGeoSpatialServiceImpl implements RedisGeoSpatialService {
 	@Override
 	public boolean registerUserLocation(String userId, double longitude, double latitude) {
 		try {
-			Point userLocation = new Point(longitude, latitude);
-			Long locationAddResult = redisTemplate.opsForGeo().add(LOCATION_KEY, userLocation, userId);
+			RedisGeoCommands.GeoLocation<Object> location =
+				new RedisGeoCommands.GeoLocation<>(userId, new Point(longitude, latitude));
+
+			Long result = redisTemplate.opsForGeo().add(LOCATION_KEY, location);
 			redisTemplate.expire(LOCATION_KEY, DEFAULT_TTL);
-			log.info("Redis 위치 등록 시도: userId={}, lon={}, lat={}", userId, longitude, latitude);
-			return locationAddResult != null && locationAddResult > 0;
+			log.info("Redis 위치 등록/갱신 완료: userId={}, lon={}, lat={}", userId, longitude, latitude);
+			return result != null;
 		} catch (Exception e) {
 			log.error("Redis Geo Add Error :: {}", e.getMessage(), e);
 			return false;
