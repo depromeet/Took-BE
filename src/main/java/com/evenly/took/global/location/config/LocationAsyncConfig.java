@@ -4,6 +4,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -17,7 +18,7 @@ public class LocationAsyncConfig implements AsyncConfigurer {
 
 	private static final int AWAIT_SECONDS = 600;
 
-	@Override
+	@Bean(name = "LocationAsyncExecutor")
 	public Executor getAsyncExecutor() {
 		int processors = Runtime.getRuntime().availableProcessors();
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -28,7 +29,6 @@ public class LocationAsyncConfig implements AsyncConfigurer {
 		executor.setWaitForTasksToCompleteOnShutdown(true);
 		executor.setAwaitTerminationSeconds(AWAIT_SECONDS);
 		executor.setThreadNamePrefix("LocationAsyncExecutor-");
-		executor.setBeanName("LocationAsyncExecutor");
 		executor.initialize();
 		return executor;
 	}
