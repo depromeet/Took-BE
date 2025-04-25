@@ -27,13 +27,18 @@ public class SchedulerService {
 		notificationService.sendNotification(LocalDateTime.of(LocalDate.now(), LocalTime.of(22, 0)));
 	}
 
-	@Scheduled(cron = "0 27 18 * * *")
+	@Scheduled(cron = "0 33 18 * * *")
 	public void test() {
 		System.out.println("스케쥴러 실행 완료1");
 	}
 
-	@Scheduled(cron = "0 28 18 * * *")
+	@Scheduled(cron = "0 34 18 * * *")
 	public void test2() {
 		System.out.println("스케쥴러 실행 완료2");
+	}
+
+	@Scheduled(cron = "0 35 18 * * *")
+	public void test3() {
+		System.out.println("스케쥴러 실행 완료3");
 	}
 }
